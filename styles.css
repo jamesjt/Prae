@@ -59,13 +59,16 @@ body {
     content: '−';
 }
 
-.sidebar-subitem {
-    padding-left: 20px;
+.subitems {
     display: none;
 }
 
-.sidebar-subitem.visible {
+.subitems.visible {
     display: block;
+}
+
+.sidebar-subitem {
+    padding-left: 20px;
 }
 
 .main-content {

@@ -2,7 +2,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4
 
 let allData = [];
 
-// Simple CSV parser
+// Enhanced CSV parser with better error handling for misalignment
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
@@ -12,20 +12,49 @@ function parseCSV(csvText) {
             console.error('Error: CSV is empty or malformed');
             throw new Error('CSV is empty or malformed');
         }
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-        console.log('Headers:', headers);
-        if (!headers.includes('Category') || !headers.includes('Details')) {
-            console.error('Error: Required headers "Category" or "Details" not found');
-            throw new Error('Required headers missing');
+        let headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        console.log('Raw headers from CSV:', headers);
+
+        // Normalize headers (handle case variations or common misnames)
+        const headerMap = {};
+        headers.forEach((h, i) => {
+            let normalized = h.toLowerCase();
+            if (normalized.includes('category') || normalized.includes('b')) headerMap.categoryIndex = i;
+            if (normalized.includes('detail') || normalized.includes('c')) headerMap.detailsIndex = i;
+        });
+        if (!headerMap.categoryIndex || !headerMap.detailsIndex) {
+            console.error('Error: Could not identify Category (B) or Details (C) columns. Available headers:', headers);
+            throw new Error('Required columns missing or misnamed');
         }
-        const rows = lines.slice(1).map((line, index) => {
+        headers[headerMap.categoryIndex] = 'Category'; // Standardize for code
+        headers[headerMap.detailsIndex] = 'Details';
+
+        const rows = lines.slice(1).map((line, rowIndex) => {
             const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-            return headers.reduce((obj, header, i) => {
+            if (values.length < Math.max(headerMap.categoryIndex, headerMap.detailsIndex) + 1) {
+                console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
+                while (values.length <= Math.max(headerMap.categoryIndex, headerMap.detailsIndex)) {
+                    values.push('');
+                }
+            }
+            const rowObj = headers.reduce((obj, header, i) => {
                 obj[header] = values[i] || '';
                 return obj;
             }, {});
+            console.log(`Row ${rowIndex + 2} - Category (B): "${rowObj.Category}" | Details (C): "${rowObj.Details}"`);
+            return rowObj;
         }).filter(row => Object.values(row).some(val => val));
+
         console.log('Parsed rows:', rows.length);
+        console.log('Sample row:', rows[0] || 'No sample (empty rows)');
+
+        // Debug: Check if Category values look like Details (e.g., long text)
+        rows.forEach((row, i) => {
+            if (row.Category && row.Details && row.Category.length > 100 && row.Category.includes(row.Details.substring(0, 20))) {
+                console.warn(`Row ${i + 2} warning: Category value "${row.Category.substring(0, 50)}..." may contain Details content (possible parsing shift)`);
+            }
+        });
+
         return { headers, rows };
     } catch (error) {
         console.error('CSV parsing failed:', error);
@@ -41,25 +70,27 @@ function organizeData(rows) {
         let currentHeader = '';
         rows.forEach((row, index) => {
             const category = row['Category'];
+            const details = row['Details'];
             if (!category) {
                 console.warn(`Row ${index + 2} has empty Category, skipping`);
                 return;
             }
+            console.log(`Processing row ${index + 2}: Category="${category}" | Details="${details}"`);
             if (!category.startsWith('-')) {
                 currentHeader = category;
-                organized[currentHeader] = { subitems: [], details: row['Details'] || 'WIP' };
-                console.log(`Added header: ${currentHeader}`);
+                organized[currentHeader] = { subitems: [], details: details || 'WIP' };
+                console.log(`Added header: "${currentHeader}" (from Category)`);
             } else {
                 const subitem = category.replace(/^-/, '').trim();
                 if (currentHeader && subitem) {
-                    organized[currentHeader].subitems.push({ name: subitem, details: row['Details'] || 'WIP' });
-                    console.log(`Added subitem "${subitem}" under header "${currentHeader}"`);
+                    organized[currentHeader].subitems.push({ name: subitem, details: details || 'WIP' });
+                    console.log(`Added subitem "${subitem}" under "${currentHeader}" (from Category)`);
                 } else {
                     console.warn(`Row ${index + 2}: Subitem "${subitem}" ignored, no valid header or empty subitem`);
                 }
             }
         });
-        console.log('Organized data:', organized);
+        console.log('Organized data keys (should only be from Category):', Object.keys(organized));
         if (Object.keys(organized).length === 0) {
             console.error('Error: No valid data organized. Check CSV content.');
         }
@@ -70,7 +101,7 @@ function organizeData(rows) {
     }
 }
 
-// Render sidebar
+// Render sidebar (strictly from Category data)
 function renderSidebar(data) {
     console.log('Rendering sidebar...');
     try {
@@ -84,19 +115,26 @@ function renderSidebar(data) {
             sidebar.innerHTML = '<div class="no-results">No categories available</div>';
             return;
         }
-        sidebar.innerHTML = Object.keys(data).map(header => `
-            <div class="sidebar-item section-header" data-header="${header}">
-                ${header}
-            </div>
-            <div class="subitems" data-subitems="${header}">
-                ${data[header].subitems.map(subitem => `
-                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
-                        ${subitem.name}
-                    </div>
-                `).join('')}
-            </div>
-        `).join('');
-        console.log('Sidebar HTML rendered');
+
+        let html = '';
+        Object.keys(data).forEach(header => {
+            const subitemHtml = data[header].subitems.map(subitem => `
+                <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
+                    ${subitem.name}
+                </div>
+            `).join('');
+            html += `
+                <div class="sidebar-item section-header" data-header="${header}">
+                    ${header}
+                </div>
+                <div class="subitems" data-subitems="${header}">
+                    ${subitemHtml}
+                </div>
+            `;
+        });
+        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">Debug: Headers parsed: ' + Object.keys(data).join(', ') + '</div>'; // Temp debug
+
+        console.log('Exact sidebar HTML generated:\n', html);
 
         // Add click handlers for headers
         document.querySelectorAll('.section-header').forEach(header => {
@@ -129,7 +167,7 @@ function renderSidebar(data) {
     }
 }
 
-// Render content sections
+// Render content sections (from Details only)
 function renderSections(data, searchTerm = '') {
     console.log('Rendering sections...');
     try {
@@ -161,7 +199,7 @@ function renderSections(data, searchTerm = '') {
                     `;
                 });
             });
-            console.log('Sections rendered:', Object.keys(filteredData).length);
+            console.log('Sections rendered (Details content only):', Object.keys(filteredData).length);
         }
         content.innerHTML = html;
     } catch (error) {
@@ -189,7 +227,7 @@ function filterData(data, searchTerm) {
                 };
             }
         });
-        console.log('Filtered data:', filtered);
+        console.log('Filtered data keys (Category only):', Object.keys(filtered));
         return filtered;
     } catch (error) {
         console.error('Data filtering failed:', error);

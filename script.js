@@ -2,7 +2,54 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4
 
 let allData = [];
 
-// Robust CSV parser for handling quoted fields
+// Function to parse a CSV line handling quoted fields with escaped quotes (doubled "")
+function parseCSVLine(line) {
+    const values = [];
+    let i = 0;
+    while (i < line.length) {
+        let value = '';
+        if (line[i] === ',') {
+            values.push('');
+            i++;
+            continue;
+        }
+        let quoted = false;
+        if (line[i] === '"') {
+            quoted = true;
+            i++;
+        }
+        while (i < line.length) {
+            if (quoted) {
+                if (line[i] === '"') {
+                    i++;
+                    if (i < line.length && line[i] === '"') {
+                        value += '"';
+                        i++;
+                    } else {
+                        quoted = false;
+                        break;
+                    }
+                } else {
+                    value += line[i];
+                    i++;
+                }
+            } else {
+                if (line[i] === ',') {
+                    break;
+                }
+                value += line[i];
+                i++;
+            }
+        }
+        values.push(value);
+        if (i < line.length && line[i] === ',') {
+            i++;
+        }
+    }
+    return values;
+}
+
+// Updated parser using the new line parser
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
@@ -15,29 +62,26 @@ function parseCSV(csvText) {
 
         // Parse headers
         const headerLine = lines[0];
-        const headers = headerLine.match(/(?:"[^"]*"|[^,]*)/g)
-            .map(h => h.trim().replace(/^"|"$/g, ''))
-            .filter(h => h);
+        const headers = parseCSVLine(headerLine).map(h => h.trim());
         console.log('Raw headers from CSV:', headers);
 
         // Identify Sections (B) and Details (C) columns
         let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
         let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
         if (sectionsIndex === -1) {
-            console.error('Error: "Sections" column not found. Available headers:', headers);
-            throw new Error('Sections column missing');
+            console.warn('Warning: "Sections" header not found, falling back to assuming column B (index 1)');
+            sectionsIndex = 1; // Assume second column is Sections
         }
         if (detailsIndex === -1) {
-            console.warn('Warning: "Details" column not found, will use empty string for Details');
-            detailsIndex = headers.length; // Fallback to avoid errors
+            console.warn('Warning: "Details" column not found, falling back to column C (index 2)');
+            detailsIndex = 2; // Assume third column is Details
         }
-        console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${headers[sectionsIndex]}")`);
+        console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${sectionsIndex < headers.length ? headers[sectionsIndex] : 'N/A'}")`);
         console.log(`Column C (Details) mapped to index ${detailsIndex} ("${detailsIndex < headers.length ? headers[detailsIndex] : 'N/A'}")`);
 
         // Parse rows
         const rows = lines.slice(1).map((line, rowIndex) => {
-            const values = line.match(/(?:"[^"]*"|[^,]*)/g)
-                .map(v => v.trim().replace(/^"|"$/g, ''));
+            const values = parseCSVLine(line);
             if (values.length < Math.max(sectionsIndex, detailsIndex) + 1) {
                 console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
                 while (values.length <= Math.max(sectionsIndex, detailsIndex)) {
@@ -50,7 +94,7 @@ function parseCSV(csvText) {
             };
             console.log(`Row ${rowIndex + 2} - Sections (B): "${rowObj.Sections}" | Details (C): "${rowObj.Details.substring(0, 50)}..."`);
             return rowObj;
-        }).filter(row => row.Sections); // Only keep rows with a Sections value
+        }).filter(row => row.Sections);
 
         console.log('Parsed rows:', rows.length);
         console.log('Sample row:', rows[0] || 'No sample (empty rows)');

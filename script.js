@@ -1,8 +1,9 @@
+```javascript
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
 
 let allData = [];
 
-// Enhanced CSV parser with better error handling for misalignment
+// Robust CSV parser handling quoted fields
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
@@ -12,57 +13,60 @@ function parseCSV(csvText) {
             console.error('Error: CSV is empty or malformed');
             throw new Error('CSV is empty or malformed');
         }
-        let headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+
+        // Split headers, handling quoted fields
+        const headerLine = lines[0];
+        const headers = headerLine.match(/(?:"[^"]*"|[^,]*)/g)
+            .map(h => h.trim().replace(/^"|"$/g, ''))
+            .filter(h => h);
         console.log('Raw headers from CSV:', headers);
 
-        // Normalize headers (handle case variations or common misnames)
-        const headerMap = {};
-        headers.forEach((h, i) => {
-            let normalized = h.toLowerCase();
-            if (normalized.includes('category') || normalized.includes('b')) headerMap.categoryIndex = i;
-            if (normalized.includes('detail') || normalized.includes('c')) headerMap.detailsIndex = i;
-        });
-        if (!headerMap.categoryIndex || !headerMap.detailsIndex) {
+        // Identify Category (B) and Details (C) columns
+        let categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category') || h.toLowerCase() === 'b');
+        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
+        if (categoryIndex === -1 || detailsIndex === -1) {
             console.error('Error: Could not identify Category (B) or Details (C) columns. Available headers:', headers);
             throw new Error('Required columns missing or misnamed');
         }
-        headers[headerMap.categoryIndex] = 'Category'; // Standardize for code
-        headers[headerMap.detailsIndex] = 'Details';
+        console.log(`Column B (Category) mapped to index ${categoryIndex} ("${headers[categoryIndex]}")`);
+        console.log(`Column C (Details) mapped to index ${detailsIndex} ("${headers[detailsIndex]}")`);
 
+        // Parse rows, handling quoted fields
         const rows = lines.slice(1).map((line, rowIndex) => {
-            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-            if (values.length < Math.max(headerMap.categoryIndex, headerMap.detailsIndex) + 1) {
+            const values = line.match(/(?:"[^"]*"|[^,]*)/g)
+                .map(v => v.trim().replace(/^"|"$/g, ''));
+            if (values.length < Math.max(categoryIndex, detailsIndex) + 1) {
                 console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
-                while (values.length <= Math.max(headerMap.categoryIndex, headerMap.detailsIndex)) {
+                while (values.length <= Math.max(categoryIndex, detailsIndex)) {
                     values.push('');
                 }
             }
-            const rowObj = headers.reduce((obj, header, i) => {
-                obj[header] = values[i] || '';
-                return obj;
-            }, {});
+            const rowObj = {
+                Category: values[categoryIndex] || '',
+                Details: values[detailsIndex] || ''
+            };
             console.log(`Row ${rowIndex + 2} - Category (B): "${rowObj.Category}" | Details (C): "${rowObj.Details}"`);
             return rowObj;
-        }).filter(row => Object.values(row).some(val => val));
+        }).filter(row => row.Category); // Only keep rows with a Category value
 
         console.log('Parsed rows:', rows.length);
         console.log('Sample row:', rows[0] || 'No sample (empty rows)');
 
-        // Debug: Check if Category values look like Details (e.g., long text)
+        // Check for Category values that look like Details
         rows.forEach((row, i) => {
-            if (row.Category && row.Details && row.Category.length > 100 && row.Category.includes(row.Details.substring(0, 20))) {
-                console.warn(`Row ${i + 2} warning: Category value "${row.Category.substring(0, 50)}..." may contain Details content (possible parsing shift)`);
+            if (row.Category && row.Category.length > 100) {
+                console.warn(`Row ${i + 2} warning: Category value "${row.Category.substring(0, 50)}..." is unusually long, possible Details (C) contamination`);
             }
         });
 
-        return { headers, rows };
+        return { headers, rows, categoryIndex, detailsIndex };
     } catch (error) {
         console.error('CSV parsing failed:', error);
         throw error;
     }
 }
 
-// Organize data by column B (Category) and column C (Details)
+// Organize data by column B (Category) only
 function organizeData(rows) {
     console.log('Organizing data...');
     try {
@@ -90,10 +94,7 @@ function organizeData(rows) {
                 }
             }
         });
-        console.log('Organized data keys (should only be from Category):', Object.keys(organized));
-        if (Object.keys(organized).length === 0) {
-            console.error('Error: No valid data organized. Check CSV content.');
-        }
+        console.log('Organized data keys (Sidebar, from Category only):', Object.keys(organized));
         return organized;
     } catch (error) {
         console.error('Data organization failed:', error);
@@ -118,11 +119,15 @@ function renderSidebar(data) {
 
         let html = '';
         Object.keys(data).forEach(header => {
-            const subitemHtml = data[header].subitems.map(subitem => `
-                <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
-                    ${subitem.name}
-                </div>
-            `).join('');
+            console.log(`Sidebar item: Header="${header}"`); // Debug: Log each header
+            const subitemHtml = data[header].subitems.map(subitem => {
+                console.log(`Sidebar subitem under "${header}": "${subitem.name}"`);
+                return `
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
+                        ${subitem.name}
+                    </div>
+                `;
+            }).join('');
             html += `
                 <div class="sidebar-item section-header" data-header="${header}">
                     ${header}
@@ -132,9 +137,9 @@ function renderSidebar(data) {
                 </div>
             `;
         });
-        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">Debug: Headers parsed: ' + Object.keys(data).join(', ') + '</div>'; // Temp debug
+        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">Debug: Sidebar headers: ' + Object.keys(data).join(', ') + '</div>';
 
-        console.log('Exact sidebar HTML generated:\n', html);
+        console.log('Exact sidebar HTML generated (should only contain Category values):\n', html);
 
         // Add click handlers for headers
         document.querySelectorAll('.section-header').forEach(header => {

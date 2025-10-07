@@ -174,7 +174,7 @@ function renderSidebar(data) {
             const subitemHtml = data[header].subitems.map(subitem => {
                 console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections)`);
                 return `
-                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}" data-header="${header}">
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
                         ${subitem.name}
                     </div>
                 `;
@@ -243,14 +243,14 @@ function renderSections(data, searchTerm = '') {
                 html += `
                     <div class="section" id="${header.replace(/\s+/g, '-')}">
                         <h3>${header}</h3>
-                        <div class="section-content">${filteredData[header].details}</div>
+                        <div class="section-content">${filteredData[header].details.replace(/\n/g, '<br/>')}</div>
                     </div>
                 `;
                 filteredData[header].subitems.forEach(subitem => {
                     html += `
                         <div class="section" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
                             <h3>${subitem.name}</h3>
-                            <div class="section-content">${subitem.details}</div>
+                            <div class="section-content">${subitem.details.replace(/\n/g, '<br/>')}</div>
                         </div>
                     `;
                 });

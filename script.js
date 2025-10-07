@@ -174,7 +174,7 @@ function renderSidebar(data) {
             const subitemHtml = data[header].subitems.map(subitem => {
                 console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections)`);
                 return `
-                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}" data-header="${header}">
                         ${subitem.name}
                     </div>
                 `;

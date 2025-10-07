@@ -4,175 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prae System Compendium</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #ffffff;
-            margin-bottom: 30px;
-        }
-        #search-container {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        #search {
-            width: 100%;
-            max-width: 400px;
-            padding: 10px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-            font-size: 16px;
-        }
-        #search::placeholder {
-            color: #888;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #404040;
-        }
-        th {
-            background-color: #333;
-            font-weight: bold;
-            color: #ffffff;
-        }
-        tr:hover {
-            background-color: #3a3a3a;
-        }
-        tr.no-results {
-            text-align: center;
-            color: #888;
-            font-style: italic;
-        }
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            tr {
-                border: 1px solid #404040;
-                margin-bottom: 10px;
-                border-radius: 4px;
-            }
-            td {
-                border: none;
-                position: relative;
-                padding-left: 50%;
-            }
-            td:before {
-                content: attr(data-label) ": ";
-                position: absolute;
-                left: 12px;
-                font-weight: bold;
-                color: #ffffff;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Prae System Compendium</h1>
-        <div id="search-container">
-            <input type="text" id="search" placeholder="Search entries... (e.g., by name, type, or description)">
+        <div class="sidebar">
+            <h2>Categories</h2>
+            <div id="sidebar-content"></div>
         </div>
-        <table id="data-table">
-            <thead>
-                <tr></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="main-content">
+            <h1>Prae System Compendium</h1>
+            <div id="search-container">
+                <input type="text" id="search" placeholder="Search entries... (e.g., by name, type, or description)">
+            </div>
+            <div id="content-sections"></div>
+        </div>
     </div>
-
-    <script>
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
-
-        let allData = [];
-
-        // Simple CSV parser (assumes no quoted commas for simplicity; adjust if needed)
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            const rows = lines.slice(1).map(line => {
-                const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                return headers.reduce((obj, header, i) => {
-                    obj[header] = values[i] || '';
-                    return obj;
-                }, {});
-            }).filter(row => Object.values(row).some(val => val)); // Filter empty rows
-            return { headers, rows };
-        }
-
-        function renderTable(data, searchTerm = '') {
-            const { headers, rows } = data;
-            const tbody = document.querySelector('#data-table tbody');
-            const thead = document.querySelector('#data-table thead tr');
-
-            // Render headers
-            thead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
-
-            // Filter rows
-            let filteredRows = rows;
-            if (searchTerm) {
-                filteredRows = rows.filter(row => 
-                    Object.values(row).some(val => 
-                        val.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                );
-            }
-
-            // Render rows
-            tbody.innerHTML = filteredRows.length > 0 
-                ? filteredRows.map(row => 
-                    `<tr>${headers.map(header => `<td data-label="${header}">${row[header]}</td>`).join('')}</tr>`
-                  ).join('')
-                : '<tr class="no-results"><td colspan="' + headers.length + '">No results found.</td></tr>';
-        }
-
-        // Fetch and load data
-        fetch(CSV_URL)
-            .then(response => response.text())
-            .then(csvText => {
-                const data = parseCSV(csvText);
-                allData = data.rows; // Store for filtering
-                renderTable({ headers: data.headers, rows: allData });
-            })
-            .catch(error => {
-                console.error('Error fetching CSV:', error);
-                document.querySelector('#data-table tbody').innerHTML = 
-                    '<tr><td colspan="1">Error loading data. Check console for details.</td></tr>';
-            });
-
-        // Search functionality
-        document.getElementById('search').addEventListener('input', (e) => {
-            const searchTerm = e.target.value;
-            const data = { headers: allData.length > 0 ? Object.keys(allData[0]) : [], rows: allData };
-            renderTable(data, searchTerm);
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -2,86 +2,87 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4
 
 let allData = [];
 
-// Function to parse a CSV line handling quoted fields with escaped quotes (doubled "")
-function parseCSVLine(line) {
-    const values = [];
-    let i = 0;
-    while (i < line.length) {
-        let value = '';
-        if (line[i] === ',') {
-            values.push('');
-            i++;
-            continue;
-        }
-        let quoted = false;
-        if (line[i] === '"') {
-            quoted = true;
-            i++;
-        }
-        while (i < line.length) {
-            if (quoted) {
-                if (line[i] === '"') {
-                    i++;
-                    if (i < line.length && line[i] === '"') {
-                        value += '"';
-                        i++;
-                    } else {
-                        quoted = false;
-                        break;
-                    }
-                } else {
-                    value += line[i];
-                    i++;
-                }
-            } else {
-                if (line[i] === ',') {
-                    break;
-                }
-                value += line[i];
-                i++;
-            }
-        }
-        values.push(value);
-        if (i < line.length && line[i] === ',') {
-            i++;
-        }
-    }
-    return values;
-}
-
-// Updated parser using the new line parser
+// Full CSV parser handling multiline quoted fields and escaped quotes
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
-        const lines = csvText.trim().split('\n');
-        console.log('CSV lines:', lines.length);
-        if (lines.length < 1) {
-            console.error('Error: CSV is empty or malformed');
-            throw new Error('CSV is empty or malformed');
+        const rows = [];
+        let currentRow = [];
+        let currentValue = '';
+        let insideQuote = false;
+        let i = 0;
+        while (i < csvText.length) {
+            const char = csvText[i];
+            if (insideQuote) {
+                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') {
+                    currentValue += '"';
+                    i += 2;
+                    continue;
+                } else if (char === '"') {
+                    insideQuote = false;
+                    i++;
+                    continue;
+                } else {
+                    currentValue += char;
+                    i++;
+                    continue;
+                }
+            } else {
+                if (char === '"') {
+                    insideQuote = true;
+                    i++;
+                    continue;
+                } else if (char === ',') {
+                    currentRow.push(currentValue);
+                    currentValue = '';
+                    i++;
+                    continue;
+                } else if (char === '\r' || char === '\n') {
+                    currentRow.push(currentValue);
+                    if (currentRow.some(v => v.trim() !== '')) {
+                        rows.push(currentRow);
+                    }
+                    currentRow = [];
+                    currentValue = '';
+                    i++;
+                    if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
+                    continue;
+                } else {
+                    currentValue += char;
+                    i++;
+                    continue;
+                }
+            }
+        }
+        if (currentValue !== '' || currentRow.length > 0) {
+            currentRow.push(currentValue);
+            if (currentRow.some(v => v.trim() !== '')) {
+                rows.push(currentRow);
+            }
         }
 
-        // Parse headers
-        const headerLine = lines[0];
-        const headers = parseCSVLine(headerLine).map(h => h.trim());
+        console.log('Parsed raw rows:', rows.length);
+
+        // Headers
+        const headers = (rows[0] || []).map(h => h.trim());
         console.log('Raw headers from CSV:', headers);
 
         // Identify Sections (B) and Details (C) columns
         let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
-        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
         if (sectionsIndex === -1) {
-            console.warn('Warning: "Sections" header not found, falling back to assuming column B (index 1)');
-            sectionsIndex = 1; // Assume second column is Sections
+            console.warn('Warning: "Sections" header not found, falling back to column B (index 1)');
+            sectionsIndex = 1;
         }
+        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
         if (detailsIndex === -1) {
             console.warn('Warning: "Details" column not found, falling back to column C (index 2)');
-            detailsIndex = 2; // Assume third column is Details
+            detailsIndex = 2;
         }
         console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${sectionsIndex < headers.length ? headers[sectionsIndex] : 'N/A'}")`);
         console.log(`Column C (Details) mapped to index ${detailsIndex} ("${detailsIndex < headers.length ? headers[detailsIndex] : 'N/A'}")`);
 
         // Parse rows
-        const rows = lines.slice(1).map((line, rowIndex) => {
-            const values = parseCSVLine(line);
+        const dataRows = rows.slice(1).map((values, rowIndex) => {
             if (values.length < Math.max(sectionsIndex, detailsIndex) + 1) {
                 console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
                 while (values.length <= Math.max(sectionsIndex, detailsIndex)) {
@@ -89,24 +90,27 @@ function parseCSV(csvText) {
                 }
             }
             const rowObj = {
-                Sections: values[sectionsIndex] || '',
-                Details: detailsIndex < values.length ? values[detailsIndex] || '' : ''
+                Sections: values[sectionsIndex] ? values[sectionsIndex].trim() : '',
+                Details: detailsIndex < values.length ? (values[detailsIndex] || 'WIP') : 'WIP'
             };
-            console.log(`Row ${rowIndex + 2} - Sections (B): "${rowObj.Sections}" | Details (C): "${rowObj.Details.substring(0, 50)}..."`);
+            console.log(`Row ${rowIndex + 2} - Sections (B): "${rowObj.Sections}" | Details (C): "${rowObj.Details.substring(0, 50).replace(/\n/g, '\\n')}..."`);
             return rowObj;
         }).filter(row => row.Sections);
 
-        console.log('Parsed rows:', rows.length);
-        console.log('Sample row:', rows[0] || 'No sample (empty rows)');
+        console.log('Parsed data rows:', dataRows.length);
+        console.log('Sample row:', dataRows[0] || 'No sample (empty rows)');
 
         // Validate Sections values
-        rows.forEach((row, i) => {
-            if (row.Sections && row.Sections.length > 100) {
-                console.warn(`Row ${i + 2} warning: Sections value "${row.Sections.substring(0, 50)}..." is unusually long, possible Details contamination`);
+        dataRows.forEach((row, i) => {
+            if (row.Sections.length > 100) {
+                console.warn(`Row ${i + 2} warning: Sections value "${row.Sections.substring(0, 50).replace(/\n/g, '\\n')}..." is unusually long, possible Details contamination`);
+            }
+            if (row.Sections.includes('<') && row.Sections.includes('>')) {
+                console.warn(`Row ${i + 2} warning: Sections value contains HTML-like tags, but parser treats as text`);
             }
         });
 
-        return { headers, rows, sectionsIndex, detailsIndex };
+        return { headers, rows: dataRows, sectionsIndex, detailsIndex };
     } catch (error) {
         console.error('CSV parsing failed:', error);
         throw error;
@@ -126,18 +130,18 @@ function organizeData(rows) {
                 console.warn(`Row ${index + 2} has empty Sections, skipping`);
                 return;
             }
-            console.log(`Processing row ${index + 2}: Sections="${section}" | Details="${details.substring(0, 50)}..."`);
+            console.log(`Processing row ${index + 2}: Sections="${section.replace(/\n/g, '\\n')}" | Details="${details.substring(0, 50).replace(/\n/g, '\\n')}..."`);
             if (!section.startsWith('-')) {
                 currentHeader = section;
-                organized[currentHeader] = { subitems: [], details: details || 'WIP' };
-                console.log(`Added header: "${currentHeader}" (from Sections)`);
+                organized[currentHeader] = { subitems: [], details: details };
+                console.log(`Added header: "${currentHeader.replace(/\n/g, '\\n')}" (from Sections)`);
             } else {
                 const subitem = section.replace(/^-/, '').trim();
                 if (currentHeader && subitem) {
-                    organized[currentHeader].subitems.push({ name: subitem, details: details || 'WIP' });
-                    console.log(`Added subitem "${subitem}" under "${currentHeader}" (from Sections)`);
+                    organized[currentHeader].subitems.push({ name: subitem, details: details });
+                    console.log(`Added subitem "${subitem.replace(/\n/g, '\\n')}" under "${currentHeader.replace(/\n/g, '\\n')}" (from Sections)`);
                 } else {
-                    console.warn(`Row ${index + 2}: Subitem "${subitem}" ignored, no valid header or empty subitem`);
+                    console.warn(`Row ${index + 2}: Subitem "${subitem.replace(/\n/g, '\\n')}" ignored, no valid header or empty subitem`);
                 }
             }
         });
@@ -166,11 +170,11 @@ function renderSidebar(data) {
 
         let html = '';
         Object.keys(data).forEach(header => {
-            console.log(`Sidebar item: Header="${header}" (from Sections)`);
+            console.log(`Sidebar item: Header="${header.replace(/\n/g, '\\n')}" (from Sections)`);
             const subitemHtml = data[header].subitems.map(subitem => {
-                console.log(`Sidebar subitem under "${header}": "${subitem.name}" (from Sections)`);
+                console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections)`);
                 return `
-                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}" data-header="${header}">
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
                         ${subitem.name}
                     </div>
                 `;
@@ -300,6 +304,7 @@ fetch(CSV_URL)
     })
     .then(csvText => {
         console.log('CSV text received, length:', csvText.length);
+        console.log('First 200 chars of CSV:', csvText.substring(0, 200).replace(/\n/g, '\\n'));
         const parsed = parseCSV(csvText);
         allData = organizeData(parsed.rows);
         renderSidebar(allData);

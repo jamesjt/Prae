@@ -111,6 +111,10 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.section.traea-section {
+    background-color: #8B6F47;
+}
+
 .section h3 {
     margin: 0 0 10px;
     color: #ffffff;

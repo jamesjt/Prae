@@ -174,7 +174,7 @@ function renderSidebar(data) {
             const subitemHtml = data[header].subitems.map(subitem => {
                 console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections)`);
                 return `
-                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}">
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}" data-header="${header}">
                         ${subitem.name}
                     </div>
                 `;
@@ -247,8 +247,9 @@ function renderSections(data, searchTerm = '') {
                     </div>
                 `;
                 filteredData[header].subitems.forEach(subitem => {
+                    const isTraea = subitem.name.toLowerCase().includes('traea');
                     html += `
-                        <div class="section" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
+                        <div class="section ${isTraea ? 'traea-section' : ''}" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
                             <h3>${subitem.name}</h3>
                             <div class="section-content">${subitem.details.replace(/\n/g, '<br/>')}</div>
                         </div>

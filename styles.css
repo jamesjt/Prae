@@ -43,6 +43,10 @@ body {
     background-color: #3a3a3a;
 }
 
+.sidebar-item.traea-item {
+    color: #8B6F47;
+}
+
 .sidebar-item.section-header {
     font-weight: bold;
     display: flex;

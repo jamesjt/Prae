@@ -129,7 +129,7 @@ h1 {
     color: #e0e0e0;
 }
 
-.internal-link {
+.internal-link a {
     border-bottom:  1px dotted whitesmoke;
     color: whitesmoke;
     text-decoration: none;

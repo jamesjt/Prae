@@ -132,6 +132,13 @@ h1 {
     column-fill: balance;
 }
 
+
+.internal-link a {
+    border-bottom:  1px dotted whitesmoke;
+    color: whitesmoke;
+    text-decoration: none;
+}
+
 .no-results {
     text-align: center;
     color: #888;

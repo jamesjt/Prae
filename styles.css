@@ -129,6 +129,12 @@ h1 {
     color: #e0e0e0;
 }
 
+.internal-link {
+    border-bottom:  1px dotted whitesmoke;
+    color: whitesmoke;
+    text-decoration: none;
+}
+
 .no-results {
     text-align: center;
     color: #888;

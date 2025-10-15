@@ -123,16 +123,13 @@ h1 {
     margin: 0 0 10px;
     color: #ffffff;
     font-size: 1.2em;
+    column-span: all; /* Ensure header spans both columns */
 }
 
 .section-content {
-    color: #e0e0e0;
-}
-
-.internal-link a {
-    border-bottom:  1px dotted whitesmoke;
-    color: whitesmoke;
-    text-decoration: none;
+    column-count: 2;
+    column-gap: 20px;
+    column-fill: balance;
 }
 
 .no-results {
@@ -154,5 +151,8 @@ h1 {
     }
     .main-content {
         padding: 10px;
+    }
+    .section-content {
+        column-count: 1; /* Single column on mobile */
     }
 }

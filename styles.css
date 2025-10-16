@@ -147,13 +147,3 @@ h1 {
     font-style: italic;
     padding: 20px;
 }
-
-.container {
-    flex-direction: column;
-}
-.main-content {
-    padding: 10px;
-}
-.section-content {
-    column-count: 1; /* Single column on mobile */
-}

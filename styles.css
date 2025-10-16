@@ -146,18 +146,12 @@ h1 {
     padding: 20px;
 }
 
-    .container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        position: static;
-        max-height: none;
-        overflow-y: visible;
-    }
-    .main-content {
-        padding: 10px;
-    }
-    .section-content {
-        column-count: 1; /* Single column on mobile */
-    }
+.container {
+    flex-direction: column;
+}
+.main-content {
+    padding: 10px;
+}
+.section-content {
+    column-count: 1; /* Single column on mobile */
+}

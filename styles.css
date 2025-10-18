@@ -199,6 +199,8 @@ h1 {
     margin: 0px 15px 0px 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     border-radius:8px;
+    margin-bottom: 10px;
+    font-family: "Times New Roman", serif;
 }
 
 
@@ -225,10 +227,9 @@ h1 {
   border-radius: 0 0 8px 8px;
 }
 
+.ability-trick div:first-child,
 .ability-talent div:first-child{
     color:whitesmoke;
-    background-color: rgba(88, 89, 96, 1);
-    font-family: "Times New Roman", serif;
     font-variant: small-caps;
     padding: 0px 7px;
     font-size: 20px;
@@ -236,15 +237,11 @@ h1 {
 }
 
 .ability-trick div:first-child{
-    color:whitesmoke;
     background-color: rgba(114, 133, 126, 1);
-    font-family: "Times New Roman", serif;
-    font-variant: small-caps;
-    padding: 0px 7px;
-    font-size: 20px;
-    border-radius:8px 8px 0px 0px;
 }
-
+.ability-talent div:first-child{
+    background-color: rgba(88, 89, 96, 1);
+}
 
 
 @media (max-width: 768px) {

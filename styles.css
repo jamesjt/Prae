@@ -1,10 +1,11 @@
 body {
-    font-family: Roboto, Helvetica, sans-serif;
+    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
     background-color: #1a1a1a;
     color: #e0e0e0;
     margin: 0;
     padding: 20px;
     line-height: 1.6;
+    font-family: Roboto, Helvetica, sans-serif;
 }
 
 .container {
@@ -19,7 +20,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     position: fixed;
     top: 20px;
-    left: 0px;
+    left:0px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
 }
@@ -35,7 +36,7 @@ body {
     cursor: pointer;
     color: #e0e0e0;
     border-radius: 4px;
-    border-bottom: 1px solid #d29a38;
+    bottom-border: 1px solid #d29a38;
 }
 
 .sidebar-item:hover {
@@ -65,7 +66,7 @@ body {
 
 .subitems {
     display: none;
-    margin-left: 10px;
+    margin-left:10px;
     border-left: 1px solid #d29a38;
 }
 
@@ -80,7 +81,6 @@ body {
 .main-content {
     flex: 1;
     padding: 20px;
-    margin-left: 270px; /* Match sidebar width + some spacing */
 }
 
 h1 {
@@ -110,26 +110,21 @@ h1 {
 }
 
 .section {
-    background-color: #ffffff; /* White background for all sections */
-    color: #000000; /* Black text for readability on white */
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc; /* Subtle border like TTRPG books */
+    background-color: #2a2a2a;
+    padding: 15px;
+    margin-bottom: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    max-width: 900px; /* Comfortable width for two columns */
-    column-count: 2; /* Two columns */
-    column-gap: 30px; /* Wider gap for TTRPG look */
-    column-fill: balance; /* Balance text height */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    margin-left:270px;
 }
 
 .section.traea-section {
-    background-color: #8B6F47; /* Preserve brownish-gold for Traea */
-    color: #ffffff; /* White text on Traea background */
+    background-color: #8B6F47;
 }
 
 .section h3 {
-    margin: 0 0 15px;
+    margin: 0 0 10px;
     color: #d29a38;
     font-size: 30px;
     column-span: all; /* Ensure header spans both columns */
@@ -139,11 +134,14 @@ h1 {
 }
 
 .section-content {
-    /* Moved column styling to .section, no need to repeat here */
+    column-count: 1;
+    column-gap: 20px;
+    column-fill: balance;
 }
 
+
 .internal-link a {
-    border-bottom: 1px dotted whitesmoke;
+    border-bottom:  1px dotted whitesmoke;
     color: whitesmoke;
     text-decoration: none;
 }

@@ -198,18 +198,14 @@ h1 {
     border: 1px solid rgba(88, 89, 96, 1);
     margin: 0px 15px 0px 0px;
     padding: 0px 7px;  
-    box-shadow: 0 0 10px rgba(100, 100, 100, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    border-radius:8px;
 }
 
 
 .ability-talent div:nth-of-type(2){
     color:black;
     background-color: rgba(239, 239, 239, 1);
-    font-family: "Times New Roman", serif;
-    font-variant: small-caps;
-    padding: 0px 7px;
-    font-size: 20px;
-    width:100%;
 }
 
 
@@ -220,7 +216,7 @@ h1 {
     font-variant: small-caps;
     padding: 0px 7px;
     font-size: 20px;
-    width:100%;
+    border-radius:8px 8px 0px 0px;
 }
 
 .ability-talent-name{
@@ -229,7 +225,6 @@ h1 {
     font-variant: small-caps;
     padding: 0px 7px;
     font-size: 20px;
-    width:100%;
 }
 
 @media (max-width: 768px) {

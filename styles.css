@@ -129,7 +129,7 @@ h1 {
 .section h3 {
     margin: 0 0 10px;
     color: #d29a38;
-    font-size: 1.2em;
+    font-size: 30px;
     column-span: all; /* Ensure header spans both columns */
     font-family: "Times New Roman", serif;
     font-variant: small-caps;

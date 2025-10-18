@@ -186,9 +186,18 @@ h1 {
     margin-top: 60px; /* Add margin to prevent content from being hidden under navbar */
 }
 
+.ability-group-container{
+    display:flex;
+    flex:column;
+}
+
 .ability-talent-name{
     background-color: rgba(88, 89, 96, 1);
     color:whitesmoke;
+    font-family: "Times New Roman", serif;
+    font-variant: small-caps;
+    padding: 0px 7px;
+    font-size: 20px;
 }
 
 @media (max-width: 768px) {

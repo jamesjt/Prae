@@ -198,8 +198,9 @@ h1 {
     padding: 0px 7px;
 }
 
-.ability-talent:first-child{
+.ability-talent div:first-child{
     color:whitesmoke;
+    background-color: rgba(88, 89, 96, 1);
     font-family: "Times New Roman", serif;
     font-variant: small-caps;
     padding: 0px 7px;

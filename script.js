@@ -190,7 +190,6 @@ function renderSidebar(data) {
                 </div>
             `;
         });
-        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">Debug: Sidebar headers (from Sections): ' + Object.keys(data).join(', ') + '</div>';
 
         console.log('Exact sidebar HTML generated (should only contain Sections values):\n', html);
 

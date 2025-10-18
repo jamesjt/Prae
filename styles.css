@@ -3,7 +3,6 @@ body {
     background-color: #1a1a1a;
     color: #e0e0e0;
     margin: 0;
-    padding: 20px;
     line-height: 1.6;
     font-family: Roboto, Helvetica, sans-serif;
 }
@@ -16,11 +15,12 @@ body {
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     position: fixed;
-    top: 20px;
+    top: 50px;
     left:0px;
-    max-height: calc(100vh - 40px);
+    max-height: calc(100vh - 50px);
     overflow-y: auto;
 }
+
 .sidebar h2 {
     color: #ffffff;
     margin-top: 0;
@@ -150,12 +150,13 @@ h1 {
 /* Navbar Styles */
 .navbar {
     background-color: #2a2a2a;
-    position: sticky;
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    padding: 10px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #d29a38;
 }
 
 .nav-list {
@@ -164,11 +165,6 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.nav-list {
-    margin: 0 20px;
-    display: flex;
 }
 
 .nav-list a {
@@ -191,11 +187,6 @@ h1 {
     margin-top: 60px; /* Add margin to prevent content from being hidden under navbar */
 }
 
-.sidebar {
-    top: 60px; /* Adjust sidebar position to account for navbar height */
-    max-height: calc(100vh - 80px); /* Adjust max-height for navbar */
-}
-
 @media (max-width: 768px) {
     .navbar {
         padding: 5px 0;
@@ -205,11 +196,6 @@ h1 {
         flex-direction: column;
         gap: 10px;
     }
-
-    .nav-list li {
-        margin: 5px 0;
-    }
-
     .nav-list a {
         font-size: 1em;
         padding: 8px 10px;

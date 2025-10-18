@@ -34,10 +34,11 @@ body {
 }
 
 .sidebar-item {
-    padding: 10px;
+    padding: 5px;
     cursor: pointer;
     color: #e0e0e0;
     border-radius: 4px;
+    bottom-border: 1px solid #d29a38;
 }
 
 .sidebar-item:hover {
@@ -55,18 +56,20 @@ body {
     gap: 10px;
 }
 
-.sidebar-item.section-header::before {
+.sidebar-item.section-header::after {
     content: '+';
     font-weight: normal;
     color: #888;
 }
 
-.sidebar-item.section-header.expanded::before {
+.sidebar-item.section-header.expanded::after {
     content: '−';
 }
 
 .subitems {
     display: none;
+    margin-left:20px;
+    border-left: 1px solid #d29a38;
 }
 
 .subitems.visible {
@@ -123,7 +126,7 @@ h1 {
 
 .section h3 {
     margin: 0 0 10px;
-    color: #ffffff;
+    color: #d29a38;
     font-size: 1.2em;
     column-span: all; /* Ensure header spans both columns */
 }

@@ -1,11 +1,10 @@
 body {
-    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+    font-family: Roboto, Helvetica, sans-serif;
     background-color: #1a1a1a;
     color: #e0e0e0;
     margin: 0;
     padding: 20px;
     line-height: 1.6;
-    font-family: Roboto, Helvetica, sans-serif;
 }
 
 .container {
@@ -20,7 +19,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     position: fixed;
     top: 20px;
-    left:0px;
+    left: 0px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
 }
@@ -36,7 +35,7 @@ body {
     cursor: pointer;
     color: #e0e0e0;
     border-radius: 4px;
-    bottom-border: 1px solid #d29a38;
+    border-bottom: 1px solid #d29a38;
 }
 
 .sidebar-item:hover {
@@ -66,7 +65,7 @@ body {
 
 .subitems {
     display: none;
-    margin-left:10px;
+    margin-left: 10px;
     border-left: 1px solid #d29a38;
 }
 
@@ -81,6 +80,7 @@ body {
 .main-content {
     flex: 1;
     padding: 20px;
+    margin-left: 270px; /* Match sidebar width + some spacing */
 }
 
 h1 {
@@ -110,21 +110,26 @@ h1 {
 }
 
 .section {
-    background-color: #2a2a2a;
-    padding: 15px;
-    margin-bottom: 10px;
+    background-color: #ffffff; /* White background for all sections */
+    color: #000000; /* Black text for readability on white */
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc; /* Subtle border like TTRPG books */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    width: 1000px;
-    margin-left:270px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    max-width: 900px; /* Comfortable width for two columns */
+    column-count: 2; /* Two columns */
+    column-gap: 30px; /* Wider gap for TTRPG look */
+    column-fill: balance; /* Balance text height */
 }
 
 .section.traea-section {
-    background-color: #8B6F47;
+    background-color: #8B6F47; /* Preserve brownish-gold for Traea */
+    color: #ffffff; /* White text on Traea background */
 }
 
 .section h3 {
-    margin: 0 0 10px;
+    margin: 0 0 15px;
     color: #d29a38;
     font-size: 30px;
     column-span: all; /* Ensure header spans both columns */
@@ -134,14 +139,11 @@ h1 {
 }
 
 .section-content {
-    column-count: 1;
-    column-gap: 20px;
-    column-fill: balance;
+    /* Moved column styling to .section, no need to repeat here */
 }
 
-
 .internal-link a {
-    border-bottom:  1px dotted whitesmoke;
+    border-bottom: 1px dotted whitesmoke;
     color: whitesmoke;
     text-decoration: none;
 }
@@ -151,4 +153,24 @@ h1 {
     color: #888;
     font-style: italic;
     padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
+    .main-content {
+        padding: 10px;
+        margin-left: 0; /* Reset margin on mobile */
+    }
+    .section {
+        column-count: 1; /* Single column on mobile */
+        max-width: 100%; /* Full width on mobile */
+    }
 }

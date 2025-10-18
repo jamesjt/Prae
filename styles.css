@@ -249,8 +249,10 @@ h1 {
 .ability-talent div:first-child{
     background-color: rgba(88, 89, 96, 1);
 }
-
-
+.gear-list{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
 @media (max-width: 768px) {
     .navbar {
         padding: 5px 0;

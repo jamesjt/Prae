@@ -1,174 +1,77 @@
-body {
-    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    margin: 0;
-    padding: 20px;
-    line-height: 1.6;
-    font-family: Roboto, Helvetica, sans-serif;
+/* Navbar Styles */
+.navbar {
+    background-color: #2a2a2a;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 10px 0;
 }
 
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-list li {
+    margin: 0 20px;
+}
+
+.nav-list a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-family: Roboto, Helvetica, sans-serif;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-list a:hover {
+    background-color: #3a3a3a;
+    color: #d29a38;
+}
+
+/* Adjust container and sidebar for navbar */
 .container {
-    margin: 0 auto;
+    margin-top: 60px; /* Add margin to prevent content from being hidden under navbar */
 }
 
 .sidebar {
-    width: 250px;
-    background-color: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    position: fixed;
-    top: 20px;
-    left:0px;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-}
-
-.sidebar h2 {
-    color: #ffffff;
-    margin-top: 0;
-    font-size: 1.5em;
-}
-
-.sidebar-item {
-    padding: 5px;
-    cursor: pointer;
-    color: #e0e0e0;
-    border-radius: 4px;
-    bottom-border: 1px solid #d29a38;
-}
-
-.sidebar-item:hover {
-    background-color: #3a3a3a;
-}
-
-.sidebar-item.traea-item {
-    color: #8B6F47;
-}
-
-.sidebar-item.section-header {
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.sidebar-item.section-header::after {
-    content: '+';
-    font-weight: normal;
-    color: #888;
-}
-
-.sidebar-item.section-header.expanded::after {
-    content: '−';
-}
-
-.subitems {
-    display: none;
-    margin-left:10px;
-    border-left: 1px solid #d29a38;
-}
-
-.subitems.visible {
-    display: block;
-}
-
-.sidebar-subitem {
-    padding-left: 20px;
-}
-
-.main-content {
-    flex: 1;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #ffffff;
-    margin-bottom: 30px;
-}
-
-#search-container {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-#search {
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
-    border: 1px solid #333;
-    border-radius: 4px;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    font-size: 16px;
-}
-
-#search::placeholder {
-    color: #888;
-}
-
-.section {
-    background-color: #2a2a2a;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    max-width: 1000px;
-    margin-left:270px;
-}
-
-.section.traea-section {
-    background-color: #8B6F47;
-}
-
-.section h3 {
-    margin: 0 0 10px;
-    color: #d29a38;
-    font-size: 30px;
-    column-span: all; /* Ensure header spans both columns */
-    font-family: "Times New Roman", serif;
-    font-variant: small-caps;
-    font-weight: 500;
-}
-
-.section-content {
-    column-count: 1;
-    column-gap: 20px;
-    column-fill: balance;
-}
-
-
-.internal-link a {
-    border-bottom:  1px dotted whitesmoke;
-    color: whitesmoke;
-    text-decoration: none;
-}
-
-.no-results {
-    text-align: center;
-    color: #888;
-    font-style: italic;
-    padding: 20px;
+    top: 60px; /* Adjust sidebar position to account for navbar height */
+    max-height: calc(100vh - 80px); /* Adjust max-height for navbar */
 }
 
 @media (max-width: 768px) {
-    .container {
+    .navbar {
+        padding: 5px 0;
+    }
+
+    .nav-list {
         flex-direction: column;
+        gap: 10px;
     }
+
+    .nav-list li {
+        margin: 5px 0;
+    }
+
+    .nav-list a {
+        font-size: 1em;
+        padding: 8px 10px;
+    }
+
+    .container {
+        margin-top: 120px; /* Adjust for taller navbar on mobile */
+    }
+
     .sidebar {
-        width: 100%;
-        position: static;
+        top: 0; /* Reset to top on mobile since it's not fixed */
         max-height: none;
-        overflow-y: visible;
-    }
-    .main-content {
-        padding: 10px;
-        margin-left: 0; /* Reset margin on mobile */
-    }
-    .section {
-        column-count: 1; /* Single column on mobile */
-        max-width: 100%; /* Full width on mobile */
     }
 }

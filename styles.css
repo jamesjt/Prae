@@ -213,6 +213,10 @@ h1 {
     padding: 0px 7px;
 }
 
+.ability-talent div:last-of-type{
+    border-radius:0px 0px 8px 8px;
+}
+
 
 .ability-talent div:first-child{
     color:whitesmoke;

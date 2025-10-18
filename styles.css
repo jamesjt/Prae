@@ -159,7 +159,6 @@ h1 {
 }
 
 .nav-list {
-    list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
@@ -167,8 +166,9 @@ h1 {
     align-items: center;
 }
 
-.nav-list li {
+.nav-list {
     margin: 0 20px;
+    display: flex;
 }
 
 .nav-list a {

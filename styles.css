@@ -207,7 +207,7 @@ h1 {
     background-color: rgba(239, 239, 239, 1);
     padding: 0px 7px;
 }
-.ability-talent div:nth-of-type(1n){
+.ability-talent div:nth-of-type(2n+1){
     color:black;
     background-color: rgba(217, 217, 217, 1);
     padding: 0px 7px;

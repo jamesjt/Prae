@@ -188,7 +188,7 @@ h1 {
 
 .ability-group-container{
     display:flex;
-    flex:column;
+    flex:1;
 }
 
 .ability-talent-name{

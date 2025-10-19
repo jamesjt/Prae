@@ -208,12 +208,9 @@ h1 {
 }
 
 .ability-trick{margin-right:15px;}
-.gear-list{border-radius:8px; margin-bottom: 10px; font-family: "Times New Roman", serif;}
+.gear-list{font-family: "Times New Roman", serif;}
 
-
-.ability-trick div:nth-of-type(2n),
-.ability-talent div:nth-of-type(2n),
-.gear-list div:nth-of-type(2n){
+.ability-trick div:nth-of-type(2n),.ability-talent div:nth-of-type(2n),.gear-list div:nth-of-type(2n){
     color:black;
     background-color: rgba(239, 239, 239, 1);
     padding: 0px 7px;
@@ -223,14 +220,11 @@ h1 {
 .ability-trick div:nth-of-type(2n+1){color:black; background-color: rgba(215, 228, 223, 1); padding: 0px 7px;}
 .gear-list div:nth-of-type(2n+1){color:black; background-color: rgba(154, 128, 105, 1); padding: 0px 7px;}
 
-.ability-trick div:last-of-type,
-.ability-talent div:last-of-type,
-.gear-list div:last-of-type {
+.ability-trick div:last-of-type,.ability-talent div:last-of-type,.gear-list div:last-of-type {
   border-radius: 0 0 8px 8px;
 }
 
-.ability-trick div:first-child,
-.ability-talent div:first-child{
+.ability-trick div:first-child,.ability-talent div:first-child{
     color:whitesmoke;
     font-variant: small-caps;
     padding: 0px 7px;
@@ -241,10 +235,6 @@ h1 {
 .ability-trick div:first-child{background-color: rgba(114, 133, 126, 1);}
 .ability-talent div:first-child{background-color: rgba(88, 89, 96, 1);}
 .gear-list div:first-child{background-color: rgba(164, 137.68, 115, 1);padding: 0px 7px;}
-
-
-.gear-list{}
-
 
 @media (max-width: 768px) {
     .navbar {

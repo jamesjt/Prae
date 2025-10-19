@@ -200,7 +200,7 @@ h1 {
 }
 
 .ability-tricks-container,
-.ability-talents-container,{}
+.ability-talents-container,.gear-list-container{}
 
 .ability-trick,
 .ability-talent,
@@ -257,7 +257,7 @@ h1 {
 .ability-talent div:first-child{
     background-color: rgba(88, 89, 96, 1);
 }
-.gear-list{
+.gear-list-container{
     display:grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }

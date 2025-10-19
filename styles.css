@@ -203,14 +203,20 @@ h1 {
 .ability-talents-container,.gear-list-container{}
 
 .ability-trick,
-.ability-talent,
-.gear-list{
+.ability-talent,{
     margin: 0px 15px 0px 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     border-radius:8px;
     margin-bottom: 10px;
     font-family: "Times New Roman", serif;
 }
+
+.gear-list{
+    border-radius:8px;
+    margin-bottom: 10px;
+    font-family: "Times New Roman", serif;
+}
+
 
 .ability-trick div:nth-of-type(2n),
 .ability-talent div:nth-of-type(2n),
@@ -230,7 +236,7 @@ h1 {
     background-color: rgba(215, 228, 223, 1);
     padding: 0px 7px;
 }
-.ability-trick div:nth-of-type(2n+1){
+.gear-list div:nth-of-type(2n+1){
     color:black;
     background-color: rgba(194, 168, 145, 1)
     padding: 0px 7px;
@@ -261,8 +267,12 @@ h1 {
     display:grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
+.gear-list{
+
+}
 .gear-list div:first-child{
     background-color: rgba(164, 137.68, 115, 1);
+    padding: 0px 7px;
 }
 @media (max-width: 768px) {
     .navbar {

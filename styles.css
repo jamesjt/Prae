@@ -211,6 +211,10 @@ h1 {
     font-family: "Times New Roman", serif;
 }
 
+.ability-trick{
+    margin-right:15px;
+}
+
 .gear-list{
     border-radius:8px;
     margin-bottom: 10px;

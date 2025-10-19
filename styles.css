@@ -199,7 +199,7 @@ h1 {
 
 .ability-tricks-container,.ability-talents-container,.gear-list-container{}
 
-.ability-trick,.ability-talent,{
+.ability-trick,.ability-talent{
     margin: 0px 15px 0px 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     border-radius:8px;

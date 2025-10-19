@@ -194,16 +194,12 @@ h1 {
     margin-top: 60px; /* Add margin to prevent content from being hidden under navbar */
 }
 
-.ability-group-container{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-}
+.ability-group-container{display:grid;grid-template-columns: 1fr 1fr;}
+.gear-list-container{display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;}
 
-.ability-tricks-container,
-.ability-talents-container,.gear-list-container{}
+.ability-tricks-container,.ability-talents-container,.gear-list-container{}
 
-.ability-trick,
-.ability-talent,{
+.ability-trick,.ability-talent,{
     margin: 0px 15px 0px 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     border-radius:8px;
@@ -212,7 +208,6 @@ h1 {
 }
 
 .ability-trick{margin-right:15px;}
-
 .gear-list{border-radius:8px; margin-bottom: 10px; font-family: "Times New Roman", serif;}
 
 
@@ -224,21 +219,9 @@ h1 {
     padding: 0px 7px;
 }
 
-.ability-talent div:nth-of-type(2n+1){
-    color:black;
-    background-color: rgba(217, 217, 217, 1);
-    padding: 0px 7px;
-}
-.ability-trick div:nth-of-type(2n+1){
-    color:black;
-    background-color: rgba(215, 228, 223, 1);
-    padding: 0px 7px;
-}
-.gear-list div:nth-of-type(2n+1){
-    color:black;
-    background-color: rgba(154, 128, 105, 1);
-    padding: 0px 7px;
-}
+.ability-talent div:nth-of-type(2n+1){color:black; background-color: rgba(217, 217, 217, 1); padding: 0px 7px;}
+.ability-trick div:nth-of-type(2n+1){color:black; background-color: rgba(215, 228, 223, 1); padding: 0px 7px;}
+.gear-list div:nth-of-type(2n+1){color:black; background-color: rgba(154, 128, 105, 1); padding: 0px 7px;}
 
 .ability-trick div:last-of-type,
 .ability-talent div:last-of-type,
@@ -255,23 +238,14 @@ h1 {
     border-radius:8px 8px 0px 0px;
 }
 
-.ability-trick div:first-child{
-    background-color: rgba(114, 133, 126, 1);
-}
-.ability-talent div:first-child{
-    background-color: rgba(88, 89, 96, 1);
-}
-.gear-list-container{
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-}
-.gear-list{
+.ability-trick div:first-child{background-color: rgba(114, 133, 126, 1);}
+.ability-talent div:first-child{background-color: rgba(88, 89, 96, 1);}
+.gear-list div:first-child{background-color: rgba(164, 137.68, 115, 1);padding: 0px 7px;}
 
-}
-.gear-list div:first-child{
-    background-color: rgba(164, 137.68, 115, 1);
-    padding: 0px 7px;
-}
+
+.gear-list{}
+
+
 @media (max-width: 768px) {
     .navbar {
         padding: 5px 0;

@@ -153,6 +153,27 @@ h1 {
         column-count: 1; /* Single column on mobile */
         max-width: 100%; /* Full width on mobile */
     }
+        .navbar {
+        padding: 5px 0;
+    }
+
+    .nav-list {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .nav-list a {
+        font-size: 1em;
+        padding: 8px 10px;
+    }
+
+    .container {
+        margin-top: 120px; /* Adjust for taller navbar on mobile */
+    }
+
+    .sidebar {
+        top: 0; /* Reset to top on mobile since it's not fixed */
+        max-height: none;
+    }
 }
 
 /* Navbar Styles */
@@ -195,7 +216,7 @@ h1 {
 }
 
 .ability-group-container{display:grid;grid-template-columns: 1fr 1fr;}
-.gear-list-container{display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr;}
+.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr 1fr;}
 
 .ability-tricks-container,.ability-talents-container,.gear-list-container{}
 
@@ -236,26 +257,3 @@ h1 {
 .ability-talent div:first-child{background-color: rgba(88, 89, 96, 1);}
 .gear-list div:first-child{background-color: rgba(164, 138, 115, 1);padding: 0px 7px;}
 
-@media (max-width: 768px) {
-    .navbar {
-        padding: 5px 0;
-    }
-
-    .nav-list {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .nav-list a {
-        font-size: 1em;
-        padding: 8px 10px;
-    }
-
-    .container {
-        margin-top: 120px; /* Adjust for taller navbar on mobile */
-    }
-
-    .sidebar {
-        top: 0; /* Reset to top on mobile since it's not fixed */
-        max-height: none;
-    }
-}

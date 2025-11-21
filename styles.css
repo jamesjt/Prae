@@ -108,7 +108,7 @@ h1 {
     margin-left:270px;
 }
 .section.traea-section {
-    background-color: #8B6F47;
+    border: 1px solid #8B6F47;
 }
 .section h3 {
     margin: 0 0 10px;

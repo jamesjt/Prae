@@ -216,8 +216,7 @@ h1 {
 }
 
 .ability-group-container{display:grid;grid-template-columns: 1fr 1fr;}
-.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr 1fr;}
-
+.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr 1fr;box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);}
 .ability-tricks-container,.ability-talents-container,.gear-list-container{}
 
 .ability-trick,.ability-talent{
@@ -241,9 +240,7 @@ h1 {
 .ability-trick div:nth-of-type(2n+1){color:black; background-color: rgba(215, 228, 223, 1); padding: 0px 7px;}
 .gear-list div:nth-of-type(2n+1){color:black; background-color: rgba(226, 210, 197, 1); padding: 0px 7px;}
 
-.ability-trick div:last-of-type,.ability-talent div:last-of-type{
-  border-radius: 0 0 8px 8px;
-}
+.ability-trick div:last-of-type,.ability-talent div:last-of-type{border-radius: 0 0 8px 8px;}
 
 .ability-trick div:first-child,.ability-talent div:first-child{
     color:whitesmoke;
@@ -255,5 +252,6 @@ h1 {
 
 .ability-trick div:first-child{background-color: rgba(114, 133, 126, 1);}
 .ability-talent div:first-child{background-color: rgba(88, 89, 96, 1);}
-.gear-list div:first-child{background-color: rgba(164, 138, 115, 1);padding: 0px 7px;}
+.gear-list div:first-child{background-color: rgba(74, 53, 34,1);padding: 0px 7px;color:whitesmoke;}
+.way-text{margin-right:15px;}
 

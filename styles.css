@@ -108,7 +108,7 @@ h1 {
     margin-left:270px;
 }
 .section.traea-section {
-    border: 1pox solid #8B6F47;
+    background-color: #8B6F47;
 }
 .section h3 {
     margin: 0 0 10px;
@@ -216,7 +216,7 @@ h1 {
 }
 
 .ability-group-container{display:grid;grid-template-columns: 1fr 1fr;}
-.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.8fr 1fr;}
+.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr 1fr;}
 
 .ability-tricks-container,.ability-talents-container,.gear-list-container{}
 

@@ -59,7 +59,7 @@ function parseCSV(csvText) {
     }
 }
 
-// Organize data by column B (Sections) only for sidebar
+// Organize data
 function organizeData(rows) {
     try {
         const organized = {};
@@ -113,14 +113,20 @@ function renderSidebar(data) {
             const h = item.dataset.header;
             const s = item.dataset.subitem;
             const id = (s ? `${h}-${s}` : h).replace(/\s+/g, '-');
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+            const element = document.getElementById(id);
+            if (element) {
+                const navbarHeight = document.querySelector('.navbar').offsetHeight || 60;
+                const yOffset = -navbarHeight - 20; // 20px extra breathing room
+                const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
         }));
     } catch (error) {
         throw error;
     }
 }
 
-// Render sections with dash-based indentation (dashes stay visible)
+// Render sections with dash-based indentation
 function renderSections(data, term = '') {
     try {
         const filtered = term ? filterData(data, term) : data;

@@ -5,18 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prae System Compendium</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Character Creator styles — loaded only when needed -->
+    <link rel="stylesheet" href="creator-styles.css" id="creator-css" disabled>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-list">
-            <div><a href="#" data-section="prae-rulebook">Prae</a></div>
-            <div><a href="#" data-section="fables">Fables of Faen</a></div>
-            <div><a href="#" data-section="character-creator">Character Creator</a></div>
+            <a href="#" data-section="prae-rulebook" class="active">Prae</a>
+            <a href="#" data-section="fables">Fables of Faen</a>
+            <a href="#" data-section="character-creator">Character Creator</a>
         </div>
     </nav>
 
     <div class="container">
-        <!-- Prae Rulebook (main content) -->
+        <!-- Prae Rulebook -->
         <div id="prae-rulebook" class="content-section active">
             <div class="sidebar">
                 <div id="sidebar-content"></div>
@@ -24,7 +26,7 @@
             <div class="main-content">
                 <h1>Prae Rulebook</h1>
                 <div id="search-container">
-                    <input type="text" id="search" placeholder="Filter sections by input (e.g., Strike, Magic, or Abilities)">
+                    <input type="text" id="search" placeholder="Filter sections (e.g. Strike, Magic, Athletics)">
                 </div>
                 <div id="content-sections"></div>
             </div>
@@ -34,19 +36,51 @@
         <div id="fables" class="content-section">
             <div class="main-content">
                 <h1>Fables of Faen</h1>
-                <p>Content for Fables of Faen will go here.</p>
+                <p>Coming soon...</p>
             </div>
         </div>
 
         <!-- Character Creator -->
         <div id="character-creator" class="content-section">
-            <div class="main-content">
+            <div class="main-content character-creator-page">
                 <h1>Character Creator</h1>
-                <p>Character creation tools will go here.</p>
+                <div id="character-form">Loading character sheet...</div>
+                <div style="text-align:center; margin-top:30px;">
+                    <button id="export-csv" class="btn">Download Character as CSV</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <!-- Character Creator logic — loaded dynamically -->
+    <script id="creator-script" src="creator-script.js" type="text/javascript"></script>
+
+    <script>
+        // Navigation logic
+        document.querySelectorAll('.nav-list a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = link.dataset.section;
+
+                // Update active tab
+                document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+
+                document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
+                link.classList.add('active');
+
+                // Load Character Creator only when first opened
+                if (target === 'character-creator') {
+                    document.getElementById('creator-css').disabled = false;
+                    const script = document.getElementById('creator-script');
+                    if (!script.dataset.loaded) {
+                        script.onload = () => console.log("Character Creator loaded");
+                        script.dataset.loaded = "true";
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

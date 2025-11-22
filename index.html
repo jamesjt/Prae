@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prae System Compendium</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Character Creator styles — loaded only when needed -->
     <link rel="stylesheet" href="creator-styles.css" id="creator-css" disabled>
 </head>
 <body>
@@ -20,13 +19,11 @@
     <div class="container">
         <!-- Prae Rulebook -->
         <div id="prae-rulebook" class="content-section active">
-            <div class="sidebar">
-                <div id="sidebar-content"></div>
-            </div>
+            <div class="sidebar"><div id="sidebar-content"></div></div>
             <div class="main-content">
                 <h1>Prae Rulebook</h1>
                 <div id="search-container">
-                    <input type="text" id="search" placeholder="Filter sections (e.g. Strike, Magic, Athletics)">
+                    <input type="text" id="search" placeholder="Filter sections...">
                 </div>
                 <div id="content-sections"></div>
             </div>
@@ -34,18 +31,79 @@
 
         <!-- Fables of Faen -->
         <div id="fables" class="content-section">
-            <div class="main-content">
-                <h1>Fables of Faen</h1>
-                <p>Coming soon...</p>
-            </div>
+            <div class="main-content"><h1>Fables of Faen</h1><p>Coming soon...</p></div>
         </div>
 
-        <!-- Character Creator -->
+        <!-- Character Creator — Pure Static Structure -->
         <div id="character-creator" class="content-section">
             <div class="main-content character-creator-page">
                 <h1>Character Creator</h1>
-                <div id="character-form">Loading character sheet...</div>
-                <div style="text-align:center; margin-top:30px;">
+                <div id="character-sheet">
+                    <!-- Your old sheet — 100% static, beautiful -->
+                    <div class="char-info-bar">
+                        <input type="text" id="charName" placeholder="Character Name">
+                        <input type="number" id="charLvl" value="1" min="1" max="10">
+                        <select id="roleSelector"><option>Role</option></select>
+                    </div>
+
+                    <div class="stats-wrapper">
+                        <div class="attribute-wrapper physicalAtt">
+                            <span>Priority</span>
+                            <select id="bodyPriority" class="attributeSelect">
+                                <option value="">—</option>
+                                <option>Primary</option>
+                                <option>Secondary</option>
+                                <option>Tertiary</option>
+                            </select>
+                            <div class="attribute bodyColor">Body <div class="filledField">3</div></div>
+                            <div class="attributePoints">3</div>
+                        </div>
+
+                        <div class="subAttributeWrapper">
+                            <div class="subAttribute mightSkill">Might <input class="inputField" type="number" min="0" max="4" value="0"></div>
+                            <div class="subAttribute agilitySkill subMiddle">Agility <input class="inputField" type="number" min="0" max="4" value="0"></div>
+                            <div class="subAttribute brawnSkill">Brawn <input class="inputField" type="number" min="0" max="4" value="0"></div>
+                        </div>
+
+                        <div class="skillWrapper">
+                            <div class="skillListing mightSkill">
+                                <div class="skillName">Athletics</div>
+                                <div class="skillRank">
+                                    <select class="validSkills">
+                                        <option value="1">1: Unskilled</option>
+                                        <option value="2">2: Basic</option>
+                                        <option value="3" selected>3: Trained</option>
+                                        <option value="4">4: Adept</option>
+                                        <option value="5">5: Expert</option>
+                                        <option value="6">6: Master</option>
+                                    </select>
+                                </div>
+                                <div class="skillMod filledField">3</div>
+                                <div class="skillPassive filledField">6</div>
+                            </div>
+                            <!-- More skills... -->
+                        </div>
+                    </div>
+
+                    <div class="secondary-stats">
+                        <div class="secondaryAttributesWrapper">
+                            <div id="maxHP">HP <div id="maxHpValue">30</div></div>
+                            <div id="guard">Guard <div id="guardValue">10</div></div>
+                            <div id="armor">Armor <div id="armorValue">0</div></div>
+                        </div>
+                    </div>
+
+                    <div class="abilityWrapper">
+                        <div class="talentWrapper">
+                            <h3>Talents</h3>
+                            <select class="talentSelector"><option>None</option></select>
+                            <select class="talentSelector"><option>None</option></select>
+                        </div>
+                        <!-- More ability sections -->
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin:40px 0;">
                     <button id="export-csv" class="btn">Download Character as CSV</button>
                 </div>
             </div>
@@ -53,31 +111,21 @@
     </div>
 
     <script src="script.js"></script>
-    <!-- Character Creator logic — loaded dynamically -->
-    <script id="creator-script" src="creator-script.js" type="text/javascript"></script>
-
     <script>
-        // Navigation logic
+        // Tab navigation
         document.querySelectorAll('.nav-list a').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
                 const target = link.dataset.section;
 
-                // Update active tab
                 document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
 
                 document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
                 link.classList.add('active');
 
-                // Load Character Creator only when first opened
                 if (target === 'character-creator') {
                     document.getElementById('creator-css').disabled = false;
-                    const script = document.getElementById('creator-script');
-                    if (!script.dataset.loaded) {
-                        script.onload = () => console.log("Character Creator loaded");
-                        script.dataset.loaded = "true";
-                    }
                 }
             });
         });

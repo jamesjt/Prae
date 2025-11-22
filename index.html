@@ -9,23 +9,44 @@
 <body>
     <nav class="navbar">
         <div class="nav-list">
-            <div><a href="#prae">Prae</a></div>
-            <div><a href="#fables">Fables of Faen</a></div>
-            <div><a href="#character-creator">Character Creator</a></div>
+            <div><a href="#" data-section="prae-rulebook">Prae</a></div>
+            <div><a href="#" data-section="fables">Fables of Faen</a></div>
+            <div><a href="#" data-section="character-creator">Character Creator</a></div>
         </div>
     </nav>
+
     <div class="container">
-        <div class="sidebar">
-            <div id="sidebar-content"></div>
-        </div>
-        <div class="main-content">
-            <h1>Prae</h1>
-            <div id="search-container">
-                <input type="text" id="search" placeholder="Filter sections by input (e.g., Strike, Magic, or Abilities)">
+        <!-- Prae Rulebook (main content) -->
+        <div id="prae-rulebook" class="content-section active">
+            <div class="sidebar">
+                <div id="sidebar-content"></div>
             </div>
-            <div id="content-sections"></div>
+            <div class="main-content">
+                <h1>Prae Rulebook</h1>
+                <div id="search-container">
+                    <input type="text" id="search" placeholder="Filter sections by input (e.g., Strike, Magic, or Abilities)">
+                </div>
+                <div id="content-sections"></div>
+            </div>
+        </div>
+
+        <!-- Fables of Faen -->
+        <div id="fables" class="content-section">
+            <div class="main-content">
+                <h1>Fables of Faen</h1>
+                <p>Content for Fables of Faen will go here.</p>
+            </div>
+        </div>
+
+        <!-- Character Creator -->
+        <div id="character-creator" class="content-section">
+            <div class="main-content">
+                <h1>Character Creator</h1>
+                <p>Character creation tools will go here.</p>
+            </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

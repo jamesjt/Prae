@@ -1,14 +1,14 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
 let allData = [];
 
-// Count leading dashes to determine indent level (dashes stay visible)
+// Count leading dashes
 function getIndentLevel(text) {
     if (!text) return 0;
     const match = text.match(/^-+/);
     return match ? match[0].length : 0;
 }
 
-// Full CSV parser handling multiline quoted fields and escaped quotes
+// Parse CSV
 function parseCSV(csvText) {
     try {
         const rows = [];
@@ -49,7 +49,7 @@ function parseCSV(csvText) {
             while (values.length <= Math.max(sectionsIndex, detailsIndex)) values.push('');
             return {
                 Sections: values[sectionsIndex]?.trim() || '',
-                Details:  values[detailsIndex] || 'WIP'
+                Details: values[detailsIndex] || 'WIP'
             };
         }).filter(r => r.Sections);
 
@@ -116,7 +116,7 @@ function renderSidebar(data) {
             const element = document.getElementById(id);
             if (element) {
                 const navbarHeight = document.querySelector('.navbar').offsetHeight || 60;
-                const yOffset = -navbarHeight - 20; // 20px extra breathing room
+                const yOffset = -navbarHeight - 20;
                 const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                 window.scrollTo({ top: y, behavior: 'smooth' });
             }
@@ -126,7 +126,7 @@ function renderSidebar(data) {
     }
 }
 
-// Render sections with dash-based indentation
+// Render sections with dash indentation
 function renderSections(data, term = '') {
     try {
         const filtered = term ? filterData(data, term) : data;
@@ -183,7 +183,23 @@ function filterData(data, term) {
     return filtered;
 }
 
-// Load data
+// Navigation between sections
+document.querySelectorAll('.nav-list a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.getAttribute('data-section');
+        
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.classList.remove('active');
+        });
+        document.getElementById(target)?.classList.add('active');
+        
+        document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+    });
+});
+
+// Load Prae data
 fetch(CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {

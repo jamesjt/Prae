@@ -170,19 +170,17 @@ function renderSidebar(data) {
 
         let html = '';
         Object.keys(data).forEach(header => {
-            const isTraeaHeader = header.toLowerCase().includes('traea');
-            console.log(`Sidebar item: Header="${header.replace(/\n/g, '\\n')}" (from Sections, Traea=${isTraeaHeader})`);
+            console.log(`Sidebar item: Header="${header.replace(/\n/g, '\\n')}" (from Sections)`);
             const subitemHtml = data[header].subitems.map(subitem => {
-                const isTraeaSubitem = subitem.name.toLowerCase().includes('traea');
-                console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections, Traea=${isTraeaSubitem})`);
+                console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections)`);
                 return `
-                    <div class="sidebar-item sidebar-subitem ${isTraeaSubitem ? 'traea-item' : ''}" data-subitem="${subitem.name}" data-header="${header}">
+                    <div class="sidebar-item sidebar-subitem" data-subitem="${subitem.name}" data-header="${header}">
                         ${subitem.name}
                     </div>
                 `;
             }).join('');
             html += `
-                <div class="sidebar-item section-header ${isTraeaHeader ? 'traea-item' : ''}" data-header="${header}">
+                <div class="sidebar-item section-header" data-header="${header}">
                     ${header}
                 </div>
                 <div class="subitems" data-subitems="${header}">
@@ -190,7 +188,7 @@ function renderSidebar(data) {
                 </div>
             `;
         });
-        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">' + '</div>';
+        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">Debug: Sidebar headers (from Sections): ' + Object.keys(data).join(', ') + '</div>';
 
         console.log('Exact sidebar HTML generated (should only contain Sections values):\n', html);
 

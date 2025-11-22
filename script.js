@@ -1,8 +1,14 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
-
 let allData = [];
 
-// Full CSV parser handling multiline quoted fields and escaped quotes
+// Count leading dashes to determine indent level (dashes stay visible)
+function getIndentLevel(text) {
+    if (!text) return 0;
+    const match = text.match(/^-+/);
+    return match ? match[0].length : 0;
+}
+
+// Parse CSV (your original)
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
@@ -14,60 +20,28 @@ function parseCSV(csvText) {
         while (i < csvText.length) {
             const char = csvText[i];
             if (insideQuote) {
-                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') {
-                    currentValue += '"';
-                    i += 2;
-                    continue;
-                } else if (char === '"') {
-                    insideQuote = false;
-                    i++;
-                    continue;
-                } else {
-                    currentValue += char;
-                    i++;
-                    continue;
-                }
+                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
+                else if (char === '"') { insideQuote = false; i++; continue; }
+                else { currentValue += char; i++; continue; }
             } else {
-                if (char === '"') {
-                    insideQuote = true;
-                    i++;
-                    continue;
-                } else if (char === ',') {
+                if (char === '"') { insideQuote = true; i++; continue; }
+                else if (char === ',') { currentRow.push(currentValue); currentValue = ''; i++; continue; }
+                else if (char === '\r' || char === '\n') {
                     currentRow.push(currentValue);
-                    currentValue = '';
-                    i++;
-                    continue;
-                } else if (char === '\r' || char === '\n') {
-                    currentRow.push(currentValue);
-                    if (currentRow.some(v => v.trim() !== '')) {
-                        rows.push(currentRow);
-                    }
-                    currentRow = [];
-                    currentValue = '';
-                    i++;
+                    if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
+                    currentRow = []; currentValue = ''; i++;
                     if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
                     continue;
-                } else {
-                    currentValue += char;
-                    i++;
-                    continue;
-                }
+                } else { currentValue += char; i++; continue; }
             }
         }
         if (currentValue !== '' || currentRow.length > 0) {
             currentRow.push(currentValue);
-            if (currentRow.some(v => v.trim() !== '')) {
-                rows.push(currentRow);
-            }
+            if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
         }
-
         console.log('Parsed raw rows:', rows.length);
-
-        // Headers
         const headers = (rows[0] || []).map(h => h.trim());
         console.log('Raw headers from CSV:', headers);
-
-        // Identify Sections (B) and Details (C) columns
         let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
         if (sectionsIndex === -1) {
             console.warn('Warning: "Sections" header not found, falling back to column B (index 1)');
@@ -80,8 +54,6 @@ function parseCSV(csvText) {
         }
         console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${sectionsIndex < headers.length ? headers[sectionsIndex] : 'N/A'}")`);
         console.log(`Column C (Details) mapped to index ${detailsIndex} ("${detailsIndex < headers.length ? headers[detailsIndex] : 'N/A'}")`);
-
-        // Parse rows
         const dataRows = rows.slice(1).map((values, rowIndex) => {
             if (values.length < Math.max(sectionsIndex, detailsIndex) + 1) {
                 console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
@@ -96,11 +68,8 @@ function parseCSV(csvText) {
             console.log(`Row ${rowIndex + 2} - Sections (B): "${rowObj.Sections}" | Details (C): "${rowObj.Details.substring(0, 50).replace(/\n/g, '\\n')}..."`);
             return rowObj;
         }).filter(row => row.Sections);
-
         console.log('Parsed data rows:', dataRows.length);
         console.log('Sample row:', dataRows[0] || 'No sample (empty rows)');
-
-        // Validate Sections values
         dataRows.forEach((row, i) => {
             if (row.Sections.length > 100) {
                 console.warn(`Row ${i + 2} warning: Sections value "${row.Sections.substring(0, 50).replace(/\n/g, '\\n')}..." is unusually long, possible Details contamination`);
@@ -109,7 +78,6 @@ function parseCSV(csvText) {
                 console.warn(`Row ${i + 2} warning: Sections value contains HTML-like tags, but parser treats as text`);
             }
         });
-
         return { headers, rows: dataRows, sectionsIndex, detailsIndex };
     } catch (error) {
         console.error('CSV parsing failed:', error);
@@ -167,7 +135,6 @@ function renderSidebar(data) {
             sidebar.innerHTML = '<div class="no-results">No sections available</div>';
             return;
         }
-
         let html = '';
         Object.keys(data).forEach(header => {
             const isTraeaHeader = header.toLowerCase().includes('traea');
@@ -236,22 +203,23 @@ function renderSections(data, searchTerm = '') {
         }
         let html = '';
         const filteredData = searchTerm ? filterData(data, searchTerm) : data;
-
         if (Object.keys(filteredData).length === 0) {
             html = '<div class="no-results">No results found.</div>';
             console.log('No results after filtering');
         } else {
             Object.keys(filteredData).forEach(header => {
+                const indentLevel = getIndentLevel(filteredData[header].details);
                 html += `
-                    <div class="section" id="${header.replace(/\s+/g, '-')}">
+                    <div class="section indent-${indentLevel}" id="${header.replace(/\s+/g, '-')}">
                         <h3>${header}</h3>
                         <div class="section-content">${filteredData[header].details.replace(/\n/g, '<br/>')}</div>
                     </div>
                 `;
                 filteredData[header].subitems.forEach(subitem => {
                     const isTraea = subitem.name.toLowerCase().includes('traea');
+                    const subIndentLevel = getIndentLevel(subitem.details);
                     html += `
-                        <div class="section ${isTraea ? 'traea-section' : ''}" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
+                        <div class="section ${isTraea ? 'traea-section' : ''} indent-${subIndentLevel}" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
                             <h3>${subitem.name}</h3>
                             <div class="section-content">${subitem.details.replace(/\n/g, '<br/>')}</div>
                         </div>

@@ -261,3 +261,8 @@ h1 {
 .level-list div:first-child{background-color: rgba(74, 53, 34,1);padding: 0px 7px;color:whitesmoke;}
 .way-text{margin-right:15px;}
 
+/* Indentation for leading dashes — keeps dashes visible */
+.indent-1 { margin-left: 2em; }
+.indent-2 { margin-left: 4em; }
+.indent-3 { margin-left: 6em; }
+.indent-4 { margin-left: 8em; }

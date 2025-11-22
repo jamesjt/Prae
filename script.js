@@ -8,7 +8,7 @@ function getIndentLevel(text) {
     return match ? match[0].length : 0;
 }
 
-// Parse CSV (your original)
+// Full CSV parser handling multiline quoted fields and escaped quotes
 function parseCSV(csvText) {
     console.log('Parsing CSV...');
     try {
@@ -20,28 +20,57 @@ function parseCSV(csvText) {
         while (i < csvText.length) {
             const char = csvText[i];
             if (insideQuote) {
-                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
-                else if (char === '"') { insideQuote = false; i++; continue; }
-                else { currentValue += char; i++; continue; }
+                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') {
+                    currentValue += '"';
+                    i += 2;
+                    continue;
+                } else if (char === '"') {
+                    insideQuote = false;
+                    i++;
+                    continue;
+                } else {
+                    currentValue += char;
+                    i++;
+                    continue;
+                }
             } else {
-                if (char === '"') { insideQuote = true; i++; continue; }
-                else if (char === ',') { currentRow.push(currentValue); currentValue = ''; i++; continue; }
-                else if (char === '\r' || char === '\n') {
+                if (char === '"') {
+                    insideQuote = true;
+                    i++;
+                    continue;
+                } else if (char === ',') {
                     currentRow.push(currentValue);
-                    if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
-                    currentRow = []; currentValue = ''; i++;
+                    currentValue = '';
+                    i++;
+                    continue;
+                } else if (char === '\r' || char === '\n') {
+                    currentRow.push(currentValue);
+                    if (currentRow.some(v => v.trim() !== '')) {
+                        rows.push(currentRow);
+                    }
+                    currentRow = [];
+                    currentValue = '';
+                    i++;
                     if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
                     continue;
-                } else { currentValue += char; i++; continue; }
+                } else {
+                    currentValue += char;
+                    i++;
+                    continue;
+                }
             }
         }
         if (currentValue !== '' || currentRow.length > 0) {
             currentRow.push(currentValue);
-            if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
+            if (currentRow.some(v => v.trim() !== '')) {
+                rows.push(currentRow);
+            }
         }
         console.log('Parsed raw rows:', rows.length);
+        // Headers
         const headers = (rows[0] || []).map(h => h.trim());
         console.log('Raw headers from CSV:', headers);
+        // Identify Sections (B) and Details (C) columns
         let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
         if (sectionsIndex === -1) {
             console.warn('Warning: "Sections" header not found, falling back to column B (index 1)');
@@ -54,6 +83,7 @@ function parseCSV(csvText) {
         }
         console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${sectionsIndex < headers.length ? headers[sectionsIndex] : 'N/A'}")`);
         console.log(`Column C (Details) mapped to index ${detailsIndex} ("${detailsIndex < headers.length ? headers[detailsIndex] : 'N/A'}")`);
+        // Parse rows
         const dataRows = rows.slice(1).map((values, rowIndex) => {
             if (values.length < Math.max(sectionsIndex, detailsIndex) + 1) {
                 console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
@@ -70,6 +100,7 @@ function parseCSV(csvText) {
         }).filter(row => row.Sections);
         console.log('Parsed data rows:', dataRows.length);
         console.log('Sample row:', dataRows[0] || 'No sample (empty rows)');
+        // Validate Sections values
         dataRows.forEach((row, i) => {
             if (row.Sections.length > 100) {
                 console.warn(`Row ${i + 2} warning: Sections value "${row.Sections.substring(0, 50).replace(/\n/g, '\\n')}..." is unusually long, possible Details contamination`);
@@ -84,7 +115,6 @@ function parseCSV(csvText) {
         throw error;
     }
 }
-
 // Organize data by column B (Sections) only for sidebar
 function organizeData(rows) {
     console.log('Organizing data...');
@@ -120,7 +150,6 @@ function organizeData(rows) {
         throw error;
     }
 }
-
 // Render sidebar (strictly from Sections column)
 function renderSidebar(data) {
     console.log('Rendering sidebar...');
@@ -158,9 +187,7 @@ function renderSidebar(data) {
             `;
         });
         sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">' + '</div>';
-
         console.log('Exact sidebar HTML generated (should only contain Sections values):\n', html);
-
         // Add click handlers for headers
         document.querySelectorAll('.section-header').forEach(header => {
             header.addEventListener('click', () => {
@@ -170,7 +197,6 @@ function renderSidebar(data) {
                 console.log(`Toggled visibility for header: ${header.dataset.header}`);
             });
         });
-
         // Add click handlers for scrolling
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.addEventListener('click', () => {
@@ -191,7 +217,6 @@ function renderSidebar(data) {
         throw error;
     }
 }
-
 // Render content sections (from Details only)
 function renderSections(data, searchTerm = '') {
     console.log('Rendering sections...');
@@ -234,7 +259,6 @@ function renderSections(data, searchTerm = '') {
         throw error;
     }
 }
-
 // Filter data based on search term
 function filterData(data, searchTerm) {
     console.log('Filtering data with term:', searchTerm);
@@ -261,7 +285,6 @@ function filterData(data, searchTerm) {
         throw error;
     }
 }
-
 // Fetch and load data
 console.log('Fetching CSV from:', CSV_URL);
 fetch(CSV_URL)
@@ -288,7 +311,6 @@ fetch(CSV_URL)
         document.getElementById('sidebar-content').innerHTML = 
             '<div class="no-results">Error loading sections. Check console for details.</div>';
     });
-
 // Search functionality
 document.getElementById('search').addEventListener('input', (e) => {
     const searchTerm = e.target.value;

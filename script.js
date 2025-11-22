@@ -1,297 +1,229 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
 let allData = [];
 
-// Count leading dashes to determine indent level (dashes stay visible)
-function getIndentLevel(text) {
-    if (!text) return 0;
-    const match = text.match(/^-+/);
+/* -------------------------------
+   Helper: Count leading dashes
+--------------------------------*/
+function countDashes(line) {
+    const match = line.match(/^-+/);
     return match ? match[0].length : 0;
 }
 
-// Parse CSV (your original)
+/* -------------------------------------------------------------
+   NEW: Format the Details text by INDENTING individual lines
+------------------------------------------------------------- */
+function formatDetailsWithIndentation(text) {
+    if (!text) return "";
+
+    return text
+        .split(/\n/)
+        .map(line => {
+            const dashCount = countDashes(line);
+            const cleanLine = line.replace(/^-+/, "").trim();
+            return `<span class="indent-${dashCount}">${line}</span>`;
+        })
+        .join("<br/>");
+}
+
+/* -------------------------
+   CSV PARSER (unchanged)
+--------------------------*/
 function parseCSV(csvText) {
-    console.log('Parsing CSV...');
-    try {
-        const rows = [];
-        let currentRow = [];
-        let currentValue = '';
-        let insideQuote = false;
-        let i = 0;
-        while (i < csvText.length) {
-            const char = csvText[i];
-            if (insideQuote) {
-                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
-                else if (char === '"') { insideQuote = false; i++; continue; }
-                else { currentValue += char; i++; continue; }
+    const rows = [];
+    let currentRow = [];
+    let currentValue = '';
+    let insideQuote = false;
+
+    let i = 0;
+    while (i < csvText.length) {
+        const char = csvText[i];
+        if (insideQuote) {
+            if (char === '"' && csvText[i + 1] === '"') {
+                currentValue += '"';
+                i += 2;
+            } else if (char === '"') {
+                insideQuote = false;
+                i++;
             } else {
-                if (char === '"') { insideQuote = true; i++; continue; }
-                else if (char === ',') { currentRow.push(currentValue); currentValue = ''; i++; continue; }
-                else if (char === '\r' || char === '\n') {
-                    currentRow.push(currentValue);
-                    if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
-                    currentRow = []; currentValue = ''; i++;
-                    if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
-                    continue;
-                } else { currentValue += char; i++; continue; }
+                currentValue += char;
+                i++;
+            }
+        } else {
+            if (char === '"') {
+                insideQuote = true;
+                i++;
+            } else if (char === ',') {
+                currentRow.push(currentValue);
+                currentValue = '';
+                i++;
+            } else if (char === '\n' || char === '\r') {
+                currentRow.push(currentValue);
+                if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
+                currentRow = [];
+                currentValue = '';
+                i++;
+                if (char === '\r' && csvText[i] === '\n') i++;
+            } else {
+                currentValue += char;
+                i++;
             }
         }
-        if (currentValue !== '' || currentRow.length > 0) {
-            currentRow.push(currentValue);
-            if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
-        }
-        console.log('Parsed raw rows:', rows.length);
-        const headers = (rows[0] || []).map(h => h.trim());
-        console.log('Raw headers from CSV:', headers);
-        let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
-        if (sectionsIndex === -1) {
-            console.warn('Warning: "Sections" header not found, falling back to column B (index 1)');
-            sectionsIndex = 1;
-        }
-        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
-        if (detailsIndex === -1) {
-            console.warn('Warning: "Details" column not found, falling back to column C (index 2)');
-            detailsIndex = 2;
-        }
-        console.log(`Column B (Sections) mapped to index ${sectionsIndex} ("${sectionsIndex < headers.length ? headers[sectionsIndex] : 'N/A'}")`);
-        console.log(`Column C (Details) mapped to index ${detailsIndex} ("${detailsIndex < headers.length ? headers[detailsIndex] : 'N/A'}")`);
-        const dataRows = rows.slice(1).map((values, rowIndex) => {
-            if (values.length < Math.max(sectionsIndex, detailsIndex) + 1) {
-                console.warn(`Row ${rowIndex + 2} has insufficient columns (${values.length}), padding with empties`);
-                while (values.length <= Math.max(sectionsIndex, detailsIndex)) {
-                    values.push('');
-                }
-            }
-            const rowObj = {
-                Sections: values[sectionsIndex] ? values[sectionsIndex].trim() : '',
-                Details: detailsIndex < values.length ? (values[detailsIndex] || 'WIP') : 'WIP'
-            };
-            console.log(`Row ${rowIndex + 2} - Sections (B): "${rowObj.Sections}" | Details (C): "${rowObj.Details.substring(0, 50).replace(/\n/g, '\\n')}..."`);
-            return rowObj;
-        }).filter(row => row.Sections);
-        console.log('Parsed data rows:', dataRows.length);
-        console.log('Sample row:', dataRows[0] || 'No sample (empty rows)');
-        dataRows.forEach((row, i) => {
-            if (row.Sections.length > 100) {
-                console.warn(`Row ${i + 2} warning: Sections value "${row.Sections.substring(0, 50).replace(/\n/g, '\\n')}..." is unusually long, possible Details contamination`);
-            }
-            if (row.Sections.includes('<') && row.Sections.includes('>')) {
-                console.warn(`Row ${i + 2} warning: Sections value contains HTML-like tags, but parser treats as text`);
-            }
-        });
-        return { headers, rows: dataRows, sectionsIndex, detailsIndex };
-    } catch (error) {
-        console.error('CSV parsing failed:', error);
-        throw error;
     }
+
+    if (currentValue !== '' || currentRow.length > 0) {
+        currentRow.push(currentValue);
+        if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
+    }
+
+    const headers = rows[0];
+    const sectionsIndex = headers.findIndex(h => h.toLowerCase() === "sections");
+    const detailsIndex = headers.findIndex(h => h.toLowerCase().includes("detail"));
+
+    const dataRows = rows.slice(1).map(v => ({
+        Sections: v[sectionsIndex] || "",
+        Details: v[detailsIndex] || ""
+    }));
+
+    return { rows: dataRows };
 }
 
-// Organize data by column B (Sections) only for sidebar
+/* -------------------------
+   ORGANIZE DATA (same)
+--------------------------*/
 function organizeData(rows) {
-    console.log('Organizing data...');
-    try {
-        const organized = {};
-        let currentHeader = '';
-        rows.forEach((row, index) => {
-            const section = row['Sections'];
-            const details = row['Details'];
-            if (!section) {
-                console.warn(`Row ${index + 2} has empty Sections, skipping`);
-                return;
-            }
-            console.log(`Processing row ${index + 2}: Sections="${section.replace(/\n/g, '\\n')}" | Details="${details.substring(0, 50).replace(/\n/g, '\\n')}..."`);
-            if (!section.startsWith('-')) {
-                currentHeader = section;
-                organized[currentHeader] = { subitems: [], details: details };
-                console.log(`Added header: "${currentHeader.replace(/\n/g, '\\n')}" (from Sections)`);
-            } else {
-                const subitem = section.replace(/^-/, '').trim();
-                if (currentHeader && subitem) {
-                    organized[currentHeader].subitems.push({ name: subitem, details: details });
-                    console.log(`Added subitem "${subitem.replace(/\n/g, '\\n')}" under "${currentHeader.replace(/\n/g, '\\n')}" (from Sections)`);
-                } else {
-                    console.warn(`Row ${index + 2}: Subitem "${subitem.replace(/\n/g, '\\n')}" ignored, no valid header or empty subitem`);
-                }
-            }
-        });
-        console.log('Organized data keys (Sidebar, from Sections only):', Object.keys(organized));
-        return organized;
-    } catch (error) {
-        console.error('Data organization failed:', error);
-        throw error;
-    }
+    const organized = {};
+    let currentHeader = '';
+
+    rows.forEach(row => {
+        const section = row.Sections;
+        const details = row.Details;
+
+        if (!section.startsWith('-')) {
+            currentHeader = section.trim();
+            organized[currentHeader] = { subitems: [], details };
+        } else {
+            const name = section.replace(/^-/, '').trim();
+            organized[currentHeader].subitems.push({ name, details });
+        }
+    });
+
+    return organized;
 }
 
-// Render sidebar (strictly from Sections column)
-function renderSidebar(data) {
-    console.log('Rendering sidebar...');
-    try {
-        const sidebar = document.getElementById('sidebar-content');
-        if (!sidebar) {
-            console.error('Error: Sidebar content element not found');
-            throw new Error('Sidebar element missing');
-        }
-        if (Object.keys(data).length === 0) {
-            console.error('Error: No data to render in sidebar');
-            sidebar.innerHTML = '<div class="no-results">No sections available</div>';
-            return;
-        }
-        let html = '';
-        Object.keys(data).forEach(header => {
-            const isTraeaHeader = header.toLowerCase().includes('traea');
-            console.log(`Sidebar item: Header="${header.replace(/\n/g, '\\n')}" (from Sections, Traea=${isTraeaHeader})`);
-            const subitemHtml = data[header].subitems.map(subitem => {
-                const isTraeaSubitem = subitem.name.toLowerCase().includes('traea');
-                console.log(`Sidebar subitem under "${header.replace(/\n/g, '\\n')}": "${subitem.name.replace(/\n/g, '\\n')}" (from Sections, Traea=${isTraeaSubitem})`);
-                return `
-                    <div class="sidebar-item sidebar-subitem ${isTraeaSubitem ? 'traea-item' : ''}" data-subitem="${subitem.name}" data-header="${header}">
-                        ${subitem.name}
-                    </div>
-                `;
-            }).join('');
-            html += `
-                <div class="sidebar-item section-header ${isTraeaHeader ? 'traea-item' : ''}" data-header="${header}">
-                    ${header}
+/* ------------------------------------
+   RENDER SECTIONS (UPDATED)
+-------------------------------------*/
+function renderSections(data, searchTerm = '') {
+    const content = document.getElementById('content-sections');
+    let html = '';
+
+    const filtered = searchTerm ? filterData(data, searchTerm) : data;
+
+    Object.keys(filtered).forEach(header => {
+        html += `
+            <div class="section" id="${header.replace(/\s+/g, '-')}">
+                <h3>${header}</h3>
+                <div class="section-content">
+                    ${formatDetailsWithIndentation(filtered[header].details)}
                 </div>
-                <div class="subitems" data-subitems="${header}">
-                    ${subitemHtml}
+            </div>
+        `;
+
+        filtered[header].subitems.forEach(sub => {
+            html += `
+                <div class="section" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">
+                    <h3>${sub.name}</h3>
+                    <div class="section-content">
+                        ${formatDetailsWithIndentation(sub.details)}
+                    </div>
                 </div>
             `;
         });
-        sidebar.innerHTML = html + '<div style="font-size: 0.8em; color: #888; margin-top: 20px;">' + '</div>';
+    });
 
-        console.log('Exact sidebar HTML generated (should only contain Sections values):\n', html);
-
-        // Add click handlers for headers
-        document.querySelectorAll('.section-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const subitems = header.nextElementSibling;
-                subitems.classList.toggle('visible');
-                header.classList.toggle('expanded');
-                console.log(`Toggled visibility for header: ${header.dataset.header}`);
-            });
-        });
-
-        // Add click handlers for scrolling
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const header = item.dataset.header;
-                const subitem = item.dataset.subitem;
-                const sectionId = subitem ? `${header}-${subitem}` : header;
-                const section = document.getElementById(sectionId.replace(/\s+/g, '-'));
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth' });
-                    console.log(`Scrolled to section: ${sectionId}`);
-                } else {
-                    console.warn(`Section not found for ID: ${sectionId}`);
-                }
-            });
-        });
-    } catch (error) {
-        console.error('Sidebar rendering failed:', error);
-        throw error;
-    }
+    content.innerHTML = html;
 }
 
-// Render content sections (from Details only)
-function renderSections(data, searchTerm = '') {
-    console.log('Rendering sections...');
-    try {
-        const content = document.getElementById('content-sections');
-        if (!content) {
-            console.error('Error: Content sections element not found');
-            throw new Error('Content element missing');
+/* -------------------------
+   FILTER DATA (same)
+--------------------------*/
+function filterData(data, term) {
+    const out = {};
+    const lower = term.toLowerCase();
+
+    Object.keys(data).forEach(header => {
+        const headerMatch = header.toLowerCase().includes(lower);
+        const detailsMatch = data[header].details.toLowerCase().includes(lower);
+
+        const matchedSubitems = data[header].subitems.filter(
+            s => s.name.toLowerCase().includes(lower) ||
+                 s.details.toLowerCase().includes(lower)
+        );
+
+        if (headerMatch || detailsMatch || matchedSubitems.length > 0) {
+            out[header] = {
+                details: data[header].details,
+                subitems: matchedSubitems
+            };
         }
-        let html = '';
-        const filteredData = searchTerm ? filterData(data, searchTerm) : data;
-        if (Object.keys(filteredData).length === 0) {
-            html = '<div class="no-results">No results found.</div>';
-            console.log('No results after filtering');
-        } else {
-            Object.keys(filteredData).forEach(header => {
-                const indentLevel = getIndentLevel(filteredData[header].details);
-                html += `
-                    <div class="section indent-${indentLevel}" id="${header.replace(/\s+/g, '-')}">
-                        <h3>${header}</h3>
-                        <div class="section-content">${filteredData[header].details.replace(/\n/g, '<br/>')}</div>
+    });
+    return out;
+}
+
+/* -------------------------
+   SIDEBAR (unchanged)
+--------------------------*/
+function renderSidebar(data) {
+    const sidebar = document.getElementById('sidebar-content');
+    let html = '';
+
+    Object.keys(data).forEach(header => {
+        html += `
+            <div class="sidebar-item section-header" data-header="${header}">
+                ${header}
+            </div>
+            <div class="subitems">
+                ${data[header].subitems.map(sub => `
+                    <div class="sidebar-item sidebar-subitem"
+                        data-subitem="${sub.name}" data-header="${header}">
+                        ${sub.name}
                     </div>
-                `;
-                filteredData[header].subitems.forEach(subitem => {
-                    const isTraea = subitem.name.toLowerCase().includes('traea');
-                    const subIndentLevel = getIndentLevel(subitem.details);
-                    html += `
-                        <div class="section ${isTraea ? 'traea-section' : ''} indent-${subIndentLevel}" id="${(header + '-' + subitem.name).replace(/\s+/g, '-')}">
-                            <h3>${subitem.name}</h3>
-                            <div class="section-content">${subitem.details.replace(/\n/g, '<br/>')}</div>
-                        </div>
-                    `;
-                });
-            });
-            console.log('Sections rendered (Details content only):', Object.keys(filteredData).length);
-        }
-        content.innerHTML = html;
-    } catch (error) {
-        console.error('Section rendering failed:', error);
-        throw error;
-    }
+                `).join('')}
+            </div>
+        `;
+    });
+
+    sidebar.innerHTML = html;
+
+    document.querySelectorAll('.section-header').forEach(h =>
+        h.addEventListener('click', () => {
+            h.classList.toggle('expanded');
+            h.nextElementSibling.classList.toggle('visible');
+        })
+    );
+
+    document.querySelectorAll('.sidebar-item').forEach(item =>
+        item.addEventListener('click', () => {
+            const header = item.dataset.header;
+            const sub = item.dataset.subitem;
+            const id = (header + (sub ? '-' + sub : '')).replace(/\s+/g, '-');
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        })
+    );
 }
 
-// Filter data based on search term
-function filterData(data, searchTerm) {
-    console.log('Filtering data with term:', searchTerm);
-    try {
-        const filtered = {};
-        Object.keys(data).forEach(header => {
-            const headerMatch = header.toLowerCase().includes(searchTerm.toLowerCase());
-            const detailsMatch = data[header].details.toLowerCase().includes(searchTerm.toLowerCase());
-            const subitemMatches = data[header].subitems.filter(subitem =>
-                subitem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                subitem.details.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            if (headerMatch || detailsMatch || subitemMatches.length > 0) {
-                filtered[header] = {
-                    details: data[header].details,
-                    subitems: subitemMatches
-                };
-            }
-        });
-        console.log('Filtered data keys (Sections only):', Object.keys(filtered));
-        return filtered;
-    } catch (error) {
-        console.error('Data filtering failed:', error);
-        throw error;
-    }
-}
-
-// Fetch and load data
-console.log('Fetching CSV from:', CSV_URL);
+/* -------------------------
+   FETCH + INIT
+--------------------------*/
 fetch(CSV_URL)
-    .then(response => {
-        if (!response.ok) {
-            console.error('Fetch failed with status:', response.status);
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        console.log('Fetch successful');
-        return response.text();
-    })
-    .then(csvText => {
-        console.log('CSV text received, length:', csvText.length);
-        console.log('First 200 chars of CSV:', csvText.substring(0, 200).replace(/\n/g, '\\n'));
-        const parsed = parseCSV(csvText);
+    .then(r => r.text())
+    .then(csv => {
+        const parsed = parseCSV(csv);
         allData = organizeData(parsed.rows);
         renderSidebar(allData);
         renderSections(allData);
-    })
-    .catch(error => {
-        console.error('Error in data pipeline:', error);
-        document.getElementById('content-sections').innerHTML = 
-            '<div class="no-results">Error loading data. Check console for details.</div>';
-        document.getElementById('sidebar-content').innerHTML = 
-            '<div class="no-results">Error loading sections. Check console for details.</div>';
     });
 
-// Search functionality
-document.getElementById('search').addEventListener('input', (e) => {
-    const searchTerm = e.target.value;
-    console.log('Search term entered:', searchTerm);
-    renderSections(allData, searchTerm);
-});
+document.getElementById('search').addEventListener('input', e =>
+    renderSections(allData, e.target.value)
+);

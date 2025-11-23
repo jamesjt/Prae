@@ -255,6 +255,22 @@ function populateRoleInfo(event) {
             }
         }
 
+        // Set the attack type skill rank to 2 if not already higher
+        const attackType = attackSkillKey ? way.props[attackSkillKey].trim() : '';
+        const attackRankIdMap = {
+            'Strike': 'strikeSkillRank',
+            'Blast': 'blastSkillRank',
+            'Invoke': 'invokeSkillRank'
+        };
+        const attackRankId = attackRankIdMap[attackType];
+        if (attackRankId) {
+            const attackSelect = document.getElementById(attackRankId);
+            if (attackSelect && parseInt(attackSelect.value) < 2) {
+                attackSelect.value = '2';
+                attackSelect.dispatchEvent(new Event('change'));
+            }
+        }
+
         // Set primary attribute priority to value '1'
         const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
         let priorityId;

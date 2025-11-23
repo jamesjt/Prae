@@ -464,13 +464,24 @@ function updateSkillModAndPassive(skillId) {
     if (!subInput) return;
 
     const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
-    const skillName = skillId.replace('Rank', '');
+    const skillName = skillId.replace('SkillRank', '');
 
+    // Update main mod display (div)
     const modDisplay = document.getElementById(skillName + 'Mod');
     if (modDisplay) {
         modDisplay.innerText = modValue;
     }
 
+    // Update damage mod span if it's an attack skill
+    const attackSkills = ['strike', 'blast', 'invoke'];
+    if (attackSkills.includes(skillName.toLowerCase())) {
+        const damageModSpan = document.getElementById(skillName + 'DamageMod');
+        if (damageModSpan) {
+            damageModSpan.innerText = modValue;
+        }
+    }
+
+    // Update passive if needed
     const passiveDisplay = document.getElementById(skillName + 'Passive');
     if (passiveDisplay) {
         passiveDisplay.innerText = 2 + skillValue + modValue;

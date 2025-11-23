@@ -227,7 +227,7 @@
 .mindColor {background-color: #19315C; color:white;}
 .spiritColor{background-color: #281957; color:white;}
 
-.mightSkill, .brawnSkill { background-color: #E06666;}
+.mightSkill, .brawnSkill { background-color: #BD534D}
 .agilitySkill { background-color:  #EA9999;}
 .willSkill, .resolveSkill { background-color: #A4C2F4;}
 .witSkill { background-color: #C9DAF8;}
@@ -736,7 +736,15 @@
 #atkManWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .exploitWrapper {width: 250px;height: 200px;border-radius: 8px 8px 0px 0px;}
 
-.inputField{width: 30px;}
+.inputField{    width: 30px;
+    background-color: #BD534D;
+    border: none;
+    margin-left: 20px;
+    color: whitesmoke;}
+.inputField hover{
+    background-color: white;
+    color:black;
+}
 .attackSkills {margin-left: 1px;}
 .nonAttackSkills {margin-left: 1px;}
 

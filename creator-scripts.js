@@ -52,10 +52,9 @@ const SKILL_ID_MAP = {
     'Charm': 'charmSkillRank',
     'Calm': 'calmSkillRank',
     'Command': 'commandSkillRank',
-    // Add attack skills if they are separate and used in the sheet
-    //'Strikes': 'strikesSkillRank',
-    //'Blasts': 'blastsSkillRank',
-    //'Scolds': 'scoldsSkillRank',
+    'Strike': 'strikeSkillRank',
+    'Blast': 'blastSkillRank',
+    'Invoke': 'invokeSkillRank',
 };
 
 // Add this map after SKILL_ID_MAP
@@ -78,6 +77,9 @@ const SKILL_MOD_MAP = {
     'charmSkillRank': 'empathyValue',
     'calmSkillRank': 'faithValue',
     'commandSkillRank': 'faithValue',
+    'strikeSkillRank': 'bodyValue',
+    'blastSkillRank': 'mindValue',
+    'invokeSkillRank': 'spiritValue',
 };
 
 const ATTRIBUTE_GROUPS = {
@@ -456,7 +458,7 @@ function updateSkillModAndPassive(skillId) {
     const subInput = document.getElementById(subId);
     if (!subInput) return;
 
-    const modValue = parseInt(subInput.value) || 0;
+    const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
     const skillName = skillId.replace('Rank', '');
 
     const modDisplay = document.getElementById(skillName + 'Mod');

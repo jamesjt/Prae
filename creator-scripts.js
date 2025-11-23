@@ -229,6 +229,7 @@ function populateRoleInfo(event) {
             }
         }
         calculateAttPoints(); // Recalculate after changes
+        calculateAttributeValues(); // Update attribute values
     }
 }
 
@@ -310,6 +311,7 @@ function atkManAmount(event) {
 
 function setAttPoints(event) {
     calculateAttPoints();
+    calculateAttributeValues();
 }
 
 function calculateAttPoints() {
@@ -343,9 +345,53 @@ function calculateAttPoints() {
     document.getElementById('spiritAttributePoints').innerText = spiritPoints;
 }
 
+function calculateAttributeValues() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+
+    const priVal = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
+    const secVal = 2 + (level >= 6 ? 1 : 0);
+    const terVal = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
+
+    const bodyPri = document.getElementById('bodyPriority').value || '';
+    let bodyVal = 0;
+    if (bodyPri === '1') bodyVal = priVal;
+    else if (bodyPri === '2') bodyVal = secVal;
+    else if (bodyPri === '3') bodyVal = terVal;
+    document.getElementById('bodyValue').innerText = bodyVal;
+
+    const mindPri = document.getElementById('mindPriority').value || '';
+    let mindVal = 0;
+    if (mindPri === '1') mindVal = priVal;
+    else if (mindPri === '2') mindVal = secVal;
+    else if (mindPri === '3') mindVal = terVal;
+    document.getElementById('mindValue').innerText = mindVal;
+
+    const spiritPri = document.getElementById('spiritPriority').value || '';
+    let spiritVal = 0;
+    if (spiritPri === '1') spiritVal = priVal;
+    else if (spiritPri === '2') spiritVal = secVal;
+    else if (spiritPri === '3') spiritVal = terVal;
+    document.getElementById('spiritValue').innerText = spiritVal;
+}
+
+// Add event listeners for priorities and level
+function addPriorityListeners() {
+    ['bodyPriority', 'mindPriority', 'spiritPriority', 'charLvl'].forEach(id => {
+        const elem = document.getElementById(id);
+        if (elem) {
+            elem.addEventListener('change', () => {
+                calculateAttPoints();
+                calculateAttributeValues();
+            });
+        }
+    });
+}
+
 // Call initial calculations on load
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
     calculateAttPoints();
+    calculateAttributeValues();
+    addPriorityListeners();
 });

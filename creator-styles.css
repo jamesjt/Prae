@@ -126,7 +126,7 @@
 
 #physicalStatsWrapper {background-color: #5F1817;margin-bottom: 5px;width:100%;}
 #mentalStatsWrapper {background-color: #19315C;margin-bottom: 5px;width: 100%;}
-#socialStatsWrapper {background-color: #797781;width: 100%;}
+#socialStatsWrapper {background-color: #281957;width: 100%;}
 
 #bodyPriority {}
 .att-desc-font{font-size: 8px}
@@ -184,7 +184,7 @@
 
 .mentalAtt {background-color: #19315C;}
 
-.socialAtt {background-color: #72639F;}
+.socialAtt {background-color: #281957;}
 
 .attributePoints {
     border: 1px solid black;
@@ -716,7 +716,7 @@
     background-color: white;
     color:black;
 }
-.attackSkills {margin-left: 1px;}
+.attackSkills {margin-left: 1px; color:whitesmoke; border: none;}
 .attackSkills:hover {margin-left: 1px;background-color: white;color:black;}
 .nonAttackSkills {margin-left: 1px; color:whitesmoke; border: none;}
 .nonAttackSkills:hover {margin-left: 1px;background-color: white;color:black;}

@@ -58,6 +58,27 @@ const SKILL_ID_MAP = {
     //'Scolds': 'scoldsSkillRank',
 };
 
+const ATTRIBUTE_GROUPS = {
+    physical: {
+        priorityId: 'bodyPriority',
+        pointsId: 'physicalAttributePoints',
+        primaryValueId: 'bodyValue',
+        subIds: ['mightValue', 'agilityValue', 'brawnValue']
+    },
+    mental: {
+        priorityId: 'mindPriority',
+        pointsId: 'mentalAttributePoints',
+        primaryValueId: 'mindValue',
+        subIds: ['willValue', 'witValue', 'resolveValue']
+    },
+    spirit: {
+        priorityId: 'spiritPriority',
+        pointsId: 'spiritAttributePoints',
+        primaryValueId: 'spiritValue',
+        subIds: ['vigorValue', 'faithValue', 'empathyValue']
+    }
+};
+
 let waysData = [];
 
 // Fetch and process ways
@@ -228,8 +249,8 @@ function populateRoleInfo(event) {
                 select.dispatchEvent(new Event('change'));
             }
         }
-        calculateAttPoints(); // Recalculate after changes
-        calculateAttributeValues(); // Update attribute values
+        calculateAttributeValues(); // Recalculate after changes
+        updateAttributeGroups();
     }
 }
 
@@ -310,39 +331,8 @@ function atkManAmount(event) {
 }
 
 function setAttPoints(event) {
-    calculateAttPoints();
     calculateAttributeValues();
-}
-
-function calculateAttPoints() {
-    const level = parseInt(document.getElementById('charLvl').value) || 1;
-
-    const priPoints = level + 2;
-    const secPoints = level + 1;
-    const terPoints = level;
-
-    // Assume IDs for priority selects: bodyPriority, mindPriority, spiritPriority with values '1' Primary, '2' Secondary, '3' Tertiary
-
-    const bodyPri = document.getElementById('bodyPriority') ? document.getElementById('bodyPriority').value : '';
-    let bodyPoints = 0;
-    if (bodyPri === '1') bodyPoints = priPoints;
-    else if (bodyPri === '2') bodyPoints = secPoints;
-    else if (bodyPri === '3') bodyPoints = terPoints;
-    document.getElementById('physicalAttributePoints').innerText = bodyPoints; // Assuming physical = body
-
-    const mindPri = document.getElementById('mindPriority') ? document.getElementById('mindPriority').value : '';
-    let mindPoints = 0;
-    if (mindPri === '1') mindPoints = priPoints;
-    else if (mindPri === '2') mindPoints = secPoints;
-    else if (mindPri === '3') mindPoints = terPoints;
-    document.getElementById('mentalAttributePoints').innerText = mindPoints;
-
-    const spiritPri = document.getElementById('spiritPriority') ? document.getElementById('spiritPriority').value : '';
-    let spiritPoints = 0;
-    if (spiritPri === '1') spiritPoints = priPoints;
-    else if (spiritPri === '2') spiritPoints = secPoints;
-    else if (spiritPri === '3') spiritPoints = terPoints;
-    document.getElementById('spiritAttributePoints').innerText = spiritPoints;
+    updateAttributeGroups();
 }
 
 function calculateAttributeValues() {
@@ -374,14 +364,56 @@ function calculateAttributeValues() {
     document.getElementById('spiritValue').innerText = spiritVal;
 }
 
+function updateAttributeGroups() {
+    Object.values(ATTRIBUTE_GROUPS).forEach(group => updateAttributeGroup(group));
+}
+
+function updateAttributeGroup(group) {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = document.getElementById(group.priorityId).value || '3';
+    let totalPoints = level;
+    if (pri === '1') totalPoints += 2;
+    else if (pri === '2') totalPoints += 1;
+    // ter = level
+
+    const primaryMax = parseInt(document.getElementById(group.primaryValueId).innerText) || 0;
+
+    let sum = 0;
+    group.subIds.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            let val = parseInt(input.value) || 0;
+            if (val > primaryMax) val = primaryMax;
+            if (val < 0) val = 0;
+            input.value = val;
+            sum += val;
+        }
+    });
+
+    const remaining = totalPoints - sum;
+    document.getElementById(group.pointsId).innerText = remaining;
+}
+
+// Add event listeners for sub-attributes
+function addSubListeners() {
+    Object.values(ATTRIBUTE_GROUPS).forEach(group => {
+        group.subIds.forEach(subId => {
+            const input = document.getElementById(subId);
+            if (input) {
+                input.addEventListener('change', () => updateAttributeGroup(group));
+            }
+        });
+    });
+}
+
 // Add event listeners for priorities and level
 function addPriorityListeners() {
     ['bodyPriority', 'mindPriority', 'spiritPriority', 'charLvl'].forEach(id => {
         const elem = document.getElementById(id);
         if (elem) {
             elem.addEventListener('change', () => {
-                calculateAttPoints();
                 calculateAttributeValues();
+                updateAttributeGroups();
             });
         }
     });
@@ -391,7 +423,8 @@ function addPriorityListeners() {
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
-    calculateAttPoints();
     calculateAttributeValues();
+    updateAttributeGroups();
     addPriorityListeners();
+    addSubListeners();
 });

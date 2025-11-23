@@ -164,6 +164,10 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     background-color: white !important;
 }
 
+select:has(> option[value="profUnassigned"]:checked)  {
+    background-color: white !important;
+}
+
 .attributeWrapper {
     width: 65px;
     height: 136px;
@@ -205,9 +209,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 
 .physicalAtt {background-color: #5F1817;}
-
 .mentalAtt {background-color: #19315C;}
-
 .socialAtt {background-color: #281957;}
 
 .attributePoints {
@@ -533,8 +535,11 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 .profDesc:empty{border:none;}
 .invokeProfSelector, .strikeProfSelector {position:relative;}
+.blastProfSelector {background-color: #1A305C; color:whitesmoke;}
+.strikeProfSelector {background-color: #5F1717; color:whitesmoke;}
+.invokeProfSelector {background-color: #281957; color:whitesmoke;}
 .invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
-.profSelector, .exploitSelector {width: 230px !important; font-size: 12px; margin-bottom: 6px;}
+.profSelector{width: 230px !important; font-size: 12px; margin-bottom: 6px;}
 
 /* Gear */
 

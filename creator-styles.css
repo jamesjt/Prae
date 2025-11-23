@@ -500,9 +500,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #strikeWrapper {width:236px;}
 #blastWrapper {width: 236px;}
-#scoldWrapper {width: 236px;}
+#invokeWrapper {width: 236px;}
 
-#strikeProfContainer, #blastProfContainer, #scoldProfContainer {
+#strikeProfContainer, #blastProfContainer, #invokeProfContainer {
     border-style: solid;
     border-width: 1px;
     padding-top: 7px;
@@ -514,7 +514,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 #strikeProfContainer{border-color: #4D0708; background-color: #B07C71;}
 #blastProfContainer {border-color: #19315C; background-color: #9BAABF;}
-#scoldProfContainer {border-color: #281957; background-color: #797781;}
+#invokeProfContainer {border-color: #281957; background-color: #797781;}
 
 .exploitDesc {
     font-size: 12px;
@@ -532,8 +532,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 
 .exploitDesc:empty{border:none;}
-.scoldProfSelector, .strikeProfSelector {position:relative;}
-.scoldProfSelector:hover .exploitDesc, .strikeProfSelector:hover .exploitDesc {display:block;}
+.invokeProfSelector, .strikeProfSelector {position:relative;}
+.invokeProfSelector:hover .exploitDesc, .strikeProfSelector:hover .exploitDesc {display:block;}
 .profSelector, .exploitSelector {width: 230px !important; font-size: 12px; margin-bottom: 6px;}
 
 /* Gear */

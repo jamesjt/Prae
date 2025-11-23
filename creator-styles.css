@@ -505,10 +505,6 @@ select:has(> option[value="profUnassigned"]:checked)  {
 #invokeWrapper {width: 236px;}
 
 .profContainer{
-    margin-top: -5px;
-}
-
-#strikeProfContainer, #blastProfContainer, #invokeProfContainer {
     border-style: solid;
     border-width: 1px;
     padding-top: 7px;
@@ -517,6 +513,7 @@ select:has(> option[value="profUnassigned"]:checked)  {
     padding-bottom: 2px;
     margin-bottom: 5px;
 }
+
 #strikeProfContainer{border-color: #4D0708; background-color: #B07C71;}
 #blastProfContainer {border-color: #19315C; background-color: #9BAABF;}
 #invokeProfContainer {border-color: #281957; background-color: #797781;}
@@ -542,7 +539,7 @@ select:has(> option[value="profUnassigned"]:checked)  {
 .strikeProfSelector {background-color: #5F1717; color:whitesmoke;}
 .invokeProfSelector {background-color: #281957; color:whitesmoke;}
 .invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
-.profSelector{width: 230px !important; font-size: 12px; margin-bottom: 6px;}
+.profSelector{font-size: 12px; border:none;}
 
 /* Gear */
 

@@ -561,13 +561,13 @@
     height: 100%;
     display:flex;
 }
-#talentHeader, #nonAtkManHeader, #atkManHeader, #exploitHeader {
+#talentHeader, #trickHeader, #atkManHeader, #exploitHeader {
   background-color: black;
   color:white;
   border-radius: 8px 8px 0px 0px;
   text-align:center;
 }
-#atkManAmount, #talentAmount, #exploitAmount, #nonAtkManAmount {width:40px;}
+#atkManAmount, #talentAmount, #exploitAmount, #trickAmount {width:40px;}
        
 .talentWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .talent, .talentSelector{ background-color:#6a877d !important;color:white;}

@@ -32,19 +32,30 @@ function parseWaysCSV(csvText) {
     return rows;
 }
 
-// Expand with all skill names and their IDs (add more as per your HTML)
+// Updated skill map based on provided skills
 const SKILL_ID_MAP = {
+    'Athletics': 'athleticsSkillRank',
+    'Force': 'forceSkillRank',
     'Acrobatics': 'acrobaticsSkillRank',
-    'Might': 'mightSkillRank',
-    'Brawn': 'brawnSkillRank',
-    'Agility': 'agilitySkillRank',
-    'Will': 'willSkillRank',
-    'Resolve': 'resolveSkillRank',
-    'Wit': 'witSkillRank',
-    'Vigor': 'vigorSkillRank',
-    'Faith': 'faithSkillRank',
-    'Empathy': 'empathySkillRank',
-    // Add all other skills, e.g., 'Strikes': 'strikesSkillRank', 'Blasts': 'blastsSkillRank', 'Scolds': 'scoldsSkillRank', etc.
+    'Sneak': 'sneakSkillRank',
+    'Endurance': 'enduranceSkillRank',
+    'Poise': 'poiseSkillRank',
+    'Lore': 'loreSkillRank',
+    'Tinkering': 'tinkeringSkillRank',
+    'Deception': 'deceptionSkillRank',
+    'Insight': 'insightSkillRank',
+    'Awareness': 'awarenessSkillRank',
+    'Survival': 'survivalSkillRank',
+    'Compel': 'compelSkillRank',
+    'Rouse': 'rouseSkillRank',
+    'Assure': 'assureSkillRank',
+    'Charm': 'charmSkillRank',
+    'Calm': 'calmSkillRank',
+    'Command': 'commandSkillRank',
+    // If there are attack skills like 'Strikes', 'Blasts', 'Scolds' in the sheet, add them here if needed
+    //'Strikes': 'strikesSkillRank',
+    //'Blasts': 'blastsSkillRank',
+    //'Scolds': 'scoldsSkillRank',
 };
 
 let waysData = [];
@@ -55,8 +66,11 @@ fetch(WAYS_CSV_URL)
     .then(text => {
         const rows = parseWaysCSV(text);
 
-        // Find include row
-        let includeRowIdx = rows.findIndex(row => row[0].toLowerCase().includes('include'));
+        // Log rows for debugging
+        console.log('Parsed Rows:', rows);
+
+        // Find include row - make matching case-insensitive
+        let includeRowIdx = rows.findIndex(row => row[0].toLowerCase().trim().includes('include'));
 
         if (includeRowIdx === -1) {
             console.error('Missing "Include" row in Ways CSV');
@@ -65,25 +79,48 @@ fetch(WAYS_CSV_URL)
 
         const includeRow = rows[includeRowIdx];
 
-        // Collect ways where include === 'TRUE'
+        // Log include row
+        console.log('Include Row:', includeRow);
+
+        // Collect ways where include === 'TRUE' or 'true' or '1'
         for (let col = 1; col < includeRow.length; col++) {
-            if (includeRow[col].toUpperCase() === 'TRUE') {
+            const includeValue = (includeRow[col] || '').toUpperCase().trim();
+            console.log(`Column ${col} Include: ${includeValue}`);
+            if (includeValue === 'TRUE' || includeValue === '1') {  // Handle possible '1' for checkbox
                 const props = {};
-                rows.forEach(row => {
-                    const key = row[0].trim();
+                rows.forEach((row, rowIdx) => {
+                    const key = (row[0] || '').trim().toLowerCase();
                     if (key) {
-                        props[key] = row[col].trim() || '';
+                        props[key] = (row[col] || '').trim();
                     }
                 });
 
-                const name = props['Way Name'];
-                const reqSkill = props['Required Skill'];
+                // Log props for this column
+                console.log(`Props for Column ${col}:`, props);
 
-                if (name && reqSkill && SKILL_ID_MAP[reqSkill]) {
-                    waysData.push({ name, props, reqSkill, skillId: SKILL_ID_MAP[reqSkill] });
+                const nameKey = Object.keys(props).find(k => k.includes('way name'));
+                const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
+
+                const name = nameKey ? props[nameKey] : '';
+                const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
+
+                if (name && reqSkill) {
+                    const normalizedReqSkill = reqSkill.trim(); // No toLowerCase for matching
+                    const skillId = SKILL_ID_MAP[normalizedReqSkill];
+                    if (skillId) {
+                        waysData.push({ name, props, reqSkill: normalizedReqSkill, skillId });
+                        console.log(`Added Way: ${name}, Req: ${normalizedReqSkill}, ID: ${skillId}`);
+                    } else {
+                        console.warn(`Skipping ${name}: No matching skill ID for "${normalizedReqSkill}" in SKILL_ID_MAP`);
+                    }
+                } else {
+                    console.warn(`Skipping Column ${col}: Missing name or reqSkill`);
                 }
             }
         }
+
+        // Log final waysData
+        console.log('Final Ways Data:', waysData);
 
         populateRoleSelector();
         addSkillListeners();
@@ -91,7 +128,6 @@ fetch(WAYS_CSV_URL)
     })
     .catch(err => {
         console.error('Error loading Ways CSV:', err);
-        // Fallback: hardcoded ways if needed
     });
 
 // Populate dropdown
@@ -124,7 +160,7 @@ function updateWayOptions() {
     const selector = document.getElementById('roleSelector');
     waysData.forEach(way => {
         const skillSelect = document.getElementById(way.skillId);
-        const isQualified = skillSelect && skillSelect.selectedIndex !== 0; // Not the first option (untrained)
+        const isQualified = skillSelect && skillSelect.selectedIndex !== 0;
         const option = selector.querySelector(`option[value="${way.name}"]`);
         if (option) {
             option.disabled = !isQualified;
@@ -140,15 +176,22 @@ function populateRoleInfo(event) {
 
     const way = waysData.find(w => w.name === value);
     if (way) {
-        // Set talent and maneuver using props (adjust keys based on your sheet)
-        document.getElementById('rTalentName').innerText = way.props['Talent Name'] || way.name;
-        document.getElementById('rTalentDesc').innerText = way.props['Talent Description'] || '';
-        document.getElementById('rManName').innerText = way.props['Foci Name'] || '';
-        document.getElementById('rManCost').innerText = way.props['Foci Cost'] || '';
-        document.getElementById('rManEffect').innerText = way.props['Foci Effect'] || '';
+        // Find keys case-insensitively for talent, foci, etc.
+        const talentNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent name'));
+        const talentDescKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent description'));
+        const fociNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci name'));
+        const fociCostKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci cost'));
+        const fociEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci effect'));
+        const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
+
+        document.getElementById('rTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
+        document.getElementById('rTalentDesc').innerText = talentDescKey ? way.props[talentDescKey] : '';
+        document.getElementById('rManName').innerText = fociNameKey ? way.props[fociNameKey] : '';
+        document.getElementById('rManCost').innerText = fociCostKey ? way.props[fociCostKey] : '';
+        document.getElementById('rManEffect').innerText = fociEffectKey ? way.props[fociEffectKey] : '';
 
         // Set the attack/required skill to 3:Trained if not already higher
-        const attackSkill = way.props['Attack Skill'] || way.reqSkill;
+        const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
         const skillId = SKILL_ID_MAP[attackSkill];
         if (skillId) {
             const skillSelect = document.getElementById(skillId);

@@ -513,7 +513,7 @@ select:has(> option[value="profUnassigned"]:checked)  {
     flex-direction: column;
     align-items: center;
 }
-.profSelector{font-size: 12px; border:none; width:236px;margin-top:4px;height:18px}
+.profSelector{font-size: 11px; border:none; width:236px;margin-top:4px;height:21px;}
 
 #strikeProfContainer{border-color: #4D0708; background-color: #B07C71;}
 #blastProfContainer {border-color: #19315C; background-color: #9BAABF;}
@@ -536,9 +536,9 @@ select:has(> option[value="profUnassigned"]:checked)  {
 
 .profDesc:empty{border:none;}
 .invokeProfSelector, .strikeProfSelector {position:relative;}
-.blastProfSelector {background-color: #1A305C; color:whitesmoke;}
-.strikeProfSelector {background-color: #5F1717; color:whitesmoke;}
-.invokeProfSelector {background-color: #281957; color:whitesmoke;}
+.strikeProfSelector {border:1px solid #5F1717; color:whitesmoke;background-color: #B07C71;}
+.blastProfSelector {border:1px solid #1A305C; color:whitesmoke; background-color: #9BAABF;}
+.invokeProfSelector {border:1px solid #281957; color:whitesmoke;background-color: #797781;}
 .invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
 
 

@@ -15,7 +15,6 @@
             <a href="#" data-section="character-creator">Character Creator</a>
         </div>
     </nav>
-
     <div class="container">
         <!-- Prae Rulebook -->
         <div id="prae-rulebook" class="content-section active">
@@ -28,30 +27,27 @@
                 <div id="content-sections"></div>
             </div>
         </div>
-
         <!-- Fables of Faen -->
         <div id="fables" class="content-section">
             <div class=""><h1>Fables of Faen</h1><p>Coming soon...</p></div>
         </div>
-
         <!-- Character Creator — Pure Static Structure -->
         <div id="character-creator" class="content-section">
             <section class="" id="">
-
             <article id="Traea" class="sectionBody">
                 <div id="charInfo">
                     Name <input id="charName" class="charText" type="text" >
                     Level <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1" onkeyup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);" onmouseup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);">
                     Childhood <input id="childhood" class="charText" type="text">
                     Training <input id="training" class="charText" type="text">
-                    Way 
+                    Way
                     <select id="roleSelector" onchange="populateRoleInfo(event);">
                       <option value=""></option>
                     </select>
                     <img id="showCheckList" class="charInfoHover" onclick="showDesc('checkList');" src="imgs/check.png">
                     <div id="checkList" class="charDetails draggable">
                       <div id="hideCheckList" class="closeRitual" onclick="hideDesc('checkList');">X</div>
-                      Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
+                      Remaining Skill Points <span id="skillPoints" class="filledField">12</span>
                       Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
                       <br/>
                       Total Abilities <span id="abilityNumber" class="filledField">7</span>
@@ -79,16 +75,15 @@
                         Select a Way.<br/>
                         <div class="indent">
                         - Increase the Way's attack skill Rank to 3:Trained<br/>
-                        - Learn the Talent and Foci related to your Way
+                        - Learn the Talent related to your Way
                         </div>
                       </div>
                       <div id="abilityCheck" class="checkSection">
                         Gain 5 Ability Points<br/>
                         <div class="indent">
                           - 1 must be used on for a Talent<br/>
-                          - 1 must be used for a Foci<br/>
-                          - 2 must be used for a Arcana<br/>
-                          - The remaining 1 can be used at player's discretion
+                          - 1 must be used for a Trick<br/>
+                          - The remaining 3 can be used at player's discretion
                         </div>
                       </div>
                       <div id="proficiencyCheck" class="checkSection">
@@ -112,11 +107,10 @@
                         <div class="indent">
                           - Select 1 Weapon for free<br/>
                           - Learn 1 Ritual you can cast for free<br/>
-                          - Purchase additional gear with 150 starting g. 
+                          - Purchase additional gear with 150 starting g.
                         </div>
                       </div>
                     </div>
-
                     <img id="showCharDesc" class="charInfoHover" onclick="showDesc('charDesc');" src="imgs/charDesc.png">
                     <div id="charDesc" class="charDetails draggable">
                       <div id="hideCharDesc" class="closeRitual" onclick="hideDesc('charDesc');">-</div>
@@ -160,7 +154,6 @@
                       <input id="gear12" class="gearInput" type="text">
                       <br/>
                       <textarea id="gearBucket"></textarea>
-
                     </div>
                     <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="imgs/notes.png">'
                     <div id="notes" class="charDetails draggable">
@@ -170,9 +163,8 @@
                       <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
                       <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
                     </div>
-                    <button id="charSave" onclick="saveCharacter();">Save</button>                    
+                    <button id="charSave" onclick="saveCharacter();">Save</button>
                 </div>
-
                 <div class="secondaryAttributesWrapper">
                   <div class="secondaryAttributes">
                     <div class="image" id="HP">
@@ -180,16 +172,16 @@
                     </div>
                     <div id="recovery">
                       <img id="recPtsImg" src="imgs/recPts.png" width="40px" height="40px">
-                      <input type="text" id="recoveryValue" value="1">       
+                      <input type="text" id="recoveryValue" value="1">
                     </div>
                     <div id="mana">
                       <img id="manaImg" src="imgs/mana.png" height="40px">
-                      <input type="text" id="manaValue" value="3">  
-                    </div> 
+                      <input type="text" id="manaValue" value="3">
+                    </div>
                     <div id="conversion">
                       <img id="manaImg" src="imgs/conversion.png" height="40px">
-                      <div id="conversionValue">3</div> 
-                    </div> 
+                      <div id="conversionValue">3</div>
+                    </div>
                     <div id="initialMomentum">
                       <img id="initialMomentumImg" src="imgs/initialMomentum.png" width="40px">
                       <div id="initialMomentumValue">3</div>
@@ -201,7 +193,7 @@
                     <div id="armor">
                       <img id="armorImg" src="imgs/armour.png" width="45px" height="40px">
                       <input type="text" id="armorValue" value="0">
-                    </div>            
+                    </div>
                     <div id="pace">
                       <img id="paceImg" src="imgs/pace.png" width="45px" height="30px">
                       <div id="paceValue">6</div>
@@ -210,9 +202,8 @@
                       <img id="initiativeImg" src="imgs/initiative.png" width="40px">
                       <div id="initiativeValue">0</div>
                     </div>
-                             
+                            
                   </div>
-
                   <div id="secondaryAttributeValues">
                     <div id="maxHPDesc">
                       Max HP
@@ -243,19 +234,16 @@
                     </div>
                     <div id="armorDesc">
                       Armor
-                    </div>            
+                    </div>
                     <div id="paceDesc">
                       Pace
                     </div>
                     <div id="initiativeDesc">
                      Init
                     </div>
-
-                    
-
+                   
                   </div>
                 </div> <!-- End Secondary Attributes Wrapper -->
-
                 <div class="columnWrapper">
                 <div id="column1">
                     <div id="skillHeader" class="skillListing">
@@ -272,10 +260,8 @@
                         Passive
                       </div>
                     </div>
-
                   <!-- Physical Stats Wrapper -->
-                  <div id="physicalStatsWrapper" class="statsWrapper"> 
-
+                  <div id="physicalStatsWrapper" class="statsWrapper">
                     <!-- Physical Attributes -->
                     <div class="attributeWrapper physicalAtt">
                       <span class="att-desc-font">Priority</span>
@@ -294,27 +280,25 @@
                       <span class="att-desc-font">Att Pts</span>
                       <div id="physicalAttributePoints" class="attributePoints">UA</div>
                     </div>
-
                     <!-- Physical Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute mightSkill">
                         Might
                         <!-- Replace any <input type="number"> with this -->
-                        <input class="inputField mightSkill"  id="mightValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onchange="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" />
+                        <input class="inputField mightSkill" id="mightValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onchange="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" />
                       </div>
                       <div class="subAttribute subMiddle agilitySkill">
                         Agility
-                        <input class="inputField agilitySkill"  id="agilityValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onmouseup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onchange="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);"/>
+                        <input class="inputField agilitySkill" id="agilityValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onmouseup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onchange="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute brawnSkill">
                         Brawn
-                        <input class="inputField brawnSkill"  id="brawnValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onmouseup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onchange="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);"/>
+                        <input class="inputField brawnSkill" id="brawnValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onmouseup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onchange="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);"/>
                       </div>
                     </div>
-                    
+                   
                     <!-- Physical Skills -->
                     <div class="skillWrapper">
-
                     <!-- Athletics -->
                       <div class="skillListing mightSkill">
                         <div class="skillName">
@@ -337,7 +321,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Force -->
                       <div class="skillListing mightSkill">
                         <div class="skillName">
@@ -360,7 +343,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Acrobatics -->
                       <div class="skillListing agilitySkill skillListingMidTop">
                         <div class="skillName">
@@ -383,7 +365,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Sneak -->
                       <div class="skillListing agilitySkill skillListingMidBot">
                         <div class="skillName">
@@ -406,7 +387,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Endurance -->
                       <div class="skillListing brawnSkill">
                         <div class="skillName">
@@ -429,7 +409,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Poise -->
                       <div class="skillListing brawnSkill">
                         <div class="skillName">
@@ -452,13 +431,10 @@
                           3
                         </div>
                       </div>
-
                     </div> <!-- End Physical Skills Wrapper-->
                   </div> <!-- End Physical Stats Wrapper -->
-
                   <!-- Mental Stats Wrapper -->
-                  <div id="mentalStatsWrapper" class="statsWrapper"> 
-
+                  <div id="mentalStatsWrapper" class="statsWrapper">
                     <!-- Mental Attributes -->
                     <div class="attributeWrapper mentalAtt">
                       <span class="att-desc-font">Priority</span>
@@ -477,27 +453,25 @@
                       <span class="att-desc-font">Att Pts</span>
                       <div id="mentalAttributePoints" class="attributePoints">UA</div>
                     </div>
-
                     <!-- Mental Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute willSkill">
                         Will
-                        <input class="inputField willSkill"  id="willValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);" onmouseup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"
+                        <input class="inputField willSkill" id="willValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);" onmouseup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"
                         onchange="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle witSkill">
                         Wit
-                        <input class="inputField witSkill"  id="witValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onmouseup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onchange="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);"/>
+                        <input class="inputField witSkill" id="witValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onmouseup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onchange="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute resolveSkill">
                         Resolve
-                        <input class="inputField resolveSkill"  id="resolveValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);" onchange="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);"/>
+                        <input class="inputField resolveSkill" id="resolveValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);" onchange="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);"/>
                       </div>
                     </div>
-                    
+                   
                     <!-- Mental Skills -->
                     <div class="skillWrapper">
-
                     <!-- lore -->
                       <div class="skillListing willSkill">
                         <div class="skillName">
@@ -520,7 +494,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Tinkering -->
                       <div class="skillListing resolveSkill">
                         <div class="skillName">
@@ -543,7 +516,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Deception -->
                       <div class="skillListing witSkill skillListingMidTop">
                         <div class="skillName">
@@ -566,7 +538,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Insight -->
                       <div class="skillListing witSkill skillListingMidBot">
                         <div class="skillName">
@@ -589,7 +560,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Awareness -->
                       <div class="skillListing resolveSkill">
                         <div class="skillName">
@@ -612,7 +582,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Survival -->
                       <div class="skillListing willSkill">
                         <div class="skillName">
@@ -635,13 +604,12 @@
                           3
                         </div>
                       </div>
-                      
+                     
                     </div> <!-- End Mental Skills Wrapper-->
                   </div> <!-- End Mental Stats Wrapper -->
-
+                  
                   <!-- Social Stats Wrapper -->
-                  <div id="socialStatsWrapper" class="statsWrapper"> 
-
+                  <div id="socialStatsWrapper" class="statsWrapper">
                     <!-- Social Attributes -->
                     <div class="attributeWrapper socialAtt">
                       <span class="att-desc-font">Priority</span>
@@ -660,26 +628,24 @@
                       <span class="att-desc-font">Att Pts</span>
                       <div id="spiritAttributePoints" class="attributePoints">UA</div>
                     </div>
-
                     <!-- Social Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute vigorSkill">
                         Vigor
-                        <input class="inputField vigorSkill"  id="vigorValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onmouseup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onchange="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);"/>
+                        <input class="inputField vigorSkill" id="vigorValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onmouseup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onchange="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle empathySkill">
                         Empathy
-                        <input class="inputField empathySkill"  id="empathyValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onmouseup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onchange="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);"/>
+                        <input class="inputField empathySkill" id="empathyValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onmouseup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onchange="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute faithSkill">
                         Faith
-                        <input class="inputField faithSkill"  id="faithValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onmouseup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onchange="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);"/>
+                        <input class="inputField faithSkill" id="faithValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onmouseup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onchange="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);"/>
                       </div>
                     </div>
-                    
+                   
                     <!-- Social Skills -->
                     <div class="skillWrapper">
-
                     <!-- Compel -->
                       <div class="skillListing vigorSkill">
                         <div class="skillName">
@@ -702,7 +668,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Rouse -->
                       <div class="skillListing vigorSkill">
                         <div class="skillName">
@@ -725,7 +690,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Assure -->
                       <div class="skillListing empathySkill skillListingMidTop">
                         <div class="skillName">
@@ -748,7 +712,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Charm -->
                       <div class="skillListing empathySkill skillListingMidBot">
                         <div class="skillName">
@@ -771,9 +734,6 @@
                           3
                         </div>
                       </div>
-
-
-
                     <!-- Calm -->
                       <div class="skillListing faithSkill">
                         <div class="skillName">
@@ -796,7 +756,6 @@
                           3
                         </div>
                       </div>
-
                     <!-- Command -->
                       <div class="skillListing faithSkill">
                         <div class="skillName">
@@ -819,13 +778,12 @@
                           3
                         </div>
                       </div>
-                      
+                     
                     </div> <!-- End Mental Skills Wrapper-->
-                  </div> <!-- End Mental Stats Wrapper -->
+                  </div> <!-- End Social Stats Wrapper -->
                 </div> <!-- End Column 1 -->
-
                 <div id="column2">
-                  
+                 
                   <div id="attackSkillHeader" class="skillListing">
                     <div class="attackSkillName">
                       Name
@@ -840,7 +798,6 @@
                       Dmg
                     </div>
                   </div>
-
                   <div id="strikeWrapper" class="skillListing bodyColor">
                     <div class="attackSkillName">
                       Strike
@@ -862,7 +819,6 @@
                       0
                     </div>
                   </div>
-
                 <div id="strikeProfContainer">
                     <div class="exploitContainer">
                       <div id="strikeProfSelector1" hidden class="strikeProfSelector" onchange="populateExploitInfo('strikeProfSelector1');">
@@ -872,7 +828,7 @@
                         <div id="strikeProfSelector1Description" class="exploitDesc"></div>
                       </div>
                     </div>
-                    
+                   
                     <div class="exploitContainer">
                       <div id="strikeProfSelector2" hidden class="strikeProfSelector" onchange="populateExploitInfo('strikeProfSelector2');">
                         <select id="strikeProfSelect2" class="exploitSelector">
@@ -881,7 +837,6 @@
                         <div id="strikeProfSelector2Description" class="exploitDesc"></div>
                       </div>
                     </div>
-
                     <div class="exploitContainer">
                       <div id="strikeProfSelector3" hidden class="strikeProfSelector" onchange="populateExploitInfo('strikeProfSelector3');">
                         <select id="strikeProfSelect3" class="exploitSelector">
@@ -906,10 +861,7 @@
                         <div id="strikeProfSelector5Description" class="exploitDesc"></div>
                       </div>
                     </div>
-
                   </div> <!-- End strikeProfContainer -->
-
-
                   <div id="blastWrapper" class="skillListing mindColor">
                     <div class="attackSkillName">
                       Blast
@@ -931,7 +883,6 @@
                       0
                     </div>
                   </div>
-
                   <div id="blastProfContainer">
                     <div id="blastProfSelector1" hidden class="blastProfSelector">
                       <select id="blastProfSelect1" class="profSelector" onchange="proficiencyListManagement('blast');">
@@ -957,9 +908,8 @@
                       <select id="blastProfSelect5" class="profSelector" onchange="proficiencyListManagement('blast');">
                         <option value="0"></option>
                       </select>
-                    </div>      
+                    </div>
                   </div> <!-- End blastWrapper -->
-
                   <div id="scoldWrapper" class="skillListing spiritColor">
                     <div class="attackSkillName">
                       Scold
@@ -981,7 +931,6 @@
                       0
                     </div>
                   </div>
-
                   <div id="scoldProfContainer">
                     <div class="exploitContainer">
                       <div id="scoldProfSelector1" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector1');">
@@ -991,7 +940,7 @@
                         <div id="scoldProfSelector1Description" class="exploitDesc"></div>
                       </div>
                     </div>
-                    
+                   
                     <div class="exploitContainer">
                       <div id="scoldProfSelector2" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector2');">
                         <select id="scoldProfSelect2" class="exploitSelector">
@@ -1000,7 +949,6 @@
                         <div id="scoldProfSelector2Description" class="exploitDesc"></div>
                       </div>
                     </div>
-
                     <div class="exploitContainer">
                       <div id="scoldProfSelector3" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector3');">
                         <select id="scoldProfSelect3" class="exploitSelector">
@@ -1025,12 +973,9 @@
                         <div id="scoldProfSelector5Description" class="exploitDesc"></div>
                       </div>
                     </div>
-
-                  
-
+                 
                   </div> <!-- End scoldWrapper -->
                 </div><!-- End Column 2 -->
-
                 <div id="column3">
                   <div id='weaponList'>
                     <div id="weaponHeader">
@@ -1057,7 +1002,7 @@
                       </select>
                     </div>
                     <div id="weapon1" class="weaponListing">
-                      <input  id="weapon1Name" class="weaponName" type="text" value="Weapon Name">
+                      <input id="weapon1Name" class="weaponName" type="text" value="Weapon Name">
                       <select id="weapon1Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon1');">
                         <option value="">Type</option>
                         <option value="Axe">Axe</option>
@@ -1073,7 +1018,6 @@
                         <option value="Straight_Sword">Str_Sword</option>
                         <option value="Thrusting_Sword">Thr_Sword</option>
                       </select>
-
                       <select id="weapon1Size" class="weaponSize">
                         <option value="">Size</option>
                         <option value="2">Sm: (3)</option>
@@ -1082,9 +1026,9 @@
                       </select>
                       <input id="weapon1Damage" class="weaponDamage" type="text" value="Dmg">
                       <div class="weaponExploit"><span id="weapon1ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon1ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 1 -->      
+                    </div> <!-- End Weapon 1 -->
                     <div id="weapon2" hidden class="weaponListing">
-                      <input  id="weapon2Name" class="weaponName" type="text" value="Weapon Name">
+                      <input id="weapon2Name" class="weaponName" type="text" value="Weapon Name">
                       <select id="weapon2Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon2');">
                         <option value="">Type</option>
                         <option value="Axe">Axe</option>
@@ -1108,9 +1052,9 @@
                       </select>
                       <input id="weapon2Damage" class="weaponDamage" type="text" value="Dmg">
                      <div class="weaponExploit"><span id="weapon2ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon2ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 2 --> 
+                    </div> <!-- End Weapon 2 -->
                     <div id="weapon3" hidden class="weaponListing">
-                      <input  id="weapon3Name" class="weaponName" type="text" value="Weapon Name">
+                      <input id="weapon3Name" class="weaponName" type="text" value="Weapon Name">
                       <select id="weapon3Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon3');">
                         <option value="">Type</option>
                         <option value="Axe">Axe</option>
@@ -1134,9 +1078,8 @@
                       </select>
                       <input id="weapon3Damage" class="weaponDamage" type="text" value="Dmg">
                       <div class="weaponExploit"><span id="weapon3ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon3ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 3 --> 
-                  </div> <!-- End Weapon List   onchange="populateExploitInfo('scoldProfSelector5');"-->
-
+                    </div> <!-- End Weapon 3 -->
+                  </div> <!-- End Weapon List onchange="populateExploitInfo('scoldProfSelector5');"-->
                   <div id='ritualList'>
                     <div id="ritual1" class="ritualListing">
                       <select id="ritual1Select" class="ritualSelector" onchange="populateRitualInfo('ritual1Select');">
@@ -1161,11 +1104,9 @@
                           <div id="ritual1SelectNotes" class="ritualNotes ritualDescLine"></div>
                         </div>
                       </div>
-                    </div>  
-                    
-
-                    <!-- End ritual 1 -->  
-
+                    </div>
+                   
+                    <!-- End ritual 1 -->
                     <div id="ritual2" hidden class="ritualListing">
                       <select id="ritual2Select" class="ritualSelector" onchange="populateRitualInfo('ritual2Select');">
                         <option value="0"></option>
@@ -1189,9 +1130,8 @@
                           <div id="ritual2SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>  
+                    </div>
                     <!-- End ritual 2 -->
-
                     <div id="ritual3" hidden class="ritualListing">
                       <select id="ritual3Select" class="ritualSelector" onchange="populateRitualInfo('ritual3Select');">
                         <option value="0"></option>
@@ -1215,9 +1155,8 @@
                           <div id="ritual3SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>  
+                    </div>
                     <!-- End ritual 3 -->
-
                     <div id="ritual4" hidden class="ritualListing">
                       <select id="ritual4Select" class="ritualSelector" onchange="populateRitualInfo('ritual4Select');">
                         <option value="0"></option>
@@ -1241,9 +1180,8 @@
                           <div id="ritual4SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>  
+                    </div>
                     <!-- End ritual 4 -->
-
                     <div id="ritual5" hidden class="ritualListing">
                       <select id="ritual5Select" class="ritualSelector" onchange="populateRitualInfo('ritual5Select');">
                         <option value="0"></option>
@@ -1267,13 +1205,12 @@
                           <div id="ritual5SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>  
+                    </div>
                     <!-- End ritual 5 -->
                   </div> <!-- End ritual List -->
-
                   <div id='armorList'>
                     <div id="armor1" class="armorListing">
-                      <input  id="armor1Name" class="armorName" type="text" value="Armor Name" >
+                      <input id="armor1Name" class="armorName" type="text" value="Armor Name" >
                       <select id="armor1Type" class="armorType" onchange="selectArmor(1);">
                         <option value="0">Type</option>
                         <option value="1">Light Armor</option>
@@ -1282,11 +1219,11 @@
                         <option value="4">Shield</option>
                       </select>
                       <span id="armor1Bonus" class="filledField armorBonus">-</span>
-                      <input  id="armor1Notes" class="armorNotes" type="text" value="notes">
-                      <span id="armor1Penalty"  class="filledField armorPen">-</span>
-                    </div> <!-- End Armor 1 -->   
+                      <input id="armor1Notes" class="armorNotes" type="text" value="notes">
+                      <span id="armor1Penalty" class="filledField armorPen">-</span>
+                    </div> <!-- End Armor 1 -->
                     <div id="armor2" hidden class="armorListing">
-                      <input  id="armor2Name" class="armorName" type="text" value="Armor Name">
+                      <input id="armor2Name" class="armorName" type="text" value="Armor Name">
                       <select id="armor2Type" class="armorType" onchange="selectArmor(2);">
                         <option value="0">Type</option>
                         <option value="1">Light Armor</option>
@@ -1295,11 +1232,11 @@
                         <option value="4">Shield</option>
                       </select>
                       <span id="armor2Bonus" class="filledField armorBonus">-</span>
-                      <input  id="armor2Notes" class="armorNotes" type="text" value="notes">
+                      <input id="armor2Notes" class="armorNotes" type="text" value="notes">
                       <span id="armor2Penalty" class="filledField armorPen">-</span>
-                    </div> <!-- End Armor 2 -->  
+                    </div> <!-- End Armor 2 -->
                     <div id="armor3" hidden class="armorListing">
-                      <input  id="armor3Name" class="armorName" type="text" value="Armor Name">
+                      <input id="armor3Name" class="armorName" type="text" value="Armor Name">
                       <select id="armor3Type" class="armorType" onchange="selectArmor(3);">
                         <option value="0">Type</option>
                         <option value="1">Light Armor</option>
@@ -1308,14 +1245,13 @@
                         <option value="4">Shield</option>
                       </select>
                       <span id="armor3Bonus" class="filledField armorBonus">-</span>
-                      <input  id="armor3Notes" class="armorNotes" type="text" value="notes">
+                      <input id="armor3Notes" class="armorNotes" type="text" value="notes">
                       <span id="armor3Penalty" class="filledField armorPen">-</span>
-                    </div> <!-- End Armor 3 --> 
+                    </div> <!-- End Armor 3 -->
                   </div> <!-- End Armor List -->
-
                 </div> <!-- End Column 3 -->
-
                 </div> <!-- End Row Wrapper -->
+                
                 <div class="abilityWrapper">
                   <div class="talentWrapper">
                     <div id="talentHeader">
@@ -1355,102 +1291,42 @@
                       <div id="talent3Description"></div>
                     </div>
                   </div> <!-- End Talent Wrapper -->
-                  <div class="nonAtkManWrapper">
-                    <div id="nonAtkManHeader">
+                  
+                  <div class="trickWrapper">
+                    <div id="trickHeader">
                       Tricks
-                      <select id="nonAtkManAmount" onchange="nonAtkManAmount(event); setAbilityAmount(event);">
+                      <select id="trickAmount" onchange="trickAmount(event); setAbilityAmount(event);">
                         <option value="1">2</option>
                         <option value="2">3</option>
                         <option value="3">4</option>
                       </select>
                     </div>
-                    <div class="abilityTable wayManeuver">
-                      <div id="rManName" class="nonAtkMan">Choose a Way</div>
-                      <div id="rManCost"></div>
-                      <div id="rManEffect"></div>
-                    </div>
-                    <div id="nonAtkManTable1" class="abilityTable">
-                      <div class="nonAtkMan">
-                        <select id="nonAtkMan1" onchange="populateNonAtkManInfo('nonAtkMan1')" class="nonAtkManSelector">
+                    <div id="trickTable1" class="abilityTable">
+                      <div class="trick1 trick">
+                        <select id="trick1" onchange="populateTrickInfo('trick1')" class="trickSelector">
                           <option value="0"></option>
                         </select>
                       </div>
-                      <div id="nonAtkMan1Cost"></div>
-                      <div id="nonAtkMan1Trigger"></div>
-                      <div id="nonAtkMan1Effect"></div>
+                      <div id="trick1Description"></div>
                     </div>
-                    <div id="nonAtkManTable2" class="abilityTable" hidden>
-                      <div class="nonAtkMan2 nonAtkMan">
-                        <select id="nonAtkMan2" onchange="populateNonAtkManInfo('nonAtkMan2')" class="nonAtkManSelector">
-                          <option value="None"></option>
-                        </select>
-                      </div>
-                      <div id="nonAtkMan2Cost"></div>
-                      <div id="nonAtkMan2Trigger"></div>
-                      <div id="nonAtkMan2Effect"></div>
-                    </div>
-                    <div id="nonAtkManTable3" class="abilityTable" hidden>
-                      <div class="nonAtkMan3 nonAtkMan">
-                        <select id="nonAtkMan3" onchange="populateNonAtkManInfo('nonAtkMan3')" class="nonAtkManSelector">
+                    <div id="trickTable2" class="abilityTable" hidden>
+                      <div class="trick2 trick">
+                        <select id="trick2" onchange="populateTrickInfo('trick2')" class="trickSelector">
                           <option value="0"></option>
                         </select>
                       </div>
-                      <div id="nonAtkMan3Cost"></div>
-                      <div id="nonAtkMan3Trigger"></div>
-                      <div id="nonAtkMan3Effect"></div>
+                      <div id="trick2Description"></div>
+                    </div>
+                    <div id="trickTable3" class="abilityTable" hidden>
+                      <div class="trick3 trick">
+                        <select id="trick3" onchange="populateTrickInfo('trick3')" class="trickSelector">
+                          <option value="0"></option>
+                        </select>
+                      </div>
+                      <div id="trick3Description"></div>
                     </div>
                   </div>
-                  <div id="atkManWrapper">
-                    <div id="atkManHeader">
-                      Arcana
-                      <select id="atkManAmount" onchange="atkManAmount(event); setAbilityAmount(event);">
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                      </select>
-                    </div>
-                    <div id="atkManTable1" class="abilityTable">
-                      <div class="atkMan1 atkMan">
-                        <select id="atkMan1" onchange="populateAtkManInfo('atkMan1')" class="atkManSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="atkMan1Cost"></div>
-                      <div id="atkMan1EffectSm"></div>
-                      <div id="atkMan1EffectBg"></div>
-                    </div>
-                    <div id="atkManTable2" class="abilityTable">
-                      <div class="atkMan2 atkMan">
-                        <select id="atkMan2" onchange="populateAtkManInfo('atkMan2')" class="atkManSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="atkMan2Cost"></div>
-                      <div id="atkMan2EffectSm"></div>
-                      <div id="atkMan2EffectBg"></div>
-                    </div>
-                    <div id="atkManTable3" class="abilityTable" hidden>
-                      <div class="atkMan3 atkMan">
-                        <select id="atkMan3" onchange="populateAtkManInfo('atkMan3')" class="atkManSelector">
-                          <option value="None"></option>
-                        </select>
-                      </div>
-                      <div id="atkMan3Cost"></div>
-                      <div id="atkMan3EffectSm"></div>
-                      <div id="atkMan3EffectBg"></div>
-                    </div>
-                    <div id="atkManTable4" class="abilityTable" hidden>
-                      <div class="atkMan4 atkMan">
-                        <select id="atkMan4" onchange="populateAtkManInfo('atkMan4')" class="atkManSelector">
-                          <option value="None"></option>
-                        </select>
-                      </div>
-                      <div id="atkMan4Cost"></div>
-                      <div id="atkMan4EffectSm"></div>
-                      <div id="atkMan4EffectBg"></div>
-                    </div>
-                  </div>          
-                </div> 
+                </div>
               </div> <!-- End abilityWrapper -->
       </article>
     <script src="script.js"></script>
@@ -1461,13 +1337,10 @@
             link.addEventListener('click', e => {
                 e.preventDefault();
                 const target = link.dataset.section;
-
                 document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
-
                 document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
                 link.classList.add('active');
-
                 if (target === 'character-creator') {
                     document.getElementById('creator-css').disabled = false;
                 }

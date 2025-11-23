@@ -58,6 +58,28 @@ const SKILL_ID_MAP = {
     //'Scolds': 'scoldsSkillRank',
 };
 
+// Add this map after SKILL_ID_MAP
+const SKILL_MOD_MAP = {
+    'athleticsSkillRank': 'mightValue',
+    'forceSkillRank': 'mightValue',
+    'acrobaticsSkillRank': 'agilityValue',
+    'sneakSkillRank': 'agilityValue',
+    'enduranceSkillRank': 'brawnValue',
+    'poiseSkillRank': 'brawnValue',
+    'loreSkillRank': 'willValue',
+    'tinkeringSkillRank': 'willValue',
+    'deceptionSkillRank': 'witValue',
+    'insightSkillRank': 'witValue',
+    'awarenessSkillRank': 'resolveValue',
+    'survivalSkillRank': 'resolveValue',
+    'compelSkillRank': 'vigorValue',
+    'rouseSkillRank': 'vigorValue',
+    'assureSkillRank': 'empathyValue',
+    'charmSkillRank': 'empathyValue',
+    'calmSkillRank': 'faithValue',
+    'commandSkillRank': 'faithValue',
+};
+
 const ATTRIBUTE_GROUPS = {
     physical: {
         priorityId: 'bodyPriority',
@@ -163,7 +185,7 @@ function populateRoleSelector() {
     });
 }
 
-// Add listeners
+// Modify addSkillListeners to include update
 function addSkillListeners() {
     Object.values(SKILL_ID_MAP).forEach(id => {
         const skillSelect = document.getElementById(id);
@@ -171,6 +193,7 @@ function addSkillListeners() {
             skillSelect.addEventListener('change', () => {
                 updateWayOptions();
                 calculateSkillPoints();
+                updateSkillModAndPassive(id);
             });
         }
     });
@@ -394,13 +417,53 @@ function updateAttributeGroup(group) {
     document.getElementById(group.pointsId).innerText = remaining;
 }
 
-// Add event listeners for sub-attributes
+// Add this function
+function updateSkillModAndPassive(skillId) {
+    const skillSelect = document.getElementById(skillId);
+    if (!skillSelect) return;
+
+    const skillValue = parseInt(skillSelect.value) || 0;
+    const subId = SKILL_MOD_MAP[skillId];
+    if (!subId) return;
+
+    const subInput = document.getElementById(subId);
+    if (!subInput) return;
+
+    const modValue = parseInt(subInput.value) || 0;
+    const skillName = skillId.replace('SkillRank', '');
+
+    const modDisplay = document.getElementById(skillName + 'Mod');
+    if (modDisplay) {
+        modDisplay.innerText = modValue;
+    }
+
+    const passiveDisplay = document.getElementById(skillName + 'Passive');
+    if (passiveDisplay) {
+        passiveDisplay.innerText = 2 + skillValue + modValue;
+    }
+}
+
+// Add this function
+function updateSkillsForMod(subId) {
+    const skills = Object.keys(SKILL_MOD_MAP).filter(skill => SKILL_MOD_MAP[skill] === subId);
+    skills.forEach(skillId => updateSkillModAndPassive(skillId));
+}
+
+// Add this function
+function updateAllSkillModsAndPassives() {
+    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
+}
+
+// Modify addSubListeners to include update
 function addSubListeners() {
     Object.values(ATTRIBUTE_GROUPS).forEach(group => {
         group.subIds.forEach(subId => {
             const input = document.getElementById(subId);
             if (input) {
-                input.addEventListener('change', () => updateAttributeGroup(group));
+                input.addEventListener('change', () => {
+                    updateAttributeGroup(group);
+                    updateSkillsForMod(subId);
+                });
             }
         });
     });
@@ -427,4 +490,5 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     addPriorityListeners();
     addSubListeners();
+    updateAllSkillModsAndPassives(); // Add this line
 });

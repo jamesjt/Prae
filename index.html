@@ -189,6 +189,11 @@
 
                 <div class="secondaryAttributesWrapper">
                   <div class="secondaryAttributes">
+                                            <div class="stepper">
+                          <button class="stepper-btn decrement" type="button">−</button>
+                          <span class="stepper-value" data-value="3">3</span>
+                          <button class="stepper-btn increment" type="button">+</button>
+                        </div>
                     <div class="image" id="HP">
                         <span id="maxHpValue">30</span> <span id="marredValue">20</span> <span id="desperateValue">10</span> <span id="deadValue">-10</span>
                     </div>
@@ -314,11 +319,6 @@
                       <div class="subAttribute mightSkill">
                         Might
                         <!-- Replace any <input type="number"> with this -->
-                        <div class="stepper">
-                          <button class="stepper-btn decrement" type="button">−</button>
-                          <span class="stepper-value" data-value="3">3</span>
-                          <button class="stepper-btn increment" type="button">+</button>
-                        </div>
                         <input class="inputField"  id="mightValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onchange="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" />
                       </div>
                       <div class="subAttribute subMiddle agilitySkill">

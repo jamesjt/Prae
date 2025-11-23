@@ -399,7 +399,9 @@ function updateAttributeGroup(group) {
     let totalPoints = 1 + Math.floor((level - 1) / 3);
     if (pri === '1') totalPoints = 3 + Math.floor((level + 1) / 3);
     else if (pri === '2') totalPoints = 2 + Math.floor(level / 3);
+
     const primaryMax = parseInt(document.getElementById(group.primaryValueId).innerText) || 0;
+
     let sum = 0;
     group.subIds.forEach(id => {
         const input = document.getElementById(id);
@@ -412,20 +414,20 @@ function updateAttributeGroup(group) {
             sum += val;
         }
     });
+
     const remaining = totalPoints - sum;
     const pointsElement = document.getElementById(group.pointsId);
     pointsElement.innerText = remaining;
-
     // Add .hidden class if remaining is 0, remove otherwise
     if (remaining === 0) {
         pointsElement.classList.add('hidden');
     } else {
         pointsElement.classList.remove('hidden');
     }
-
     // Add this to update mods/passives after potential subattribute value changes
     group.subIds.forEach(subId => updateSkillsForMod(subId));
 }
+
 // Add this function
 function updateSkillModAndPassive(skillId) {
     const skillSelect = document.getElementById(skillId);

@@ -505,11 +505,9 @@ select:has(> option[value="profUnassigned"]:checked)  {
 #invokeWrapper {width: 236px;}
 
 .profContainer{
-    border-style: solid;
-    border-width: 1px;
     padding-top: 7px;
     width: 238px;
-    height: 115px;
+    height: 117px;
     padding-bottom: 2px;
     margin-bottom: 5px;
 }
@@ -539,7 +537,7 @@ select:has(> option[value="profUnassigned"]:checked)  {
 .strikeProfSelector {background-color: #5F1717; color:whitesmoke;}
 .invokeProfSelector {background-color: #281957; color:whitesmoke;}
 .invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
-.profSelector{font-size: 12px; border:none;}
+.profSelector{font-size: 12px; border:none; width:100%;}
 
 /* Gear */
 

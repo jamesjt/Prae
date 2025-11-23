@@ -52,7 +52,7 @@ const SKILL_ID_MAP = {
     'Charm': 'charmSkillRank',
     'Calm': 'calmSkillRank',
     'Command': 'commandSkillRank',
-    // If there are attack skills like 'Strikes', 'Blasts', 'Scolds' in the sheet, add them here if needed
+    // Add attack skills if they are separate and used in the sheet
     //'Strikes': 'strikesSkillRank',
     //'Blasts': 'blastsSkillRank',
     //'Scolds': 'scoldsSkillRank',
@@ -69,8 +69,8 @@ fetch(WAYS_CSV_URL)
         // Log rows for debugging
         console.log('Parsed Rows:', rows);
 
-        // Find include row - make matching case-insensitive
-        let includeRowIdx = rows.findIndex(row => row[0].toLowerCase().trim().includes('include'));
+        // Find include row - make matching case-insensitive and trim
+        let includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
 
         if (includeRowIdx === -1) {
             console.error('Missing "Include" row in Ways CSV');
@@ -105,7 +105,7 @@ fetch(WAYS_CSV_URL)
                 const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
 
                 if (name && reqSkill) {
-                    const normalizedReqSkill = reqSkill.trim(); // No toLowerCase for matching
+                    const normalizedReqSkill = reqSkill.trim(); // Exact match
                     const skillId = SKILL_ID_MAP[normalizedReqSkill];
                     if (skillId) {
                         waysData.push({ name, props, reqSkill: normalizedReqSkill, skillId });
@@ -183,6 +183,7 @@ function populateRoleInfo(event) {
         const fociCostKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci cost'));
         const fociEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci effect'));
         const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
+        const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
 
         document.getElementById('rTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
         document.getElementById('rTalentDesc').innerText = talentDescKey ? way.props[talentDescKey] : '';
@@ -200,6 +201,25 @@ function populateRoleInfo(event) {
                 skillSelect.dispatchEvent(new Event('change'));
             }
         }
+
+        // Set primary attribute priority to value '1'
+        const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
+        let priorityId;
+        if (primaryAttr === 'Body') {
+            priorityId = 'bodyPriority';
+        } else if (primaryAttr === 'Mind') {
+            priorityId = 'mindPriority';
+        } else if (primaryAttr === 'Spirit') {
+            priorityId = 'spiritPriority';
+        }
+        if (priorityId) {
+            const select = document.getElementById(priorityId);
+            if (select) {
+                select.value = '1';
+                select.dispatchEvent(new Event('change'));
+            }
+        }
+        calculateAttPoints(); // Recalculate after changes
     }
 }
 
@@ -290,28 +310,28 @@ function calculateAttPoints() {
     const secPoints = level + 1;
     const terPoints = level;
 
-    // Assume IDs for priority selects: physicalPriority, mentalPriority, socialPriority with values 'Primary', 'Secondary', 'Tertiary'
+    // Assume IDs for priority selects: bodyPriority, mindPriority, spiritPriority with values '1' Primary, '2' Secondary, '3' Tertiary
 
-    const physPri = document.getElementById('physicalPriority') ? document.getElementById('physicalPriority').value : '';
-    let physPoints = 0;
-    if (physPri === 'Primary') physPoints = priPoints;
-    else if (physPri === 'Secondary') physPoints = secPoints;
-    else if (physPri === 'Tertiary') physPoints = terPoints;
-    document.getElementById('physicalAttributePoints').innerText = physPoints;
+    const bodyPri = document.getElementById('bodyPriority') ? document.getElementById('bodyPriority').value : '';
+    let bodyPoints = 0;
+    if (bodyPri === '1') bodyPoints = priPoints;
+    else if (bodyPri === '2') bodyPoints = secPoints;
+    else if (bodyPri === '3') bodyPoints = terPoints;
+    document.getElementById('physicalAttributePoints').innerText = bodyPoints; // Assuming physical = body
 
-    const mentPri = document.getElementById('mentalPriority') ? document.getElementById('mentalPriority').value : '';
-    let mentPoints = 0;
-    if (mentPri === 'Primary') mentPoints = priPoints;
-    else if (mentPri === 'Secondary') mentPoints = secPoints;
-    else if (mentPri === 'Tertiary') mentPoints = terPoints;
-    document.getElementById('mentalAttributePoints').innerText = mentPoints;
+    const mindPri = document.getElementById('mindPriority') ? document.getElementById('mindPriority').value : '';
+    let mindPoints = 0;
+    if (mindPri === '1') mindPoints = priPoints;
+    else if (mindPri === '2') mindPoints = secPoints;
+    else if (mindPri === '3') mindPoints = terPoints;
+    document.getElementById('mentalAttributePoints').innerText = mindPoints;
 
-    const socPri = document.getElementById('socialPriority') ? document.getElementById('socialPriority').value : '';
-    let socPoints = 0;
-    if (socPri === 'Primary') socPoints = priPoints;
-    else if (socPri === 'Secondary') socPoints = secPoints;
-    else if (socPri === 'Tertiary') socPoints = terPoints;
-    document.getElementById('spiritAttributePoints').innerText = socPoints; // Assuming social is spirit
+    const spiritPri = document.getElementById('spiritPriority') ? document.getElementById('spiritPriority').value : '';
+    let spiritPoints = 0;
+    if (spiritPri === '1') spiritPoints = priPoints;
+    else if (spiritPri === '2') spiritPoints = secPoints;
+    else if (spiritPri === '3') spiritPoints = terPoints;
+    document.getElementById('spiritAttributePoints').innerText = spiritPoints;
 }
 
 // Call initial calculations on load

@@ -199,7 +199,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .subMiddle {margin-top: 2px;margin-bottom: 2px;}
 
 
-#physicalAttributePoints {background-color: #5F1817}
+#physicalAttributePoints {background-color: #b07c70}
 #mentalAttributePoints {background-color: #9BAABF;}
 #spiritAttributePoints {background-color: #797781;}
 
@@ -215,7 +215,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     border-radius:  8px;
     width: 60px;
     height: 20px;
-    text-align:     center;
+    text-align: center;
+    padding-bottom: 5px;
 
 }
 

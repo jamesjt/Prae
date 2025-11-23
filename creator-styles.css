@@ -58,8 +58,7 @@
 #charInfo{
     padding-left: 5px;
     color:white;
-    margin: 10px 10px 10px 0px;
-    padding-bottom: 4px;
+    margin: 10px 10px 15px 0px;
 }
 
 .charText{margin-left: 5px;margin-right: 5px;}
@@ -160,8 +159,6 @@
     margin-bottom: 5px;
     padding-top: 4px;
     padding-bottom:4px;
-    border-radius: 4px;
-    border: 1px solid black;
 }
 
 .subAttributeWrapper {}
@@ -181,16 +178,13 @@
 .subMiddle {margin-top: 2px;margin-bottom: 2px;}
 
 
-#physicalAttributePoints {background-color: #B07C71;}
+#physicalAttributePoints {background-color: #5F1817}
 #mentalAttributePoints {background-color: #9BAABF;}
 #spiritAttributePoints {background-color: #797781;}
 
 
 .physicalAtt {
-    border-style: solid;
-    border-width: 2px;
-    border-color: #4D0708;
-    background-color: #BD534D;
+    background-color: #5F1817;
     border-top-right-radius: 8px;
     border-top-left-radius: 8px;
 }
@@ -1023,3 +1017,5 @@ abbr.shieldPen::after {content: "-1 to Blast";}
 
 /* Fluff Terms */
 abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
+
+.attvalue{width:30px;}

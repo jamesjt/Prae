@@ -94,7 +94,7 @@
                       <div id="proficiencyCheck" class="checkSection">
                         For each attack skill of basic and above gain 1 proficiency point in that skill. <br/>
                         <div class="indent">
-                          - For each proficiency point in Strikes or Scolds learn one Critical Effect<br/>
+                          - For each proficiency point in Strikes or invokes learn one Critical Effect<br/>
                           - For each proficiency point in Blasts learn an additional String
                         </div>
                       </div>
@@ -951,12 +951,12 @@
                     </div>      
                   </div> <!-- End blastWrapper -->
 
-                  <div id="scoldWrapper" class="skillListing spiritColor">
+                  <div id="invokeWrapper" class="skillListing spiritColor">
                     <div class="attackSkillName">
-                      Scold
+                      invoke
                     </div>
                     <div class="skillRank">
-                      <select id="scoldSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills spiritColor">
+                      <select id="invokeSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills spiritColor">
                         <option value="0">0: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
@@ -965,61 +965,61 @@
                         <option value="5">6: Master</option>
                       </select>
                     </div>
-                    <div id="scoldSkillMod" class="skillMod filledField">
+                    <div id="invokeSkillMod" class="skillMod filledField">
                       0
                     </div>
-                    <div id="scoldSkillDamage" class="skillPassive filledField">
+                    <div id="invokeSkillDamage" class="skillPassive filledField">
                       0
                     </div>
                   </div>
 
-                  <div id="scoldProfContainer">
+                  <div id="invokeProfContainer">
                     <div class="exploitContainer">
-                      <div id="scoldProfSelector1" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector1');">
-                        <select id="scoldProfSelect1" class="exploitSelector">
+                      <div id="invokeProfSelector1" hidden class="invokeProfSelector" onchange="populateExploitInfo('invokeProfSelector1');">
+                        <select id="invokeProfSelect1" class="exploitSelector">
                           <option value="0"></option>
                         </select>
-                        <div id="scoldProfSelector1Description" class="exploitDesc"></div>
+                        <div id="invokeProfSelector1Description" class="exploitDesc"></div>
                       </div>
                     </div>
                     
                     <div class="exploitContainer">
-                      <div id="scoldProfSelector2" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector2');">
-                        <select id="scoldProfSelect2" class="exploitSelector">
+                      <div id="invokeProfSelector2" hidden class="invokeProfSelector" onchange="populateExploitInfo('invokeProfSelector2');">
+                        <select id="invokeProfSelect2" class="exploitSelector">
                           <option value="0"></option>
                         </select>
-                        <div id="scoldProfSelector2Description" class="exploitDesc"></div>
+                        <div id="invokeProfSelector2Description" class="exploitDesc"></div>
                       </div>
                     </div>
 
                     <div class="exploitContainer">
-                      <div id="scoldProfSelector3" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector3');">
-                        <select id="scoldProfSelect3" class="exploitSelector">
+                      <div id="invokeProfSelector3" hidden class="invokeProfSelector" onchange="populateExploitInfo('invokeProfSelector3');">
+                        <select id="invokeProfSelect3" class="exploitSelector">
                           <option value="0"></option>
                         </select>
-                        <div id="scoldProfSelector3Description" class="exploitDesc"></div>
+                        <div id="invokeProfSelector3Description" class="exploitDesc"></div>
                       </div>
                     </div>
                     <div class="exploitContainer">
-                      <div id="scoldProfSelector4" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector4');">
-                        <select id="scoldProfSelect4" class="exploitSelector">
+                      <div id="invokeProfSelector4" hidden class="invokeProfSelector" onchange="populateExploitInfo('invokeProfSelector4');">
+                        <select id="invokeProfSelect4" class="exploitSelector">
                           <option value="0"></option>
                         </select>
-                        <div id="scoldProfSelector4Description" class="exploitDesc"></div>
+                        <div id="invokeProfSelector4Description" class="exploitDesc"></div>
                       </div>
                     </div>
                     <div class="exploitContainer">
-                      <div id="scoldProfSelector5" hidden class="scoldProfSelector" onchange="populateExploitInfo('scoldProfSelector5');">
-                        <select id="scoldProfSelect5" class="exploitSelector">
+                      <div id="invokeProfSelector5" hidden class="invokeProfSelector" onchange="populateExploitInfo('invokeProfSelector5');">
+                        <select id="invokeProfSelect5" class="exploitSelector">
                           <option value="0"></option>
                         </select>
-                        <div id="scoldProfSelector5Description" class="exploitDesc"></div>
+                        <div id="invokeProfSelector5Description" class="exploitDesc"></div>
                       </div>
                     </div>
 
                   
 
-                  </div> <!-- End scoldWrapper -->
+                  </div> <!-- End invokeWrapper -->
                 </div><!-- End Column 2 -->
 
                 <div id="column3">
@@ -1126,7 +1126,7 @@
                       <input id="weapon3Damage" class="weaponDamage" type="text" value="Dmg">
                       <div class="weaponExploit"><span id="weapon3ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon3ExploitDescription" class="weaponExploitDescription"></span></div>
                     </div> <!-- End Weapon 3 --> 
-                  </div> <!-- End Weapon List   onchange="populateExploitInfo('scoldProfSelector5');"-->
+                  </div> <!-- End Weapon List   onchange="populateExploitInfo('invokeProfSelector5');"-->
 
                   <div id='ritualList'>
                     <div id="ritual1" class="ritualListing">

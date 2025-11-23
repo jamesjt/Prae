@@ -133,7 +133,12 @@
 #bodyPriority {}
 .att-desc-font{font-size: 8px}
 
-.attributeSelect {
+.attributeSelect{
+   border:none;
+   color:pink; 
+}
+
+.attributeSelect select:has(> option[value="0"]:checked)  {
     width: 70px;
     border-radius: 8px;
     height: 20px;

@@ -439,7 +439,7 @@ function updateSkillModAndPassive(skillId) {
     if (!subInput) return;
 
     const modValue = parseInt(subInput.value) || 0;
-    const skillName = skillId.replace('SkillRank', '');
+    const skillName = skillId.replace('Rank', '');
 
     const modDisplay = document.getElementById(skillName + 'Mod');
     if (modDisplay) {

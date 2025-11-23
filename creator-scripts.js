@@ -106,8 +106,8 @@ fetch(WAYS_CSV_URL)
 
                 if (name && reqSkill) {
                     const normalizedReqSkill = reqSkill.trim(); // Exact match
-                    const skillId = SKILL_ID_MAP[normalizedReqSkill];
-                    if (skillId) {
+                    const skillId = normalizedReqSkill === 'Any' ? 'Any' : SKILL_ID_MAP[normalizedReqSkill];
+                    if (skillId || normalizedReqSkill === 'Any') {
                         waysData.push({ name, props, reqSkill: normalizedReqSkill, skillId });
                         console.log(`Added Way: ${name}, Req: ${normalizedReqSkill}, ID: ${skillId}`);
                     } else {
@@ -159,8 +159,17 @@ function addSkillListeners() {
 function updateWayOptions() {
     const selector = document.getElementById('roleSelector');
     waysData.forEach(way => {
-        const skillSelect = document.getElementById(way.skillId);
-        const isQualified = skillSelect && skillSelect.selectedIndex !== 0;
+        let isQualified = false;
+        if (way.reqSkill === 'Any') {
+            // Check if any skill is not untrained (selectedIndex !== 0)
+            isQualified = Object.values(SKILL_ID_MAP).some(id => {
+                const skillSelect = document.getElementById(id);
+                return skillSelect && skillSelect.selectedIndex !== 0;
+            });
+        } else {
+            const skillSelect = document.getElementById(way.skillId);
+            isQualified = skillSelect && skillSelect.selectedIndex !== 0;
+        }
         const option = selector.querySelector(`option[value="${way.name}"]`);
         if (option) {
             option.disabled = !isQualified;

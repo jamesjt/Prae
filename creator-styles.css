@@ -733,7 +733,10 @@
     color:black;
 }
 .attackSkills {margin-left: 1px;}
-.nonAttackSkills {margin-left: 1px;}
+.attackSkills:hover {margin-left: 1px;background-color: white;color:black;}
+.nonAttackSkills {margin-left: 1px; color:whitesmoke;}
+.nonAttackSkills {margin-left: 1px; color:whitesmoke;}
+.nonAttackSkills:hover {margin-left: 1px;background-color: white;color:black;}
 
 
 

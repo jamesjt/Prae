@@ -136,18 +136,33 @@
 .attributeSelect{
 }
 
+#bodyPriority{
+    background-color: #5f1717;
+    border:none;
+    color:#5f1717;
+}
+#mindPriority{
+    background-color: #19315C;
+    border:none;
+    color:#19315C;
+}
+#spiritPriority{
+    background-color: #281957;
+    border:none;
+    color:#281957;
+}
+
+#bodyPriority:hover, #mindPriority:hover,#spiritPriority:hover{
+    background-color: white;
+    color:black;
+}
+
 select:has(> option[value="priorityUnassigned"]:checked)  {
     width: 70px;
     border-radius: 8px;
     height: 20px;
     border-color: black;
     font-size:  12px;
-}
-
-#bodyPriority{
-    background-color: #5f1717;
-    border:none;
-    color:#5f1717;
 }
 
 .attributeWrapper {

@@ -1,3 +1,4 @@
+
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
@@ -178,23 +179,6 @@ function populateRoleInfo(event) {
             if (skillSelect && parseInt(skillSelect.value) < 3) {
                 skillSelect.value = '3';
                 skillSelect.dispatchEvent(new Event('change'));
-            }
-        }
-        // Set primary attribute priority
-        const primaryAttr = way.props['Primary Attribute'].trim().toLowerCase();
-        let priorityId;
-        if (primaryAttr === 'body') {
-            priorityId = 'bodyPriority';
-        } else if (primaryAttr === 'mind') {
-            priorityId = 'mindPriority';
-        } else if (primaryAttr === 'spirit') {
-            priorityId = 'spiritPriority';
-        }
-        if (priorityId) {
-            const select = document.getElementById(priorityId);
-            if (select) {
-                select.value = '1';
-                select.dispatchEvent(new Event('change'));
             }
         }
     }

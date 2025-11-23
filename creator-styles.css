@@ -1,39 +1,4 @@
-Try AI directly in your favorite apps … Use Gemini to generate drafts and refine content, plus get Gemini Pro with access to Google's next-gen AI for $19.99 $0 for 1 month
-td {height: 20px;}
-td:empty {
-    display:none;
-}
-body {
-    height: 100%;
-    background-color:white;
-}
-table {border-collapse: separate;}
-table, td, th {border: 1px solid black}
-
-
- table.listTable, .listTable td, .listTable th {
-    border: none !important;
-}
-
-select{
-    height: 16px;
-}
-
-h1 {font-size: 24px; 
-    text-transform: uppercase; 
-    margin-bottom:7px; 
-    text-align: center; 
-    margin-right:30px; 
-    margin-top:0; 
-    padding-top: 5px; 
-    font-family: wizzta;}
-h2 {font-size: 18px; margin-bottom: 3px; font-family: gaelic;}
-h3 {font-size: 16px; margin-bottom: 3px; font-family: cosmic;}
-h4 {font-size:14px; margin-bottom: 5px; margin-top: 15px;}
-h5 {margin-bottom: 5px; margin-top: 15px;}
-p {margin-bottom: 0px;}
-a {text-decoration: none;}
-ul {margin: 1px;}
+#character-creator{margin-left: 20px; background-color: black;}
 
 @font-face { font-family: wizzta; src: url(../fonts/wizzta.ttf); }
 @font-face { font-family: dragonfly; src: url(../fonts/Dragonfly.ttf); }

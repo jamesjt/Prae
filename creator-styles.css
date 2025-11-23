@@ -561,19 +561,18 @@
     height: 100%;
     display:flex;
 }
-#talentHeader, #nonAtkManHeader, #atkManHeader, #exploitHeader {
+#talentHeader, #trickHeader, #atkManHeader, #exploitHeader {
   background-color: black;
   color:white;
   border-radius: 8px 8px 0px 0px;
   text-align:center;
 }
-#atkManAmount, #talentAmount, #exploitAmount, #nonAtkManAmount {width:40px;}
+#atkManAmount, #talentAmount, #exploitAmount, #trickAmount {width:40px;}
        
 .talentWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .talent, .talentSelector{ background-color:#6a877d !important;color:white;}
-.nonAtkMan, .nonAtkManSelector {background-color:#369180 !important;color:white;}
-.atkMan, .atkManSelector{background-color:#0a614e ; color:white;}
-.nonAtkManWrapper {width: 330px; height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
+.trickWrapper {width: 330px; height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
+.trick, .trickSelector{background-color:#369180 !important;color:white;}
 #atkManWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .exploitWrapper {width: 250px;height: 200px;border-radius: 8px 8px 0px 0px;}
 .inputField{ width: 30px;
@@ -591,9 +590,9 @@
 .physicalTalent { background-color: #b36b00 !important; color: white; }
 .mentalTalent { background-color: #006666 !important; color: white;}
 .socialTalent { background-color: #8E7CC3 !important; color: white;}
-.physicalNonAtkMan {background-color: #ac3939 !important; color: white;}
-.mentalNonAtkMan {background-color: #004c99 !important; color: white;}
-.socialNonAtkMan {background-color: #7300e6 !important; color: white;}
+.physicalTrick {background-color: #ac3939 !important; color: white;}
+.mentalTrick {background-color: #004c99 !important; color: white;}
+.socialTrick {background-color: #7300e6 !important; color: white;}
 .physicalAtkMan {background-color: #5F1817 !important; color: white;}
 .mentalAtkMan {background-color: #204077 !important; color: white;}
 .socialAtkMan {background-color: #4f1f4c !important; color: white;}

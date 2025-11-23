@@ -464,15 +464,13 @@ function updateSkillModAndPassive(skillId) {
     if (!subInput) return;
 
     const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
-    const skillName = skillId.replace('SkillRank', '');
+    const skillName = skillId.replace('Rank', '');
 
-    // Update all elements with class `${skillName}Mod` (for div and span)
-    const modDisplays = document.querySelectorAll(`.${skillName}Mod`);
-    modDisplays.forEach(el => {
-        el.innerText = modValue;
-    });
+    const modDisplay = document.getElementById(skillName + 'Mod');
+    if (modDisplay) {
+        modDisplay.innerText = modValue;
+    }
 
-    // Update passive if needed (assuming it's a single element)
     const passiveDisplay = document.getElementById(skillName + 'Passive');
     if (passiveDisplay) {
         passiveDisplay.innerText = 2 + skillValue + modValue;

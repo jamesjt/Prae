@@ -371,9 +371,9 @@ function updateAttributeGroups() {
 function updateAttributeGroup(group) {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = document.getElementById(group.priorityId).value || '3';
-    let totalPoints = 3 + Math.floor((level + 1) / 3);
-    if (pri === '2') totalPoints = 2 + Math.floor(level / 3);
-    else if (pri === '3') totalPoints = 1 + Math.floor((level - 1) / 3);
+    let totalPoints = 1 + Math.floor((level - 1) / 3);
+    if (pri === '1') totalPoints = 3 + Math.floor((level + 1) / 3);
+    else if (pri === '2') totalPoints = 2 + Math.floor(level / 3);
 
     const primaryMax = parseInt(document.getElementById(group.primaryValueId).innerText) || 0;
 
@@ -381,6 +381,7 @@ function updateAttributeGroup(group) {
     group.subIds.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
+            input.setAttribute('max', primaryMax);
             let val = parseInt(input.value) || 0;
             if (val > primaryMax) val = primaryMax;
             if (val < 0) val = 0;

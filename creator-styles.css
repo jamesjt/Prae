@@ -504,6 +504,10 @@ select:has(> option[value="profUnassigned"]:checked)  {
 #blastWrapper {width: 236px;}
 #invokeWrapper {width: 236px;}
 
+.profContainer{
+    margin-top: -5px;
+}
+
 #strikeProfContainer, #blastProfContainer, #invokeProfContainer {
     border-style: solid;
     border-width: 1px;

@@ -160,7 +160,7 @@
     padding-bottom:4px;
 }
 
-.subAttributeWrapper {}
+.subAttributeWrapper {border-left:1px solid black;}
 
 .subAttribute {
     padding:3px;
@@ -217,8 +217,8 @@
 .mindColor {background-color: #19315C; color:white;}
 .spiritColor{background-color: #281957; color:white;}
 
-.mightSkill, .brawnSkill { background-color: #BD534D}
-.agilitySkill { background-color:  #EA9999;}
+.mightSkill, .brawnSkill { background-color: #7B1C19}
+.agilitySkill { background-color:  #A34A47;}
 .willSkill, .resolveSkill { background-color: #A4C2F4;}
 .witSkill { background-color: #C9DAF8;}
 .vigorSkill, .faithSkill { background-color: #8E7CC3;}
@@ -458,7 +458,7 @@
 
 /* Skills */
 
-.skillWrapper {display: flex;flex-direction: column;}
+.skillWrapper {display: flex;flex-direction: column;border-left:1px solid black;}
 
 .skillListing {
   display: flex;

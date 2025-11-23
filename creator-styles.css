@@ -1,4 +1,4 @@
-#character-creator{margin-left: 20px; background-color: black;}
+#character-creator{padding-left: 20px; background-color: black;}
 
 @font-face { font-family: wizzta; src: url(../fonts/wizzta.ttf); }
 @font-face { font-family: dragonfly; src: url(../fonts/Dragonfly.ttf); }

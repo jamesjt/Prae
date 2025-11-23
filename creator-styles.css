@@ -56,12 +56,9 @@
 
 /* Character Info Bar */
 #charInfo{
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
     padding-left: 5px;
-    background-color: black;
     color:white;
-    margin: -5px 10px 10px 0px;
+    margin: 10px 10px 10px 0px;
     padding-bottom: 4px;
 }
 

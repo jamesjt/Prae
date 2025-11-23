@@ -138,12 +138,14 @@
    color:pink; 
 }
 
-.attributeSelect select:has(> option[value="0"]:checked)  {
+select:has(> option[value="0"]:checked)  {
     width: 70px;
     border-radius: 8px;
     height: 20px;
     border-color: black;
     font-size:  12px;
+    color:green;
+    background-color: pink;
 }
 
 .attributeWrapper {

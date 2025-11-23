@@ -36,246 +36,236 @@
 
         <!-- Character Creator — Pure Static Structure -->
         <div id="character-creator" class="content-section">
-             <section class="section" id="TraeaSection">
-    <input type="hidden" id="charID" value="<?php echo ( isset( $_GET['id'] ) ? $_GET['id'] : "0" );?>" />
-      <header class="hideWrapper sectionHeader">
-
-        <button id="showTraea" class="hidden showButton" onclick="show('Traea');">Traea</button>
-        <button id="hideTraea" class="hide" onclick="hide('Traea');">[&#8213;]</button>
-      </header>
-
-      <article id="Traea" class="sectionBody">
-
-        <div id="charInfo">
-            Name <input id="charName" class="charText" type="text" >
-            Level <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1" onkeyup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);" onmouseup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);">
-            Childhood <input id="childhood" class="charText" type="text">
-            Training <input id="training" class="charText" type="text">
-            Way 
-            <select id="roleSelector" onchange="populateRoleInfo(event);">
-              <option value=""></option>
-              <option value="Adjunct">Adjunct</option>
-              <option value="Berserker">Berserker</option>
-              <option value="Blade Dancer">Blade Dancer</option>
-              <option value="Sentinel">Sentinel</option>
-              <option value="Shadow Dancer">Shadow Dancer</option>
-              <option value="Bulwark">Bulwark</option>
-              <option value="Channeler">Channeler</option>
-              <option value="Storm Caller">Storm Caller</option>
-              <option value="Breaker">Breaker</option>
-              <option value="Overseer">Overseer</option>
-              <option value="Warden">Warden</option>
-              <option value="Bladeweaver">Blade Weaver</option>
-              <option value="Battlerager">Battlerager</option>
-              <option value="Rebuker">Rebuker</option>
-            </select>
-            <img id="showCheckList" class="charInfoHover" onclick="showDesc('checkList');" src="imgs/check.png">
-            <div id="checkList" class="charDetails draggable">
-              <div id="hideCheckList" class="closeRitual" onclick="hideDesc('checkList');">X</div>
-              Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
-              Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
-              <br/>
-              Total Abilities <span id="abilityNumber" class="filledField">7</span>
-              Remaining Abilities <span id="remainingAbilities" class="filledField">2</span>
-              <br/>
-              <div id="childhoodCheck" class="checkSection">
-                Childhood skills, 4 skill points:<br/>
-                <div class="indent">
-                  - 1 must be used to increase a Physical skill to Basic Rank.<br/>
-                  - 1 must be used to increase a Mental skill to Basic Rank.<br/>
-                  - 1 must be used to increase a Social skill to Basic Rank.<br/>
-                  - 1 can be used at player's discretion.
+            <div id="charInfo">
+                Name <input id="charName" class="charText" type="text" >
+                Level <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1" onkeyup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);" onmouseup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);">
+                Childhood <input id="childhood" class="charText" type="text">
+                Training <input id="training" class="charText" type="text">
+                Way 
+                <select id="roleSelector" onchange="populateRoleInfo(event);">
+                  <option value=""></option>
+                  <option value="Adjunct">Adjunct</option>
+                  <option value="Berserker">Berserker</option>
+                  <option value="Blade Dancer">Blade Dancer</option>
+                  <option value="Sentinel">Sentinel</option>
+                  <option value="Shadow Dancer">Shadow Dancer</option>
+                  <option value="Bulwark">Bulwark</option>
+                  <option value="Channeler">Channeler</option>
+                  <option value="Storm Caller">Storm Caller</option>
+                  <option value="Breaker">Breaker</option>
+                  <option value="Overseer">Overseer</option>
+                  <option value="Warden">Warden</option>
+                  <option value="Bladeweaver">Blade Weaver</option>
+                  <option value="Battlerager">Battlerager</option>
+                  <option value="Rebuker">Rebuker</option>
+                </select>
+                <img id="showCheckList" class="charInfoHover" onclick="showDesc('checkList');" src="imgs/check.png">
+                <div id="checkList" class="charDetails draggable">
+                  <div id="hideCheckList" class="closeRitual" onclick="hideDesc('checkList');">X</div>
+                  Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
+                  Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
+                  <br/>
+                  Total Abilities <span id="abilityNumber" class="filledField">7</span>
+                  Remaining Abilities <span id="remainingAbilities" class="filledField">2</span>
+                  <br/>
+                  <div id="childhoodCheck" class="checkSection">
+                    Childhood skills, 4 skill points:<br/>
+                    <div class="indent">
+                      - 1 must be used to increase a Physical skill to Basic Rank.<br/>
+                      - 1 must be used to increase a Mental skill to Basic Rank.<br/>
+                      - 1 must be used to increase a Social skill to Basic Rank.<br/>
+                      - 1 can be used at player's discretion.
+                    </div>
+                  </div>
+                  <div id="trainingCheck" class="checkSection">
+                    Training skills, 5 skill points:<br/>
+                    <div class="indent">
+                      - 1 must be used to increase a P,M or S skill to Basic Rank.<br/>
+                      - 1 must in a different category than above.<br/>
+                      - 1 can be used at player's discretion<br/>
+                      - 3 must be used to increase a skill with Basic to Trained Rank
+                    </div>
+                  </div>
+                  <div id="wayCheck" class="checkSection">
+                    Select a Way.<br/>
+                    <div class="indent">
+                    - Increase the Way's attack skill Rank to 3:Trained<br/>
+                    - Learn the Talent and Foci related to your Way
+                    </div>
+                  </div>
+                  <div id="abilityCheck" class="checkSection">
+                    Gain 5 Ability Points<br/>
+                    <div class="indent">
+                      - 1 must be used on for a Talent<br/>
+                      - 1 must be used for a Foci<br/>
+                      - 2 must be used for a Arcana<br/>
+                      - The remaining 1 can be used at player's discretion
+                    </div>
+                  </div>
+                  <div id="proficiencyCheck" class="checkSection">
+                    For each attack skill of basic and above gain 1 proficiency point in that skill. <br/>
+                    <div class="indent">
+                      - For each proficiency point in Strikes or Scolds learn one Critical Effect<br/>
+                      - For each proficiency point in Blasts learn an additional String
+                    </div>
+                  </div>
+                  <div id="attributeCheck" class="checkSection">
+                    Assign Attributes
+                    <div class="indent">
+                      - Select Primary Attribute. Assign it a value of 2. <br/>
+                      - Select Secondary Attribute. Assign it a value of 2. <br/>
+                      - Select Tertiary Attribute. Assing it a value of 1.<br/>
+                      - Distribute attribute points into sub-attributes (Priamry: 3, Secondary: 2, Tertiary 1)
+                    </div>
+                  </div>
+                  <div id="gearCheck" class="checkSection">
+                    Purchase Starting Gear
+                    <div class="indent">
+                      - Select 1 Weapon for free<br/>
+                      - Learn 1 Ritual you can cast for free<br/>
+                      - Purchase additional gear with 150 starting g. 
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div id="trainingCheck" class="checkSection">
-                Training skills, 5 skill points:<br/>
-                <div class="indent">
-                  - 1 must be used to increase a P,M or S skill to Basic Rank.<br/>
-                  - 1 must in a different category than above.<br/>
-                  - 1 can be used at player's discretion<br/>
-                  - 3 must be used to increase a skill with Basic to Trained Rank
+
+                <img id="showCharDesc" class="charInfoHover" onclick="showDesc('charDesc');" src="imgs/charDesc.png">
+                <div id="charDesc" class="charDetails draggable">
+                  <div id="hideCharDesc" class="closeRitual" onclick="hideDesc('charDesc');">-</div>
+                  Height <input id="charHeight" type="text">
+                  Build <input id="charBuild" type="text">
+                  Skin <input id="charSkin" type="text">
+                  Hair <input id="charHair" type="text">
+                  Eyes <input id="charEyes" type="text">
+                  <br/>
+                  <textarea id="charDescription" placeholder="Describe yourself here..."></textarea>
                 </div>
-              </div>
-              <div id="wayCheck" class="checkSection">
-                Select a Way.<br/>
-                <div class="indent">
-                - Increase the Way's attack skill Rank to 3:Trained<br/>
-                - Learn the Talent and Foci related to your Way
+                <img id="showCharStory" class="charInfoHover" onclick="showDesc('charStory');" src="imgs/charStory.png">
+                <div id="charStory" class="charDetails draggable">
+                  <div id="hideCharStory" class="closeRitual" onclick="hideDesc('charStory');">-</div>
+                  Birth Place <input id="birthPlace" type="text">
+                  <textarea id="childhoodStory" placeholder="Story of your childhood..."></textarea>
+                  <textarea id="trainingStory" placeholder="Story of your Training and how you came to your way..."></textarea>
+                  <textarea id="journalStory" placeholder="Journal..."></textarea>
                 </div>
-              </div>
-              <div id="abilityCheck" class="checkSection">
-                Gain 5 Ability Points<br/>
-                <div class="indent">
-                  - 1 must be used on for a Talent<br/>
-                  - 1 must be used for a Foci<br/>
-                  - 2 must be used for a Arcana<br/>
-                  - The remaining 1 can be used at player's discretion
+                <img id="showCharPersonality" class="charInfoHover" onclick="showDesc('charPersonality');" src="imgs/charStory.png">
+                <div id="charPersonality" class="charDetails draggable">
+                  <div id="hideCharPersonality" class="closeRitual" onclick="hideDesc('charPersonality');">-</div>
+                  Current Goal in Life <input id="charPurpose" type="text">
+                  Values...will be flushed out with world.
                 </div>
-              </div>
-              <div id="proficiencyCheck" class="checkSection">
-                For each attack skill of basic and above gain 1 proficiency point in that skill. <br/>
-                <div class="indent">
-                  - For each proficiency point in Strikes or Scolds learn one Critical Effect<br/>
-                  - For each proficiency point in Blasts learn an additional String
+                <img id="showBackpack" class="charInfoHover" onclick="showDesc('backpack');" src="imgs/backpack.png">'
+                <div id="backpack" class="charDetails draggable flexRow">
+                  <div id="hideBackpack" class="closeRitual" onclick="hideDesc('backpack');">-</div>
+                  <br/>
+                  <input id="gear1" class="gearInput" type="text">
+                  <input id="gear2" class="gearInput" type="text">
+                  <input id="gear3" class="gearInput" type="text">
+                  <input id="gear4" class="gearInput" type="text">
+                  <input id="gear5" class="gearInput" type="text">
+                  <input id="gear6" class="gearInput" type="text">
+                  <input id="gear7" class="gearInput" type="text">
+                  <input id="gear8" class="gearInput" type="text">
+                  <input id="gear9" class="gearInput" type="text">
+                  <input id="gear10" class="gearInput" type="text">
+                  <input id="gear11" class="gearInput" type="text">
+                  <input id="gear12" class="gearInput" type="text">
+                  <br/>
+                  <textarea id="gearBucket"></textarea>
+
                 </div>
-              </div>
-              <div id="attributeCheck" class="checkSection">
-                Assign Attributes
-                <div class="indent">
-                  - Select Primary Attribute. Assign it a value of 2. <br/>
-                  - Select Secondary Attribute. Assign it a value of 2. <br/>
-                  - Select Tertiary Attribute. Assing it a value of 1.<br/>
-                  - Distribute attribute points into sub-attributes (Priamry: 3, Secondary: 2, Tertiary 1)
+                <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="imgs/notes.png">'
+                <div id="notes" class="charDetails draggable">
+                  <div id="hideNotes" class="closeRitual" onclick="hideDesc('notes');">-</div>
+                  <br/>
+                  <textarea id="notes1" class="pcNotes" placeholder="Notes 1..."></textarea>
+                  <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
+                  <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
                 </div>
-              </div>
-              <div id="gearCheck" class="checkSection">
-                Purchase Starting Gear
-                <div class="indent">
-                  - Select 1 Weapon for free<br/>
-                  - Learn 1 Ritual you can cast for free<br/>
-                  - Purchase additional gear with 150 starting g. 
-                </div>
-              </div>
+                <button id="charSave" onclick="saveCharacter();">Save</button>                    
             </div>
 
-            <img id="showCharDesc" class="charInfoHover" onclick="showDesc('charDesc');" src="imgs/charDesc.png">
-            <div id="charDesc" class="charDetails draggable">
-              <div id="hideCharDesc" class="closeRitual" onclick="hideDesc('charDesc');">-</div>
-              Height <input id="charHeight" type="text">
-              Build <input id="charBuild" type="text">
-              Skin <input id="charSkin" type="text">
-              Hair <input id="charHair" type="text">
-              Eyes <input id="charEyes" type="text">
-              <br/>
-              <textarea id="charDescription" placeholder="Describe yourself here..."></textarea>
-            </div>
-            <img id="showCharStory" class="charInfoHover" onclick="showDesc('charStory');" src="imgs/charStory.png">
-            <div id="charStory" class="charDetails draggable">
-              <div id="hideCharStory" class="closeRitual" onclick="hideDesc('charStory');">-</div>
-              Birth Place <input id="birthPlace" type="text">
-              <textarea id="childhoodStory" placeholder="Story of your childhood..."></textarea>
-              <textarea id="trainingStory" placeholder="Story of your Training and how you came to your way..."></textarea>
-              <textarea id="journalStory" placeholder="Journal..."></textarea>
-            </div>
-            <img id="showCharPersonality" class="charInfoHover" onclick="showDesc('charPersonality');" src="imgs/charStory.png">
-            <div id="charPersonality" class="charDetails draggable">
-              <div id="hideCharPersonality" class="closeRitual" onclick="hideDesc('charPersonality');">-</div>
-              Current Goal in Life <input id="charPurpose" type="text">
-              Values...will be flushed out with world.
-            </div>
-            <img id="showBackpack" class="charInfoHover" onclick="showDesc('backpack');" src="imgs/backpack.png">'
-            <div id="backpack" class="charDetails draggable flexRow">
-              <div id="hideBackpack" class="closeRitual" onclick="hideDesc('backpack');">-</div>
-              <br/>
-              <input id="gear1" class="gearInput" type="text">
-              <input id="gear2" class="gearInput" type="text">
-              <input id="gear3" class="gearInput" type="text">
-              <input id="gear4" class="gearInput" type="text">
-              <input id="gear5" class="gearInput" type="text">
-              <input id="gear6" class="gearInput" type="text">
-              <input id="gear7" class="gearInput" type="text">
-              <input id="gear8" class="gearInput" type="text">
-              <input id="gear9" class="gearInput" type="text">
-              <input id="gear10" class="gearInput" type="text">
-              <input id="gear11" class="gearInput" type="text">
-              <input id="gear12" class="gearInput" type="text">
-              <br/>
-              <textarea id="gearBucket"></textarea>
+            <div class="secondaryAttributesWrapper">
+              <div class="secondaryAttributes">
+                <div class="image" id="HP">
+                    <span id="maxHpValue">30</span> <span id="marredValue">20</span> <span id="desperateValue">10</span> <span id="deadValue">-10</span>
+                </div>
+                <div id="recovery">
+                  <img id="recPtsImg" src="imgs/recPts.png" width="40px" height="40px">
+                  <input type="text" id="recoveryValue" value="1">       
+                </div>
+                <div id="mana">
+                  <img id="manaImg" src="imgs/mana.png" height="40px">
+                  <input type="text" id="manaValue" value="3">  
+                </div> 
+                <div id="conversion">
+                  <img id="manaImg" src="imgs/conversion.png" height="40px">
+                  <div id="conversionValue">3</div> 
+                </div> 
+                <div id="initialMomentum">
+                  <img id="initialMomentumImg" src="imgs/initialMomentum.png" width="40px">
+                  <div id="initialMomentumValue">3</div>
+                </div>
+                <div class="image" id="guard">
+                  <img id="guardImg" src="imgs/guardColor.png" width="40px" height="40px">
+                  <div id="guardValue">7</div>
+                </div>
+                <div id="armor">
+                  <img id="armorImg" src="imgs/armour.png" width="45px" height="40px">
+                  <input type="text" id="armorValue" value="0">
+                </div>            
+                <div id="pace">
+                  <img id="paceImg" src="imgs/pace.png" width="45px" height="30px">
+                  <div id="paceValue">6</div>
+                </div>
+                <div id="initiative">
+                  <img id="initiativeImg" src="imgs/initiative.png" width="40px">
+                  <div id="initiativeValue">0</div>
+                </div>
+                         
+              </div>
 
-            </div>
-            <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="imgs/notes.png">'
-            <div id="notes" class="charDetails draggable">
-              <div id="hideNotes" class="closeRitual" onclick="hideDesc('notes');">-</div>
-              <br/>
-              <textarea id="notes1" class="pcNotes" placeholder="Notes 1..."></textarea>
-              <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
-              <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
-            </div>
-            <button id="charSave" onclick="saveCharacter();">Save</button>                    
-        </div>
+              <div id="secondaryAttributeValues">
+                <div id="maxHPDesc">
+                  Max HP
+                </div>
+                <div id="marredDesc">
+                  Marred
+                </div>
+                <div id="desperateDesc">
+                  Desperate
+                </div>
+                <div id="deadDesc">
+                  Dead
+                </div>
+                <div id="recoveryDesc">
+                  Recovery
+                </div>
+                <div id="manaDesc">
+                  Mana
+                </div>
+                <div id="conversionDesc">
+                  Conversion
+                </div>
+                <div id="initialMomentumDesc">
+                  Initial M
+                </div>
+                <div id="guardDesc">
+                  Guard
+                </div>
+                <div id="armorDesc">
+                  Armor
+                </div>            
+                <div id="paceDesc">
+                  Pace
+                </div>
+                <div id="initiativeDesc">
+                 Init
+                </div>
 
-        <div class="secondaryAttributesWrapper">
-          <div class="secondaryAttributes">
-            <div class="image" id="HP">
-                <span id="maxHpValue">30</span> <span id="marredValue">20</span> <span id="desperateValue">10</span> <span id="deadValue">-10</span>
-            </div>
-            <div id="recovery">
-              <img id="recPtsImg" src="imgs/recPts.png" width="40px" height="40px">
-              <input type="text" id="recoveryValue" value="1">       
-            </div>
-            <div id="mana">
-              <img id="manaImg" src="imgs/mana.png" height="40px">
-              <input type="text" id="manaValue" value="3">  
-            </div> 
-            <div id="conversion">
-              <img id="manaImg" src="imgs/conversion.png" height="40px">
-              <div id="conversionValue">3</div> 
-            </div> 
-            <div id="initialMomentum">
-              <img id="initialMomentumImg" src="imgs/initialMomentum.png" width="40px">
-              <div id="initialMomentumValue">3</div>
-            </div>
-            <div class="image" id="guard">
-              <img id="guardImg" src="imgs/guardColor.png" width="40px" height="40px">
-              <div id="guardValue">7</div>
-            </div>
-            <div id="armor">
-              <img id="armorImg" src="imgs/armour.png" width="45px" height="40px">
-              <input type="text" id="armorValue" value="0">
-            </div>            
-            <div id="pace">
-              <img id="paceImg" src="imgs/pace.png" width="45px" height="30px">
-              <div id="paceValue">6</div>
-            </div>
-            <div id="initiative">
-              <img id="initiativeImg" src="imgs/initiative.png" width="40px">
-              <div id="initiativeValue">0</div>
-            </div>
-                     
-          </div>
+                
 
-          <div id="secondaryAttributeValues">
-            <div id="maxHPDesc">
-              Max HP
-            </div>
-            <div id="marredDesc">
-              Marred
-            </div>
-            <div id="desperateDesc">
-              Desperate
-            </div>
-            <div id="deadDesc">
-              Dead
-            </div>
-            <div id="recoveryDesc">
-              Recovery
-            </div>
-            <div id="manaDesc">
-              Mana
-            </div>
-            <div id="conversionDesc">
-              Conversion
-            </div>
-            <div id="initialMomentumDesc">
-              Initial M
-            </div>
-            <div id="guardDesc">
-              Guard
-            </div>
-            <div id="armorDesc">
-              Armor
-            </div>            
-            <div id="paceDesc">
-              Pace
-            </div>
-            <div id="initiativeDesc">
-             Init
-            </div>
-
-            
-
-          </div>
-        </div> <!-- End Secondary Attributes Wrapper -->
+              </div>
+            </div> <!-- End Secondary Attributes Wrapper -->
 
         <div class="columnWrapper">
         <div id="column1">

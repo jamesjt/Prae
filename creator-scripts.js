@@ -274,6 +274,7 @@ function populateRoleInfo(event) {
         }
         calculateAttributeValues(); // Recalculate after changes
         updateAttributeGroups();
+        updateAllSkillModsAndPassives(); // Ensure updates after potential subattribute adjustments
     }
 }
 
@@ -356,6 +357,7 @@ function atkManAmount(event) {
 function setAttPoints(event) {
     calculateAttributeValues();
     updateAttributeGroups();
+    updateAllSkillModsAndPassives(); // Ensure updates after potential changes
 }
 
 function calculateAttributeValues() {
@@ -415,6 +417,9 @@ function updateAttributeGroup(group) {
 
     const remaining = totalPoints - sum;
     document.getElementById(group.pointsId).innerText = remaining;
+
+    // Add this to update mods/passives after potential subattribute value changes
+    group.subIds.forEach(subId => updateSkillsForMod(subId));
 }
 
 // Add this function
@@ -477,6 +482,7 @@ function addPriorityListeners() {
             elem.addEventListener('change', () => {
                 calculateAttributeValues();
                 updateAttributeGroups();
+                updateAllSkillModsAndPassives(); // Ensure updates after changes
             });
         }
     });

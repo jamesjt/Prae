@@ -496,16 +496,16 @@
                     <div class="subAttributeWrapper">
                       <div class="subAttribute willSkill">
                         Will
-                        <input class="inputField"  id="willValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);" onmouseup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"
+                        <input class="inputField willSkill"  id="willValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);" onmouseup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"
                         onchange="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle witSkill">
                         Wit
-                        <input class="inputField"  id="witValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onmouseup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onchange="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);"/>
+                        <input class="inputField witSkill"  id="witValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onmouseup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onchange="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute resolveSkill">
                         Resolve
-                        <input class="inputField"  id="resolveValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);" onchange="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);"/>
+                        <input class="inputField resolveSkill"  id="resolveValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);" onchange="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);"/>
                       </div>
                     </div>
                     
@@ -679,15 +679,15 @@
                     <div class="subAttributeWrapper">
                       <div class="subAttribute vigorSkill">
                         Vigor
-                        <input class="inputField"  id="vigorValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onmouseup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onchange="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);"/>
+                        <input class="inputField vigorSkill"  id="vigorValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onmouseup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onchange="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle empathySkill">
                         Empathy
-                        <input class="inputField"  id="empathyValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onmouseup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onchange="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);"/>
+                        <input class="inputField empathySkill"  id="empathyValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onmouseup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onchange="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute faithSkill">
                         Faith
-                        <input class="inputField"  id="faithValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onmouseup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onchange="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);"/>
+                        <input class="inputField faithSkill"  id="faithValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onmouseup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onchange="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);"/>
                       </div>
                     </div>
                     
@@ -860,7 +860,7 @@
                       Strike
                     </div>
                     <div class="skillRank">
-                      <select id="strikeSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills">
+                      <select id="strikeSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills bodyColor">
                         <option value="0">1: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
@@ -929,7 +929,7 @@
                       Blast
                     </div>
                     <div class="skillRank">
-                      <select id="blastSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills">
+                      <select id="blastSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills mindColor">
                         <option value="0">0: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
@@ -979,7 +979,7 @@
                       Scold
                     </div>
                     <div class="skillRank">
-                      <select id="scoldSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills">
+                      <select id="scoldSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills spiritColor">
                         <option value="0">0: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>

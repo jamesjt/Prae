@@ -731,7 +731,7 @@
     border: none;
     margin-left: 20px;
     color: whitesmoke;}
-.inputField hover{
+.inputField:hover{
     background-color: white;
     color:black;
 }

@@ -162,7 +162,7 @@
     padding-bottom:4px;
 }
 
-.subAttributeWrapper {border-left:1px solid black;}
+.subAttributeWrapper {border-left:1px solid black; width: 70px;}
 
 .subAttribute {
     padding:3px;
@@ -451,12 +451,9 @@
 }
 
 #skillHeader {
-    background-color: black;
     color: white;
-    margin-left: 142px;
+    margin-left: 150px;
     width: 255px;
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
 }
 
 #attackSkillHeader {

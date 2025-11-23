@@ -516,7 +516,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #blastProfContainer {border-color: #19315C; background-color: #9BAABF;}
 #invokeProfContainer {border-color: #281957; background-color: #797781;}
 
-.exploitDesc {
+.profDesc {
     font-size: 12px;
     background-color:white;
     width: 210px;
@@ -531,9 +531,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     z-index: 10;
 }
 
-.exploitDesc:empty{border:none;}
+.profDesc:empty{border:none;}
 .invokeProfSelector, .strikeProfSelector {position:relative;}
-.invokeProfSelector:hover .exploitDesc, .strikeProfSelector:hover .exploitDesc {display:block;}
+.invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
 .profSelector, .exploitSelector {width: 230px !important; font-size: 12px; margin-bottom: 6px;}
 
 /* Gear */

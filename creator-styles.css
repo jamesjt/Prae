@@ -13,12 +13,14 @@
 @font-face { font-family: gaelic; src: url(../fonts/GAELIC.TTF); }
 
 .filledField{
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #a0a0a0;
     border-radius: 5px;
     color: black;;
     border: 1px solid black !important;
-  max-height:20px;
+    max-height:20px;
 }
 
 .flexRow{

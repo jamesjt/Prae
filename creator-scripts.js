@@ -196,6 +196,13 @@ function addSkillListeners() {
                 updateWayOptions();
                 calculateSkillPoints();
                 updateSkillModAndPassive(id);
+                // Add proficiency update for attack skills
+                const attackRankIds = ['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'];
+                if (attackRankIds.includes(id)) {
+                    const attackType = id.replace('SkillRank', '').toLowerCase();
+                    const rankValue = parseInt(skillSelect.value) || 0;
+                    updateProficiencySelectors(attackType, rankValue);
+                }
             });
         }
     });
@@ -537,4 +544,24 @@ window.addEventListener('load', () => {
     addPriorityListeners();
     addSubListeners();
     updateAllSkillModsAndPassives(); // Add this line
+    // Initial proficiency setup for attack skills
+    ['strike', 'blast', 'invoke'].forEach(type => {
+        const rankSelect = document.getElementById(type + 'SkillRank');
+        if (rankSelect) {
+            const rankValue = parseInt(rankSelect.value) || 0;
+            updateProficiencySelectors(type, rankValue);
+        }
+    });
 });
+
+// New function to handle proficiency selectors visibility
+function updateProficiencySelectors(attackType, rankValue) {
+    // Assume up to a reasonable max, e.g., 5; adjust if needed
+    const maxProf = 5;
+    for (let i = 1; i <= maxProf; i++) {
+        const profElement = document.getElementById(attackType + 'ProfSelector' + i);
+        if (profElement) {
+            profElement.hidden = i > rankValue;
+        }
+    }
+}

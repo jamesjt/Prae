@@ -1,3 +1,4 @@
+
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
@@ -32,7 +33,7 @@ function parseWaysCSV(csvText) {
     return rows;
 }
 
-// Updated skill map based on provided skills
+// Full skill map based on HTML IDs
 const SKILL_ID_MAP = {
     'Athletics': 'athleticsSkillRank',
     'Force': 'forceSkillRank',
@@ -52,31 +53,7 @@ const SKILL_ID_MAP = {
     'Charm': 'charmSkillRank',
     'Calm': 'calmSkillRank',
     'Command': 'commandSkillRank',
-    // Add attack skills if they are separate and used in the sheet
-    //'Strikes': 'strikesSkillRank',
-    //'Blasts': 'blastsSkillRank',
-    //'Scolds': 'scoldsSkillRank',
-};
-
-const ATTRIBUTE_GROUPS = {
-    physical: {
-        priorityId: 'bodyPriority',
-        pointsId: 'physicalAttributePoints',
-        primaryValueId: 'bodyValue',
-        subIds: ['mightValue', 'agilityValue', 'brawnValue']
-    },
-    mental: {
-        priorityId: 'mindPriority',
-        pointsId: 'mentalAttributePoints',
-        primaryValueId: 'mindValue',
-        subIds: ['willValue', 'witValue', 'resolveValue']
-    },
-    spirit: {
-        priorityId: 'spiritPriority',
-        pointsId: 'spiritAttributePoints',
-        primaryValueId: 'spiritValue',
-        subIds: ['vigorValue', 'faithValue', 'empathyValue']
-    }
+    // Add any missing skills here if there are more in your HTML/sheet
 };
 
 let waysData = [];
@@ -90,8 +67,8 @@ fetch(WAYS_CSV_URL)
         // Log rows for debugging
         console.log('Parsed Rows:', rows);
 
-        // Find include row - make matching case-insensitive and trim
-        let includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
+        // Find include row
+        let includeRowIdx = rows.findIndex(row => row[0].toLowerCase().includes('include'));
 
         if (includeRowIdx === -1) {
             console.error('Missing "Include" row in Ways CSV');
@@ -103,14 +80,14 @@ fetch(WAYS_CSV_URL)
         // Log include row
         console.log('Include Row:', includeRow);
 
-        // Collect ways where include === 'TRUE' or 'true' or '1'
+        // Collect ways where include === 'TRUE'
         for (let col = 1; col < includeRow.length; col++) {
-            const includeValue = (includeRow[col] || '').toUpperCase().trim();
+            const includeValue = (includeRow[col] || '').toUpperCase();
             console.log(`Column ${col} Include: ${includeValue}`);
-            if (includeValue === 'TRUE' || includeValue === '1') {  // Handle possible '1' for checkbox
+            if (includeValue === 'TRUE') {
                 const props = {};
                 rows.forEach((row, rowIdx) => {
-                    const key = (row[0] || '').trim().toLowerCase();
+                    const key = (row[0] || '').trim();
                     if (key) {
                         props[key] = (row[col] || '').trim();
                     }
@@ -119,23 +96,11 @@ fetch(WAYS_CSV_URL)
                 // Log props for this column
                 console.log(`Props for Column ${col}:`, props);
 
-                const nameKey = Object.keys(props).find(k => k.includes('way name'));
-                const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
+                const name = props['Way Name'];
+                const reqSkill = props['Required Skill'];
 
-                const name = nameKey ? props[nameKey] : '';
-                const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
-
-                if (name && reqSkill) {
-                    const normalizedReqSkill = reqSkill.trim(); // Exact match
-                    const skillId = normalizedReqSkill === 'Any' ? 'Any' : SKILL_ID_MAP[normalizedReqSkill];
-                    if (skillId || normalizedReqSkill === 'Any') {
-                        waysData.push({ name, props, reqSkill: normalizedReqSkill, skillId });
-                        console.log(`Added Way: ${name}, Req: ${normalizedReqSkill}, ID: ${skillId}`);
-                    } else {
-                        console.warn(`Skipping ${name}: No matching skill ID for "${normalizedReqSkill}" in SKILL_ID_MAP`);
-                    }
-                } else {
-                    console.warn(`Skipping Column ${col}: Missing name or reqSkill`);
+                if (name && reqSkill && SKILL_ID_MAP[reqSkill]) {
+                    waysData.push({ name, props, reqSkill, skillId: SKILL_ID_MAP[reqSkill] });
                 }
             }
         }
@@ -149,6 +114,7 @@ fetch(WAYS_CSV_URL)
     })
     .catch(err => {
         console.error('Error loading Ways CSV:', err);
+        // Fallback: hardcoded ways if needed
     });
 
 // Populate dropdown
@@ -180,17 +146,8 @@ function addSkillListeners() {
 function updateWayOptions() {
     const selector = document.getElementById('roleSelector');
     waysData.forEach(way => {
-        let isQualified = false;
-        if (way.reqSkill === 'Any') {
-            // Check if any skill is not untrained (selectedIndex !== 0)
-            isQualified = Object.values(SKILL_ID_MAP).some(id => {
-                const skillSelect = document.getElementById(id);
-                return skillSelect && skillSelect.selectedIndex !== 0;
-            });
-        } else {
-            const skillSelect = document.getElementById(way.skillId);
-            isQualified = skillSelect && skillSelect.selectedIndex !== 0;
-        }
+        const skillSelect = document.getElementById(way.skillId);
+        const isQualified = skillSelect && skillSelect.selectedIndex !== 0; // Not the first option (untrained)
         const option = selector.querySelector(`option[value="${way.name}"]`);
         if (option) {
             option.disabled = !isQualified;
@@ -206,23 +163,16 @@ function populateRoleInfo(event) {
 
     const way = waysData.find(w => w.name === value);
     if (way) {
-        // Find keys case-insensitively for talent, foci, etc.
-        const talentNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent name'));
-        const talentDescKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent description'));
-        const fociNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci name'));
-        const fociCostKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci cost'));
-        const fociEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci effect'));
-        const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
-        const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
-
-        document.getElementById('rTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
-        document.getElementById('rTalentDesc').innerText = talentDescKey ? way.props[talentDescKey] : '';
-        document.getElementById('rManName').innerText = fociNameKey ? way.props[fociNameKey] : '';
-        document.getElementById('rManCost').innerText = fociCostKey ? way.props[fociCostKey] : '';
-        document.getElementById('rManEffect').innerText = fociEffectKey ? way.props[fociEffectKey] : '';
+        // Set talent and maneuver using props (adjust keys based on your sheet)
+        document.getElementById('wayTalentName').innerText = way.props['Talent Name'] || way.name;
+        document.getElementById('wayTalentKeywords').innerText = way.props['Keywords'] || '';
+        document.getElementById('wayTalentDescription').innerText = way.props['Description'] || '';
+        document.getElementById('wayTalentPassive').innerText = way.props['Passive'] || '';
+        document.getElementById('wayTalentFocus').innerText = way.props['Focus'] || '';
+        document.getElementById('wayTalentCriticalEffect').innerText = way.props['Critical Effect'] || '';
 
         // Set the attack/required skill to 3:Trained if not already higher
-        const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
+        const attackSkill = way.props['Attack Skill'] || way.reqSkill;
         const skillId = SKILL_ID_MAP[attackSkill];
         if (skillId) {
             const skillSelect = document.getElementById(skillId);
@@ -231,26 +181,6 @@ function populateRoleInfo(event) {
                 skillSelect.dispatchEvent(new Event('change'));
             }
         }
-
-        // Set primary attribute priority to value '1'
-        const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
-        let priorityId;
-        if (primaryAttr === 'Body') {
-            priorityId = 'bodyPriority';
-        } else if (primaryAttr === 'Mind') {
-            priorityId = 'mindPriority';
-        } else if (primaryAttr === 'Spirit') {
-            priorityId = 'spiritPriority';
-        }
-        if (priorityId) {
-            const select = document.getElementById(priorityId);
-            if (select) {
-                select.value = '1';
-                select.dispatchEvent(new Event('change'));
-            }
-        }
-        calculateAttributeValues(); // Recalculate after changes
-        updateAttributeGroups();
     }
 }
 
@@ -331,100 +261,43 @@ function atkManAmount(event) {
 }
 
 function setAttPoints(event) {
-    calculateAttributeValues();
-    updateAttributeGroups();
+    calculateAttPoints();
 }
 
-function calculateAttributeValues() {
+function calculateAttPoints() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
 
-    const priVal = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
-    const secVal = 2 + (level >= 6 ? 1 : 0);
-    const terVal = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
+    const priPoints = level + 2;
+    const secPoints = level + 1;
+    const terPoints = level;
 
-    const bodyPri = document.getElementById('bodyPriority').value || '';
-    let bodyVal = 0;
-    if (bodyPri === '1') bodyVal = priVal;
-    else if (bodyPri === '2') bodyVal = secVal;
-    else if (bodyPri === '3') bodyVal = terVal;
-    document.getElementById('bodyValue').innerText = bodyVal;
+    // Assume IDs for priority selects: bodyPriority, mindPriority, spiritPriority with values 'Primary', 'Secondary', 'Tertiary'
 
-    const mindPri = document.getElementById('mindPriority').value || '';
-    let mindVal = 0;
-    if (mindPri === '1') mindVal = priVal;
-    else if (mindPri === '2') mindVal = secVal;
-    else if (mindPri === '3') mindVal = terVal;
-    document.getElementById('mindValue').innerText = mindVal;
+    const physPri = document.getElementById('bodyPriority') ? document.getElementById('bodyPriority').value : '';
+    let physPoints = 0;
+    if (physPri === '1') physPoints = priPoints;
+    else if (physPri === '2') physPoints = secPoints;
+    else if (physPri === '3') physPoints = terPoints;
+    document.getElementById('physicalAttributePoints').innerText = physPoints;
 
-    const spiritPri = document.getElementById('spiritPriority').value || '';
-    let spiritVal = 0;
-    if (spiritPri === '1') spiritVal = priVal;
-    else if (spiritPri === '2') spiritVal = secVal;
-    else if (spiritPri === '3') spiritVal = terVal;
-    document.getElementById('spiritValue').innerText = spiritVal;
-}
+    const mentPri = document.getElementById('mindPriority') ? document.getElementById('mindPriority').value : '';
+    let mentPoints = 0;
+    if (mentPri === '1') mentPoints = priPoints;
+    else if (mentPri === '2') mentPoints = secPoints;
+    else if (mentPri === '3') mentPoints = terPoints;
+    document.getElementById('mentalAttributePoints').innerText = mentPoints;
 
-function updateAttributeGroups() {
-    Object.values(ATTRIBUTE_GROUPS).forEach(group => updateAttributeGroup(group));
-}
-
-function updateAttributeGroup(group) {
-    const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const pri = document.getElementById(group.priorityId).value || '3';
-    let totalPoints = 1 + Math.floor((level - 1) / 3);
-    if (pri === '1') totalPoints = 3 + Math.floor((level + 1) / 3);
-    else if (pri === '2') totalPoints = 2 + Math.floor(level / 3);
-
-    const primaryMax = parseInt(document.getElementById(group.primaryValueId).innerText) || 0;
-
-    let sum = 0;
-    group.subIds.forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.setAttribute('max', primaryMax);
-            let val = parseInt(input.value) || 0;
-            if (val > primaryMax) val = primaryMax;
-            if (val < 0) val = 0;
-            input.value = val;
-            sum += val;
-        }
-    });
-
-    const remaining = totalPoints - sum;
-    document.getElementById(group.pointsId).innerText = remaining;
-}
-
-// Add event listeners for sub-attributes
-function addSubListeners() {
-    Object.values(ATTRIBUTE_GROUPS).forEach(group => {
-        group.subIds.forEach(subId => {
-            const input = document.getElementById(subId);
-            if (input) {
-                input.addEventListener('change', () => updateAttributeGroup(group));
-            }
-        });
-    });
-}
-
-// Add event listeners for priorities and level
-function addPriorityListeners() {
-    ['bodyPriority', 'mindPriority', 'spiritPriority', 'charLvl'].forEach(id => {
-        const elem = document.getElementById(id);
-        if (elem) {
-            elem.addEventListener('change', () => {
-                calculateAttributeValues();
-                updateAttributeGroups();
-            });
-        }
-    });
+    const socPri = document.getElementById('spiritPriority') ? document.getElementById('spiritPriority').value : '';
+    let socPoints = 0;
+    if (socPri === '1') socPoints = priPoints;
+    else if (socPri === '2') socPoints = secPoints;
+    else if (socPri === '3') socPoints = terPoints;
+    document.getElementById('spiritAttributePoints').innerText = socPoints; // Assuming social is spirit
 }
 
 // Call initial calculations on load
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
-    calculateAttributeValues();
-    updateAttributeGroups();
-    addPriorityListeners();
-    addSubListeners();
+    calculateAttPoints();
 });

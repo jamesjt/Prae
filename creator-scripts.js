@@ -1,4 +1,5 @@
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
+const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
 function parseWaysCSV(csvText) {
@@ -104,6 +105,7 @@ const ATTRIBUTE_GROUPS = {
 };
 
 let waysData = [];
+let profData = { strike: [], blast: [], invoke: [] };
 
 // Fetch and process ways
 fetch(WAYS_CSV_URL)
@@ -174,6 +176,56 @@ fetch(WAYS_CSV_URL)
     .catch(err => {
         console.error('Error loading Ways CSV:', err);
     });
+
+// Fetch and process proficiency options
+fetch(PROF_CSV_URL)
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(text => {
+        const rows = parseWaysCSV(text);
+
+        // Assume first row is headers
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+
+        const strikeCol = headers.indexOf('strike');
+        const blastCol = headers.indexOf('blast');
+        const invokeCol = headers.indexOf('invoke');
+
+        if (strikeCol !== -1) {
+            profData.strike = rows.slice(1).map(row => row[strikeCol].trim()).filter(v => v);
+        }
+        if (blastCol !== -1) {
+            profData.blast = rows.slice(1).map(row => row[blastCol].trim()).filter(v => v);
+        }
+        if (invokeCol !== -1) {
+            profData.invoke = rows.slice(1).map(row => row[invokeCol].trim()).filter(v => v);
+        }
+
+        // Log for debugging
+        console.log('Proficiency Data:', profData);
+
+        // Populate all selects for each type
+        populateProfSelects('strike', profData.strike);
+        populateProfSelects('blast', profData.blast);
+        populateProfSelects('invoke', profData.invoke);
+    })
+    .catch(err => {
+        console.error('Error loading Proficiency CSV:', err);
+    });
+
+// Function to populate selects for a type
+function populateProfSelects(type, options) {
+    const maxSelectors = 5; // Assume max rank is 5; adjust if needed
+    for (let i = 1; i <= maxSelectors; i++) {
+        const select = document.getElementById(type + 'ProfSelector' + i);
+        if (select) {
+            let html = '<option value=""></option>';
+            options.forEach(opt => {
+                html += `<option value="${opt}">${opt}</option>`;
+            });
+            select.innerHTML = html;
+        }
+    }
+}
 
 // Populate dropdown
 function populateRoleSelector() {

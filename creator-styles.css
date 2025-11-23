@@ -1,5 +1,4 @@
 #character-creator{padding-left: 20px; background-color: black;justify-content: center;}
-
 @font-face { font-family: wizzta; src: url(../fonts/wizzta.ttf); }
 @font-face { font-family: dragonfly; src: url(../fonts/Dragonfly.ttf); }
 @font-face { font-family: pebbles; src: url(../fonts/pebbles.ttf); }
@@ -11,7 +10,6 @@
 @font-face { font-family: blackcha; src: url(../fonts/Blackcha.ttf); }
 @font-face { font-family: daniel; src: url(../fonts/Daniela.ttf); }
 @font-face { font-family: gaelic; src: url(../fonts/GAELIC.TTF); }
-
 .filledField{
     display: flex;
     align-items: center;
@@ -22,47 +20,37 @@
     border: 1px solid black !important;
     max-height:20px;
 }
-
 .flexRow{
     display:flex;
 }
-
 .flexColumn{
     display:flex;
     flex-direction: column;
 }
-
 /* Structure */
 .columnWrapper {
     display: flex;
     flex-direction: row;
 }
-
 #column1 {
     margin-left: -2px;
     margin-right: 15px;
 }
-
 #column3 {
     margin-left: 15px;
-
 }
-
-.statsWrapper { 
+.statsWrapper {
   display: flex;
   flex-direction: row;
   width: 390px;
   border-radius:8px;
 }
-
-
 /* Character Info Bar */
 #charInfo{
     padding-left: 5px;
     color:white;
     margin: 10px 10px 15px 0px;
 }
-
 .charText{margin-left: 5px;margin-right: 5px;}
 #charName {width: 120px; height: 12px;}
 #charLvl {width: 29px;}
@@ -70,8 +58,6 @@
 #training {width: 90px;}
 #roleSelector {width: 110px; margin-left: 5px; margin-right:5px;}
 #charSave {width: 40px; margin-right:5px; margin-top:4px; border-radius: 6px; padding:2px; background-color:white; float:right;}
-
-
 .charInfoHover{
   position:relative;
   top:4px;
@@ -81,9 +67,7 @@
   border-radius: 3px;
   cursor:alias;
 }
-
 .charInfoHover:hover + .charDetails{display: block !important;}
-
 .charDetails {
   position:absolute;
   display:none;
@@ -99,58 +83,47 @@
   color:black;
   border: 3px solid black;
 }
-
 .checkSection{border:4px double black;}
 #remSkill {width: 15px; margin-left: 5px; margin-right:5px;}
 #maxSkill {width: 70px; margin-left: 5px; margin-right:5px;}
 #totalAbilities {width:15px; margin-left: 5px; margin-right:5px;}
 #remAbilities {width: 15px; margin-left: 5px; margin-right:5px;}
-
 #charHeight {width: 40px;}
 #charBuild{width: 40px;}
 #charHair {width: 40px;}
 #charSkin {width: 40px;}
 #charEyes {width:40px;}
 #charDescription{width:640px;height: 80px;}
-
 #birthplace {width:40px;}
 #childhoodStory{width:640px;height: 80px;}
 #trainingStory{width:640px;height: 80px;}
 #journalStory{width:640px;height: 80px;}
-
 #backpack{width:650px;}
 .gearInput {width:100px;}
 #gearBucket {width:638px; height:80px; margin-top:5px;}
-
 .pcNotes {width:640px; height:80px;}
-
 /* Attributes */
-
 #physicalStatsWrapper {background-color: #5F1817;margin-bottom: 5px;width:100%;}
 #mentalStatsWrapper {background-color: #19315C;margin-bottom: 5px;width: 100%;}
 #socialStatsWrapper {background-color: #281957;width: 100%;}
-
 #bodyPriority {}
 .att-desc-font{font-size: 8px}
-
 .attributeSelect {
     width: 70px;
     border-radius: 8px;
     height: 20px;
     border-color: black;
-    font-size:  12px;
+    font-size: 12px;
 }
-
 .attributeWrapper {
     width: 65px;
     height: 136px;
     padding: 6px;
-    border-radius:  8px 0px 0px 8px;
+    border-radius: 8px 0px 0px 8px;
     display:flex;
     flex-direction: column;
     align-items: center;
 }
-
 .attribute {
     display:flex;
     flex-direction: column;
@@ -161,9 +134,7 @@
     padding-top: 4px;
     padding-bottom:4px;
 }
-
 .subAttributeWrapper {border-left:1px solid black; width: 70px;}
-
 .subAttribute {
     padding:3px;
     height: 42px;
@@ -172,50 +143,34 @@
     justify-content: center;
     align-items: center;
 }
-
 .subMiddle {margin-top: 2px;margin-bottom: 2px;}
-
-
 #physicalAttributePoints {background-color: #5F1817}
 #mentalAttributePoints {background-color: #9BAABF;}
 #spiritAttributePoints {background-color: #797781;}
-
-
 .physicalAtt {background-color: #5F1817;}
-
 .mentalAtt {background-color: #19315C;}
-
 .socialAtt {background-color: #281957;}
-
 .attributePoints {
     border: 1px solid black;
-    border-radius:  8px;
+    border-radius: 8px;
     width: 60px;
     height: 20px;
-    text-align:     center;
-
+    text-align: center;
 }
-
 .bodyColor {background-color: #5F1817; color:white;}
 .mindColor {background-color: #19315C; color:white;}
 .spiritColor{background-color: #281957; color:white;}
-
 .mightSkill, .brawnSkill { background-color: #7B1C19;}
-.agilitySkill { background-color:  #A34A47;}
+.agilitySkill { background-color: #A34A47;}
 .willSkill, .resolveSkill { background-color: #24497F;}
 .witSkill { background-color: #5E7BA0;}
 .vigorSkill, .faithSkill { background-color: #3A2780;}
 .empathySkill { background-color: #7A6FB0;}
-
-
 /* Secondary Stats */
-
 .secondaryAttributesWrapper {margin-left: 110px;}
 .secondaryAttributes {border-radius: 8px;display:flex;height:40px;}
 #secondaryAttributeValues {display:flex; }
 .genAtt { width: 50px; text-align:center; text-align:center; border: 1px solid black;}
-
-
 #maxHP {padding-top: 5px;}
 #marred {background-color: #6385BE; color:white;}
 #desperate {background-color:#72639F; color:white;}
@@ -224,58 +179,45 @@
 #initiative {}
 #initialMomentem {}
 #conversion {}
-
 #armor {}
-
 .image {position: relative;display: flex;}
-
 #HP {
     width: 240px;
     height: 40px;
     background: url('../imgs/hp2.png') no-repeat center top;
     background-size: 100% 100%;
-
 }
-
 #hpImg {position: absolute;}
-
 #maxHPDesc, #marredDesc, #desperateDesc,#deadDesc {
     width: 60px;
     text-align:center;
     font-size: 12px;
 }
-
 #guard {position: relative;margin-left: 50px;}
-
 #guardValue{
   position: absolute;
   text-align:center;
-  top: 5px; 
+  top: 5px;
   font-size:20px;
   width: 100%;
-
 }
-
 #guardDesc{
     width: 40px;
     text-align:center;
     font-size: 12px;
     margin-left: 50px;
 }
-
 #armor {
     width: 45px;
     padding-left:15px;
     padding-right: 15px;
 }
-
 #armorValue{
     position:relative;
     top:-37px;
     left: 17px;
     width: 8px;
 }
-
 #armorDesc{
     width:45px;
     text-align:center;
@@ -284,29 +226,24 @@
     padding-left:15px;
     padding-right: 15px;
 }
-
-
 #maxHpValue {
   position: absolute;
   top: 3px;
   left: 17px;
   font-size: 30px;
 }
-
 #marredValue {
   position: absolute;
   top: 3px;
   left: 75px;
     font-size: 30px;
 }
-
 #desperateValue {
   position: absolute;
   top: 3px;
   left: 133px;
   font-size: 30px;
 }
-
 #deadValue{
     position:absolute;
     top:8px;
@@ -314,17 +251,14 @@
     color:whitesmoke;
     font-size:20px;
 }
-
 #pace {padding-right: 15px;}
 #paceImg {position:relative;top:10px;}
-
 #paceDesc {
     width: 40px;
     text-align:center;
-    font-size: 12px; 
+    font-size: 12px;
     padding-right:15px;
 }
-
 #paceValue {
     position:relative;
     top: -18px;
@@ -332,29 +266,24 @@
     color:white;
     font-size:20px;
 }
-
 #recovery {
     margin-left: 5px;
     margin-right: 2px;
     width: 40px;
 }
-
 #recoveryValue {
     position:relative;
     top: -37px;
     left:14px;
     width: 8px;
 }
-
 #recoveryDesc {
     width:45px;
     text-align:center;
     font-size:12px;
     margin-left: 2px;
 }
-
 #initiative {width:45px;}
-
 #initiativeValue {
     position:relative;
     top:-36px;
@@ -364,16 +293,13 @@
     font-size:20px;
     text-shadow: 0 0 10px grey, 0 0 10px grey, 0 0 10px grey, 0 0 10px grey;
 }
-
 #initiativeDesc {
     width:45px;
     text-align:center;
     font-size:12px;
     margin-left: 2px;
 }
-
 #initialMomentum {width: 45px;}
-
 #initialMomentumValue {
     position:relative;
     top:-36px;
@@ -384,42 +310,34 @@
     color:whitesmoke;
     text-shadow: 0 0 10px black, 0 0 10px black, 0 0 10px black, 0 0 10px black;
     text-shadow: -1px 0 2px black, 0 1px 2px black, 1px 0 2px black, 0 -1px 2px black;
-
 }
-
 #initialMomentumDesc {
     width:45px;
     text-align:center;
     font-size:12px;
     margin-left: 10px;
 }
-
 #mana {
     width: 45px;
     padding-left: 12px;
     margin-left: 60px;
 }
-
 #manaDesc{
     width:45px;
     text-align:center;
     font-size:12px;
     margin-left: 60px;
 }
-
 #manaValue{
     position:relative;
     top:-17px;
     left: -23px;
     width: 8px;
 }
-
 #conversion {
     width:45px;
     padding-right: 10px;
-
 }
-
 #conversionValue {
     position:relative;
     top:-36px;
@@ -429,7 +347,6 @@
     text-shadow: 0 0 10px black, 0 0 10px black, 0 0 10px black, 0 0 10px black;
     text-shadow: -1px 0 2px black, 0 1px 2px black, 1px 0 2px black, 0 -1px 2px black;
 }
-
 #conversionDesc {
     width:45px;
     text-align:center;
@@ -437,25 +354,19 @@
     margin-left: 2px;
     padding-right: 10px;
 }
-
-
 /* Skills */
-
 .skillWrapper {display: flex;flex-direction: column;border-left:1px solid black;}
-
 .skillListing {
   display: flex;
   height: 20px;
   padding: 1px 2px 1px 2px;
   font-size: 14px;
 }
-
 #skillHeader {
     color: white;
     margin-left: 150px;
     width: 255px;
 }
-
 #attackSkillHeader {
     background-color: black;
     color: white;
@@ -463,7 +374,6 @@
     border-top-right-radius: 4px;
     border-top-left-radius: 4px;
 }
-
 .skillListingMidTop{margin-top: 8px;}
 .skillListingMidBot{margin-bottom:8px;}
 .skillName {width:71px;}
@@ -471,13 +381,10 @@
 .skillRank {width:95px;}
 .skillMod {width: 35px;}
 .skillPassive {width: 50px;}
-
 /* Attack Skills */
-
 #strikeWrapper {width:236px;}
 #blastWrapper {width: 236px;}
 #scoldWrapper {width: 236px;}
-
 #strikeProfContainer, #blastProfContainer, #scoldProfContainer {
     border-style: solid;
     border-width: 1px;
@@ -491,7 +398,6 @@
 #strikeProfContainer{border-color: #4D0708; background-color: #B07C71;}
 #blastProfContainer {border-color: #19315C; background-color: #9BAABF;}
 #scoldProfContainer {border-color: #281957; background-color: #797781;}
-
 .exploitDesc {
     font-size: 12px;
     background-color:white;
@@ -506,17 +412,13 @@
     bottom:0px;
     z-index: 10;
 }
-
 .exploitDesc:empty{border:none;}
 .scoldProfSelector, .strikeProfSelector {position:relative;}
 .scoldProfSelector:hover .exploitDesc, .strikeProfSelector:hover .exploitDesc {display:block;}
 .profSelector, .exploitSelector {width: 230px !important; font-size: 12px; margin-bottom: 6px;}
-
 /* Gear */
-
 #weaponHeader {background-color: black;color:white;border-radius: 4px 4px 0px 0px;text-align:center;}
 #weaponAmount {margin-right: 10px;}
-
 #weaponList {
   background-color:#B07C71;
   height: 165px;
@@ -524,7 +426,6 @@
   border-radius: 4px 4px 0px 0px;
   margin-bottom:5px;
 }
-
 .weaponListing {
     background-color: #bd534d;
     padding-left: 5px;
@@ -533,25 +434,19 @@
     margin-bottom:10px;
     position:relative;
 }
-
 .weaponName {width: 90px;}
 .weaponType {width: 90px;}
 .weaponSize {width: 70px;}
 .weaponDamage {width: 41px;text-align:center;}
 .weaponCS {font-size: 12px;font-weight:bold; padding-bottom: 2px;}
-.weaponExploit {text-align: center; height:16.2px; margin-bottom:2px;}
-
+.weaponExploit {text-align: center; height:16px; margin-bottom:2px;}
 .weaponExploitDescription {font-size: 12px;}
-
-
-
 #armorList {
   background-color:#9BAABF;
   height: 144px;
   border: 2px solid #19315C;
   margin-bottom:5px;
 }
-
 #ritualList {
   background-color:#9BAABF;
   height: 144px;
@@ -559,7 +454,6 @@
   margin-bottom:5px;
   max-width: 326px;
 }
-
 .ritualListing {
     background-color: #6385BE;
     padding-left: 5px;
@@ -568,10 +462,7 @@
     display: flex;
     position:relative;
 }
-
-
 .ritualSelector{width:110px;margin-top:2px;}
-
 .showRitualDetails{
   position:relative;
   height:16px;
@@ -583,9 +474,7 @@
   border:1px solid black;
   z-index: 10;
 }
-
 .showRitualDetails:hover + .ritualDetails{display: block !important;}
-
 .ritualDetails {
   position:absolute;
   display:none;
@@ -599,7 +488,6 @@
   cursor: all-scroll;
   z-index:100;
 }
-
 .ritualBody{width: 700px;max-height: 700px;overflow: scroll;background-color:#9BAABF !important;}
 .ritualHeader{}
 .closeRitual {
@@ -616,34 +504,29 @@
   background-color:white;
   font-size: 10px;
 }
-
 .ritualCost{width: 45px; margin-left:2px; margin-right:2px;}
 .ritualCastTime{width:70px;overflow: hidden;}
 .ritualDuration{width:60px;overflow:hidden;margin-left:2px;margin-right:2px;}
 .ritualDetails div:nth-of-type(even){background-color:#adad85; margin-bottom:2px;}
 .ritualDetails div:nth-of-type(odd){background-color:#e6e6e6; margin-bottom:2px;}
 .ritualDescLine {padding-left: 5px;}
-
 .armorListing {
     background-color: #6385BE;
     padding-left: 5px;
     border-style: double;
     margin-bottom: 3px;
 }
-
 .armorName{
     margin-bottom: 3px;
     height: 14px;
     width: 100px;
 }
-
 .armorType {
     margin-left: 8px;
     margin-bottom: 3px;
     height: 18px;
     width: 105px;
 }
-
 .armorBonus {
     margin-left: 5px;
     width: 80px;
@@ -651,9 +534,7 @@
     padding-left: 5px;
     padding-right:5px;
 }
-
 .armorNotes{ width: 200px; }
-
 .armorPen {
     margin-left: 8px;
     height: 15px;
@@ -661,52 +542,40 @@
     padding-left: 5px;
     padding-right:5px;
 }
-
 #gearList {
   background-color:white;
   height: 144px;
   border: 3px solid #303030;
   margin-bottom:5px;
 }
-
 .gearListing {
   background-color:silver;
   border-style: double;
   display: flex;
   flex-wrap: wrap;
 }
-
 .gearEntry {margin: 3px; height: 13px; width: 147px;}
-
-
 /* abilities */
 .abilityWrapper {
     width: 100%;
     height: 100%;
     display:flex;
 }
-
 #talentHeader, #nonAtkManHeader, #atkManHeader, #exploitHeader {
   background-color: black;
   color:white;
   border-radius: 8px 8px 0px 0px;
   text-align:center;
 }
-
 #atkManAmount, #talentAmount, #exploitAmount, #nonAtkManAmount {width:40px;}
-        
+       
 .talentWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .talent, .talentSelector{ background-color:#6a877d !important;color:white;}
-.nonAtkMan, .nonAtkManSelector {background-color:#369180 !important;color:white;}
-.atkMan, .atkManSelector{background-color:#0a614e ; color:white;}
-
-
-.nonAtkManWrapper {width: 330px; height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
-
+.trickWrapper {width: 330px; height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
+.trick, .trickSelector{background-color:#369180 !important;color:white;}
 #atkManWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .exploitWrapper {width: 250px;height: 200px;border-radius: 8px 8px 0px 0px;}
-
-.inputField{    width: 30px;
+.inputField{ width: 30px;
     border: none;
     margin-left: 20px;
     color: whitesmoke;}
@@ -718,16 +587,12 @@
 .attackSkills:hover {margin-left: 1px;background-color: white;color:black;}
 .nonAttackSkills {margin-left: 1px; color:whitesmoke; border: none;}
 .nonAttackSkills:hover {margin-left: 1px;background-color: white;color:black;}
-
-
-
-
 .physicalTalent { background-color: #b36b00 !important; color: white; }
 .mentalTalent { background-color: #006666 !important; color: white;}
 .socialTalent { background-color: #8E7CC3 !important; color: white;}
-.physicalNonAtkMan {background-color: #ac3939 !important; color: white;}
-.mentalNonAtkMan {background-color: #004c99 !important; color: white;}
-.socialNonAtkMan {background-color: #7300e6 !important; color: white;}
+.physicalTrick {background-color: #ac3939 !important; color: white;}
+.mentalTrick {background-color: #004c99 !important; color: white;}
+.socialTrick {background-color: #7300e6 !important; color: white;}
 .physicalAtkMan {background-color: #5F1817 !important; color: white;}
 .mentalAtkMan {background-color: #204077 !important; color: white;}
 .socialAtkMan {background-color: #4f1f4c !important; color: white;}
@@ -736,13 +601,8 @@
 .socialAtkMan {background-color: #862d59 !important; color: white;}
 .socialExploit {background-color: #B4A7D6 !important;color:white;}
 .physicalExploit {background-color: #cc9900 !important; color: white;}*/
-
 .mentalExploit {background-color: #A4C2F4 !important; color: white;}
-
-
-
 .borderNone {border-style:none;}
-
 .charInfo{
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
@@ -751,21 +611,18 @@
     color:white;
     height: 20px;
 }
-
 .hidden {
     display:none !important;
 }
-
 .showButton{
     display: inline-block;
     border-radius: 10px;
     margin-top: 3px;
     border: none;
-    background: none;   
+    background: none;
     font-family: wizzta;
     font-size: 20px;
 }
-
 .hide {
     border: none;
     border-radius: 9px;
@@ -774,22 +631,18 @@
     padding:0px 3px 1px 3px;
     background: none;
 }
-
 .hideWrapper {
     position: relative;
     text-align: center;
 }
-
 .indent {padding-left: 40px;}
 .section {margin-top: 15px;}
-
 .section:nth-of-type(odd) header {
     background: url('../imgs/scrollTop3.png') no-repeat center top;
     background-size: 100% 100%;
     height:30px;
     width: 1140px;
 }
-
 .section:nth-of-type(odd) footer {
     background: url('../imgs/scrollTop3.png') no-repeat center top;
     background-size: 100% 100%;
@@ -798,7 +651,6 @@
     transform: scaleY(-1);
     margin-top:-5px;
 }
-
 .section:nth-of-type(odd) article {
     background: url('../imgs/scrollBackground4.png') no-repeat center top;
     background-size: 100% 100%;
@@ -806,9 +658,8 @@
     padding-right:30px;
     margin-left: 30px;
   width: 1000px;
-  height: 1365px;  
+  height: 1365px;
 }
-
 .section:nth-of-type(even) header {
     background: url('../imgs/scrollTop3.png') no-repeat center top;
     background-size: 100% 100%;
@@ -817,7 +668,6 @@
     box-shadow: 0px -10px 5px -7px #888, 0px -10px 5px -7px #888;
     border-radius: 20px 10px 10px 20px;
 }
-
 .section:nth-of-type(even) footer {
     background: url('../imgs/scrollTop3.png') no-repeat center top;
     background-size: 100% 100%;
@@ -827,7 +677,6 @@
     box-shadow: 0px -10px 5px -7px #888, 0px -10px 5px -7px #888;
     border-radius: 20px 10px 10px 20px;
 }
-
 .section:nth-of-type(even) article {
     background: url('../imgs/scrollBackground4.png') no-repeat center top;
     background-size: 100% 100%;
@@ -839,61 +688,48 @@
     width: 560px;
     box-shadow: 15px 0 15px -10px black, -15px 0 15px -10px black;
 }
-
 .footerText {
     transform: scaleY(-1);
     text-align:center;
 }
-
-
 a.internalLink{
     border-bottom: 1px dashed black;
     color: black;
 }
-
-
 .note {
     font-size: 12px;
 }
-
 .skillRankInfo {
     margin-top: 15px;
     margin-bottom: 15px;
     margin-left: 4%;
 }
-
 .abilityColumnLeft {
-    width:260px !important; 
-    background-color:white; 
+    width:260px !important;
+    background-color:white;
     order:1;
     margin-left:5px;
     margin-right:20px;
 }
-
 .abilityColumnRight {
-    width:260px !important; 
-    background-color:white;  
-    order:2; 
+    width:260px !important;
+    background-color:white;
+    order:2;
     margin-right:5px;
 }
-
 .abilityRow {
     margin-bottom: 30px;
     position:relative;
     right: 30px;
     display:flex;
 }
-
 .ritualTable {
     width: 700px;
     background-color: white;
 }
 .draggable {
-
 }
-
 ::-webkit-scrollbar { display:none; !important }
-
 .abilityTable{
     border: 3px solid #808080 !important;
     padding:2px !important;
@@ -901,7 +737,6 @@ a.internalLink{
     overflow:scroll;
     max-height: 250px;
 }
-
 .abilityTable div:nth-child(even){background-color: #e6e6e6;margin-bottom:2px;}
 .abilityTable div:nth-child(odd){background-color: #adad85; margin-bottom:2px;}
 .abilityTable select {
@@ -909,9 +744,6 @@ a.internalLink{
     height: 22px;
     border-radius: 0px;
 }
-
-
-
 /* Tool Tips */
 abbr {
     position: relative;
@@ -919,7 +751,6 @@ abbr {
     border-bottom: 1px dotted black;
     z-index: 1;
 }
-
 abbr::after {
     border-color: black;
     border-radius: 8px;
@@ -936,7 +767,6 @@ abbr::after {
     padding: 5px 8px;
     border-radius:5px;
 }
-
 abbr::before {
   position: absolute;
   visibility: hidden;
@@ -948,54 +778,42 @@ abbr::before {
   border-width: 6px 12px 0 12px;
   border-color: black transparent transparent transparent;
 }
-
 abbr:hover:after {
     visibility: visible;
 }
-
 abbr:hover:before {
     visibility: visible;
 }
-
 table { empty-cells: hide;}
-
 /* Durations */
 abbr.short::after {content: "First use or end of creators next turn";}
 abbr.round::after{content: "Until end of creators next turn";}
 abbr.combat::after{content: "End of the encounter";}
-
 /* Buffs */
 abbr.vigilant::after{content: "Attackers get -1 die and you have +1 Armor against AoE";}
 abbr.boosted::after{content: "+1 die to rolls";}
 abbr.haste::after{content: "+1 Attack action";}
 abbr.quick::after{content: "+1 Move action";}
 abbr.focused::after{content: "+1 Focus action";}
-
 /* Debuffs */
 abbr.breached::after{content: "Attackers get +1 die and you have -1 Armor against AoE";}
 abbr.impaired::after{content: "-1 die on rolls";}
 abbr.blind::after{content: "Can not perform Physical maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
 abbr.dizzy::after{content: "Can not perform Mental maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
 abbr.gagged::after{content: "Can not perform Social maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
-
 abbr.stun::after{content: "Can not take actions";}
 abbr.restrained::after{content: "-1 Attack Action";}
 abbr.slow::after{content: "-1 Move Action";}
 abbr.dazed::after{content: "-1 Minor Action";}
-
 abbr.burning::after{content: "Take 1 damage at the beginning of your turn for each instance of Burning";}
 abbr.vulnerable::after{content:"Increase damage taken by 1 for each instance of damage";}
 abbr.meek::after{content:"Decrease damage dealt by 1 for each instance";}
-
 abbr.pure::after {content: "Damage that ignores armor";}
-
 /* Armor Penalties */
 abbr.lightPen::after {content: "-1 Blasts, Sprint, and Swim";}
 abbr.medPen::after {content: "-1 Ranked Strikes, Jumping, Climbing and Jogging \A -2 Blast \A -2 Acrobatics, Dance, Sneaking, Sprint, and Swim \A Acrobatics, Dance and Sneak maneuvers require an additional Momentum to use"; white-space: pre-wrap;}
 abbr.heavyPen::after {content: "-1 Pace \A -3 to Blast Rolls \A -2 to hit with Ranged Strikes \A -3 to sprinting and swimming rolls \A -2 to jumping, climbing and jogging rolls \A -4 to all rolls when using the Acrobatics, Dancing or Sneaking skills \A Can not use any abilities from Acrobatics, Dancing or Sneaking skills"; white-space: pre-wrap;}
 abbr.shieldPen::after {content: "-1 to Blast";}
-
 /* Fluff Terms */
 abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
-
 .attvalue{width:30px;}

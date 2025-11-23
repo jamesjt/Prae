@@ -484,7 +484,7 @@
                       </select>
                       <div class="attribute mindColor">
                         Mind
-                        <div id="mindValue" class="filledField" style="width:30px;">
+                        <div id="mindValue" class="attValue">
                           0
                         </div>
                       </div>
@@ -518,7 +518,7 @@
                           Lore
                         </div>
                         <div class="skillRank">
-                          <select id="loreSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="loreSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills willSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -535,13 +535,13 @@
                         </div>
                       </div>
 
-                    <!-- Survival -->
-                      <div class="skillListing willSkill">
+                    <!-- Tinkering -->
+                      <div class="skillListing resolveSkill">
                         <div class="skillName">
-                          Survival
+                          Tinkering
                         </div>
                         <div class="skillRank">
-                          <select id="survivalSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="tinkeringSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills resolveSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -550,10 +550,10 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="survivalSkillMod" class="skillMod filledField">
+                        <div id="tinkeringSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="survivalSkillPassive" class="skillPassive filledField">
+                        <div id="tinkeringSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>
@@ -564,7 +564,7 @@
                           Deception
                         </div>
                         <div class="skillRank">
-                          <select id="deceptionSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="deceptionSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills witSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -587,7 +587,7 @@
                           Insight
                         </div>
                         <div class="skillRank">
-                          <select id="insightSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="insightSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills witSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -610,7 +610,7 @@
                           Awareness
                         </div>
                         <div class="skillRank">
-                          <select id="awarenessSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="awarenessSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills resolveSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -627,13 +627,13 @@
                         </div>
                       </div>
 
-                    <!-- Tinkering -->
-                      <div class="skillListing resolveSkill">
+                    <!-- Survival -->
+                      <div class="skillListing willSkill">
                         <div class="skillName">
-                          Tinkering
+                          Survival
                         </div>
                         <div class="skillRank">
-                          <select id="tinkeringSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills mentalSkills">
+                          <select id="survivalSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills willSkills">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -642,10 +642,10 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="tinkeringSkillMod" class="skillMod filledField">
+                        <div id="survivalSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="tinkeringSkillPassive" class="skillPassive filledField">
+                        <div id="survivalSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>
@@ -694,36 +694,13 @@
                     <!-- Social Skills -->
                     <div class="skillWrapper">
 
-                    <!-- Rouse -->
-                      <div class="skillListing vigorSkill">
-                        <div class="skillName">
-                          Rouse
-                        </div>
-                        <div class="skillRank">
-                          <select id="rouseSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills">
-                            <option value="1">1: Unskilled</option>
-                            <option value="2">2: Basic</option>
-                            <option value="3">3: Trained</option>
-                            <option value="4">4: Adept</option>
-                            <option value="5">5: Expert</option>
-                            <option value="6">6: Master</option>
-                          </select>
-                        </div>
-                        <div id="rouseSkillMod" class="skillMod filledField">
-                          0
-                        </div>
-                        <div id="rouseSkillPassive" class="skillPassive filledField">
-                          3
-                        </div>
-                      </div>
-
                     <!-- Compel -->
                       <div class="skillListing vigorSkill">
                         <div class="skillName">
                           Compel
                         </div>
                         <div class="skillRank">
-                          <select id="compelSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills">
+                          <select id="compelSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills vigorSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -740,13 +717,59 @@
                         </div>
                       </div>
 
+                    <!-- Rouse -->
+                      <div class="skillListing vigorSkill">
+                        <div class="skillName">
+                          Rouse
+                        </div>
+                        <div class="skillRank">
+                          <select id="rouseSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills vigorSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="rouseSkillMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="rouseSkillPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Assure -->
+                      <div class="skillListing empathySkill skillListingMidBot">
+                        <div class="skillName">
+                          Assure
+                        </div>
+                        <div class="skillRank">
+                          <select id="assureSkillRank" onchange="setSkillValues(event, 'empathy' ); skillPoints(event);" class="nonAttackSkills empathySkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="assureSkillMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="assureSkillPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
                     <!-- Charm -->
                       <div class="skillListing empathySkill skillListingMidTop">
                         <div class="skillName">
                           Charm
                         </div>
                         <div class="skillRank">
-                          <select id="charmSkillRank" onchange="setSkillValues(event, 'empathy'); skillPoints(event);" class="nonAttackSkills">
+                          <select id="charmSkillRank" onchange="setSkillValues(event, 'empathy'); skillPoints(event);" class="nonAttackSkills empathySkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -763,13 +786,15 @@
                         </div>
                       </div>
 
-                    <!-- Handling -->
-                      <div class="skillListing empathySkill skillListingMidBot">
+
+
+                    <!-- Calm -->
+                      <div class="skillListing faithSkill">
                         <div class="skillName">
-                          Handling
+                          Calm
                         </div>
                         <div class="skillRank">
-                          <select id="handlingSkillRank" onchange="setSkillValues(event, 'empathy' ); skillPoints(event);" class="nonAttackSkills">
+                          <select id="calmSkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills faithSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -778,21 +803,21 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="handlingSkillMod" class="skillMod filledField">
+                        <div id="calmSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="handlingSkillPassive" class="skillPassive filledField">
+                        <div id="calmSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>
 
-                    <!-- Diplomacy -->
+                    <!-- Command -->
                       <div class="skillListing faithSkill">
                         <div class="skillName">
-                          Diplomacy
+                          Command
                         </div>
                         <div class="skillRank">
-                          <select id="diplomacySkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills">
+                          <select id="commandSkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills faithSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -801,33 +826,10 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="diplomacySkillMod" class="skillMod filledField">
+                        <div id="commandSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="diplomacySkillPassive" class="skillPassive filledField">
-                          3
-                        </div>
-                      </div>
-
-                    <!-- Leadership -->
-                      <div class="skillListing faithSkill">
-                        <div class="skillName">
-                          Leadership
-                        </div>
-                        <div class="skillRank">
-                          <select id="leadershipSkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills">
-                            <option value="1">1: Unskilled</option>
-                            <option value="2">2: Basic</option>
-                            <option value="3">3: Trained</option>
-                            <option value="4">4: Adept</option>
-                            <option value="5">5: Expert</option>
-                            <option value="6">6: Master</option>
-                          </select>
-                        </div>
-                        <div id="leadershipSkillMod" class="skillMod filledField">
-                          0
-                        </div>
-                        <div id="leadershipSkillPassive" class="skillPassive filledField">
+                        <div id="commandSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>

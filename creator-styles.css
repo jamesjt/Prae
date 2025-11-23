@@ -140,7 +140,7 @@
     font-size:  12px;
     background-color: pink;
 }
-.attributeSelect[value="0"] {
+input[value="0"] {
     width: 70px;
     border-radius: 8px;
     height: 20px;

@@ -405,6 +405,11 @@ function calculateAttributeValues() {
     else if (spiritPri === '2') spiritVal = secVal;
     else if (spiritPri === '3') spiritVal = terVal;
     document.getElementById('spiritValue').innerText = spiritVal;
+
+    // Update attack skill mods after primary values change
+    updateSkillsForMod('bodyValue');
+    updateSkillsForMod('mindValue');
+    updateSkillsForMod('spiritValue');
 }
 
 function updateAttributeGroups() {

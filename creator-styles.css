@@ -124,7 +124,7 @@
 
 /* Attributes */
 
-#physicalStatsWrapper {background-color: #B07C71;margin-bottom: 5px;width:100%;}
+#physicalStatsWrapper {background-color: #5F1817;margin-bottom: 5px;width:100%;}
 #mentalStatsWrapper {background-color: #9BAABF;margin-bottom: 5px;width: 100%;}
 #socialStatsWrapper {background-color: #797781;width: 100%;}
 
@@ -141,13 +141,12 @@
 
 .attributeWrapper {
     width: 65px;
-    height: 132px;
+    height: 136px;
     padding: 6px;
     border-radius:  8px;
     display:flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid black;
 }
 
 .attribute {

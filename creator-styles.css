@@ -134,6 +134,7 @@
 .att-desc-font{font-size: 8px}
 
 .attributeSelect{
+    margin-top: 15px;
 }
 
 #bodyPriority{
@@ -158,11 +159,7 @@
 }
 
 select:has(> option[value="priorityUnassigned"]:checked)  {
-    width: 70px;
-    border-radius: 8px;
-    height: 20px;
-    border-color: black;
-    font-size:  12px;
+    border-radius: 2px;
     color:black !important;
     background-color: white !important;
 }

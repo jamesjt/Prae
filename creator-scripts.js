@@ -611,7 +611,7 @@ function updateProficiencySelectors(attackType, rankValue) {
     // Assume up to a reasonable max, e.g., 5; adjust if needed
     const maxProf = 5;
     for (let i = 1; i <= maxProf; i++) {
-        const profElement = document.getElementById(attackType + 'ProfSelector' + i);
+        const profElement = document.getElementById(attackType + 'ProfSelect' + i);
         if (profElement) {
             profElement.hidden = i > rankValue;
         }

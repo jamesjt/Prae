@@ -47,7 +47,6 @@
 }
 
 .statsWrapper { 
-  border: 2px solid blue;
   display: flex;
   flex-direction: row;
   width: 390px;
@@ -134,7 +133,7 @@
 #socialStatsWrapper {background-color: #797781;width: 100%;}
 
 #bodyPriority {}
-
+.att-desc-font{font-size: 8px}
 
 .attributeSelect {
     width: 70px;
@@ -162,8 +161,8 @@
     margin-top: 5px;
     width:70px;
     margin-bottom: 5px;
-    padding-top: 8px;
-    padding-bottom:8px;
+    padding-top: 4px;
+    padding-bottom:4px;
     border-radius: 4px;
     border: 1px solid black;
 }
@@ -1019,3 +1018,55 @@ abbr.shieldPen::after {content: "-1 to Blast";}
 
 /* Fluff Terms */
 abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
+
+
+/* PREMIUM STEPPER — Clean, Gold & Parchment Theme */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  background: #281957;
+  border: 2px solid #8B6F47;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: "Times New Roman", serif;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.stepper-btn {
+  width: 36px;
+  height: 36px;
+  background: #8B6F47;
+  color: white;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.stepper-btn:hover {
+  background: #a08050;
+  transform: scale(1.1);
+}
+
+.stepper-btn:active {
+  transform: scale(0.95);
+}
+
+.stepper-value {
+  min-width: 50px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #281957;
+  line-height: 36px;
+}
+
+/* Optional: Add subtle glow on focus */
+.stepper:focus-within {
+  outline: 3px solid rgba(139, 111, 71, 0.5);
+  outline-offset: 2px;
+}

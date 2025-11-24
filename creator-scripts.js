@@ -178,7 +178,7 @@ fetch(WAYS_CSV_URL)
         console.error('Error loading Ways CSV:', err);
     });
 
-// Fetch and process proficiency options
+// Fetch and process proficiency and gear options from Web Ref sheet
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -566,7 +566,7 @@ function updateSkillModAndPassive(skillId) {
     if (!subInput) return;
 
     const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
-    const skillName = skillId.replace('Rank', '');
+    const skillName = skillId.replace('SkillRank', '');
 
     // Update main mod display (div)
     const modDisplay = document.getElementById(skillName + 'Mod');

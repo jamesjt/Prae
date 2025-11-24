@@ -433,6 +433,7 @@ function getQualifiedAbilities(abilityType) {
     return qualified;
 }
 
+// Function to populate description/details
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId).value;
     const ability = abilities.find(a => a.name === value);
@@ -482,7 +483,7 @@ function populateAbilityInfo(selectId, abilities, type) {
         }
 
         const child = document.createElement('div');
-        child.className = `ability-${key}`;
+        child.className = `${type}${label}`;
         child.innerHTML = `<strong>${label}:</strong> ${val}`;
         descElement.appendChild(child);
     });

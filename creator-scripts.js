@@ -425,10 +425,49 @@ function calculateSkillPoints() {
 
 // Additional functions for abilities and attributes (to complete)
 
+function setAbilityAmount(event) {
+    calculateAbilities();
+}
+
 function calculateAbilities() {
-    // Placeholder - will be redone
-    document.getElementById('abilityNumber').innerText = '0';
-    document.getElementById('remainingAbilities').innerText = '0';
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+
+    const talentAdd = parseInt(document.getElementById('talentAmount').value) || 1;
+    const fociAdd = parseInt(document.getElementById('nonAtkManAmount').value) || 1;
+    const arcanaAdd = parseInt(document.getElementById('atkManAmount').value) || 2;
+
+    const totalAbilities = talentAdd + fociAdd + arcanaAdd + 2; // + way talent & foci; adjust if needed to match 7
+    document.getElementById('abilityNumber').innerText = totalAbilities;
+
+    const freePoints = level + 1; // For level 1 = 2
+    const extra = (talentAdd - 1) + (fociAdd - 1) + (arcanaAdd - 2);
+    const remaining = freePoints - Math.max(0, extra); // Prevent negative
+    document.getElementById('remainingAbilities').innerText = remaining;
+}
+
+function talentAmount(event) {
+    const value = parseInt(event.target.value) || 1;
+    document.getElementById('talentTable1').style.display = '';
+    document.getElementById('talentTable2').style.display = value >= 2 ? '' : 'none';
+    document.getElementById('talentTable3').style.display = value >= 3 ? '' : 'none';
+    calculateAbilities();
+}
+
+function nonAtkManAmount(event) {
+    const value = parseInt(event.target.value) || 1;
+    document.getElementById('nonAtkManTable1').style.display = '';
+    document.getElementById('nonAtkManTable2').style.display = value >= 2 ? '' : 'none';
+    document.getElementById('nonAtkManTable3').style.display = value >= 3 ? '' : 'none';
+    calculateAbilities();
+}
+
+function atkManAmount(event) {
+    const value = parseInt(event.target.value) || 2;
+    document.getElementById('atkManTable1').style.display = '';
+    document.getElementById('atkManTable2').style.display = '';
+    document.getElementById('atkManTable3').style.display = value >= 3 ? '' : 'none';
+    document.getElementById('atkManTable4').style.display = value >= 4 ? '' : 'none';
+    calculateAbilities();
 }
 
 function setAttPoints(event) {

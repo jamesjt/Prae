@@ -473,13 +473,6 @@ function populateAbilityInfo(selectId, abilities, type) {
         const label = labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
 
         // Strip duplicate label if present in value
-        const labelPrefix = label + ':';
-        if (val.toLowerCase().startsWith(labelPrefix.toLowerCase())) {
-            val = val.slice(labelPrefix.length).trim();
-        } else if (val.toLowerCase().startsWith(label.toLowerCase())) {
-            val = val.slice(label.length).trim();
-        }
-
         const child = document.createElement('div');
         child.className = `${type}${label}`;
         child.innerHTML = val;

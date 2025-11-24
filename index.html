@@ -40,13 +40,12 @@
 
             <article id="Traea" class="sectionBody">
                 <div id="charInfo">
-                    Name <input id="charName" class="charText" type="text" >
+                    <input id="charName" class="charText" type="text" placeholder="Character name">
                     Level <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1" onkeyup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);" onmouseup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);">
-                    Childhood <input id="childhood" class="charText" type="text">
-                    Training <input id="training" class="charText" type="text">
-                    Way 
+                    <input id="childhood" class="charText" type="text" placeholder="Childhood">
+                    <input id="training" class="charText" type="text" placeholder="Adolescence">
                     <select id="roleSelector" onchange="populateRoleInfo(event);">
-                      <option value=""></option>
+                      <option value="">Way</option>
                     </select>
                     <img id="showCheckList" class="charInfoHover" onclick="showDesc('checkList');" src="imgs/check.png">
                     <div id="checkList" class="charDetails draggable">

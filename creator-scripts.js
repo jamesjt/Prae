@@ -1,5 +1,6 @@
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
+const GEAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
 function parseWaysCSV(csvText) {
@@ -178,7 +179,7 @@ fetch(WAYS_CSV_URL)
         console.error('Error loading Ways CSV:', err);
     });
 
-// Fetch and process proficiency and gear options from Web Ref sheet
+// Fetch and process proficiency options
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -190,8 +191,6 @@ fetch(PROF_CSV_URL)
         const strikeCol = headers.indexOf('strike');
         const blastCol = headers.indexOf('blast');
         const invokeCol = headers.indexOf('invoke');
-        const gearCol = headers.indexOf('gear');
-        const loadCol = headers.indexOf('load');
 
         if (strikeCol !== -1) {
             profData.strike = rows.slice(1).map(row => row[strikeCol].trim()).filter(v => v);
@@ -203,6 +202,30 @@ fetch(PROF_CSV_URL)
             profData.invoke = rows.slice(1).map(row => row[invokeCol].trim()).filter(v => v);
         }
 
+        // Log for debugging
+        console.log('Proficiency Data:', profData);
+
+        // Populate all selects for each type
+        populateProfSelects('strike', profData.strike);
+        populateProfSelects('blast', profData.blast);
+        populateProfSelects('invoke', profData.invoke);
+    })
+    .catch(err => {
+        console.error('Error loading Proficiency CSV:', err);
+    });
+
+// Fetch and process gear options
+fetch(GEAR_CSV_URL)
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(text => {
+        const rows = parseWaysCSV(text);
+
+        // Assume first row is headers
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+
+        const gearCol = headers.indexOf('gear');
+        const loadCol = headers.indexOf('load');
+
         if (gearCol !== -1 && loadCol !== -1) {
             gearData = rows.slice(1).map(row => ({
                 gear: row[gearCol].trim(),
@@ -211,19 +234,13 @@ fetch(PROF_CSV_URL)
         }
 
         // Log for debugging
-        console.log('Proficiency Data:', profData);
         console.log('Gear Data:', gearData);
 
-        // Populate all selects for each type
-        populateProfSelects('strike', profData.strike);
-        populateProfSelects('blast', profData.blast);
-        populateProfSelects('invoke', profData.invoke);
-
-        // Populate gear selects
+        // Populate all gear selects
         populateGearSelects();
     })
     .catch(err => {
-        console.error('Error loading Web Ref CSV:', err);
+        console.error('Error loading Gear CSV:', err);
     });
 
 // Function to populate selects for a type
@@ -252,16 +269,6 @@ function populateGearSelects() {
                 html += `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`;
             });
             select.innerHTML = html;
-
-            // Add change listener
-            select.addEventListener('change', () => {
-                const selectedOption = select.options[select.selectedIndex];
-                const load = selectedOption.getAttribute('data-load') || '';
-                const loadDiv = document.getElementById('gearLoad' + i);
-                if (loadDiv) {
-                    loadDiv.innerText = load;
-                }
-            });
         }
     }
 }

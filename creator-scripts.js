@@ -499,18 +499,40 @@ function populateRoleInfo(event) {
     if (way) {
         // Find keys case-insensitively for talent, foci, etc.
         const talentNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent name'));
-        const talentDescKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent description'));
-        const fociNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci name'));
-        const fociCostKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci cost'));
-        const fociEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('foci effect'));
+        const shortDescKey = Object.keys(way.props).find(k => k.toLowerCase().includes('short description'));
+        const keywordsKey = Object.keys(way.props).find(k => k.toLowerCase().includes('keywords'));
+        const descKey = Object.keys(way.props).find(k => k.toLowerCase().includes('description'));
+        const passiveKey = Object.keys(way.props).find(k => k.toLowerCase().includes('passive'));
+        const focusKey = Object.keys(way.props).find(k => k.toLowerCase().includes('focus'));
         const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
         const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
 
-        document.getElementById('rTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
-        document.getElementById('rTalentDesc').innerText = talentDescKey ? way.props[talentDescKey] : '';
-        document.getElementById('rManName').innerText = fociNameKey ? way.props[fociNameKey] : '';
-        document.getElementById('rManCost').innerText = fociCostKey ? way.props[fociCostKey] : '';
-        document.getElementById('rManEffect').innerText = fociEffectKey ? way.props[fociEffectKey] : '';
+        document.getElementById('wayTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
+
+        // Populate wayTalentDesc with divs
+        const descElement = document.getElementById('wayTalentDesc');
+        if (descElement) {
+            descElement.innerHTML = ''; // Clear previous
+
+            const details = {
+                'short description': shortDescKey ? way.props[shortDescKey] : '',
+                'keywords': keywordsKey ? way.props[keywordsKey] : '',
+                'description': descKey ? way.props[descKey] : '',
+                'passive': passiveKey ? way.props[passiveKey] : '',
+                'focus': focusKey ? way.props[focusKey] : ''
+            };
+
+            const keyOrder = ['short description', 'keywords', 'description', 'passive', 'focus'];
+            keyOrder.forEach(key => {
+                const val = details[key];
+                if (val) {
+                    const child = document.createElement('div');
+                    child.className = `talent${key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '')}`;
+                    child.innerText = val;
+                    descElement.appendChild(child);
+                }
+            });
+        }
 
         // Set the attack/required skill to 3:Trained if not already higher
         const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;

@@ -1193,78 +1193,41 @@
                 </div> <!-- End Row Wrapper -->
                 <div class="abilityWrapper">
                   <div class="talentWrapper">
-                    <div id="talentHeader">
+                    <div id="talentAmount">
                       Talents
-                      <select id="talentAmount" onchange="talentAmount(event); setAbilityAmount(event);">
+                      <select id="talentAmount">
                         <option value="1">2</option>
                         <option value="2">3</option>
                         <option value="3">4</option>
                       </select>
-                      </div>
-                      <div id="wayTalent">
-                        <div id="wayTalentName" class="talent">Choose a Way</div>
-                        <div id="wayTalentDesc"class="talentInfo"></div>
-                      </div>
-                    <div id="talentTable1" class="">
-                      <div class="talent1 talent">
-                        <select id="talent1" onchange="populateTalentInfo('talent1')" class="talentSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="talent1Description" class="talentInfo"></div>
                     </div>
-                    <div id="talentTable2" class="" hidden>
-                      <div class="talent2 talent">
-                        <select id="talent2" onchange="populateTalentInfo('talent2')" class="talentSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="talent2Description"></div>
+
+                    <div id="wayTalent">
+                      <div id="wayTalentName" class="talent">Choose a Way</div>
+                      <div id="wayTalentDesc" class="talentInfo"></div>
                     </div>
-                    <div id="talentTable3" class="" hidden>
-                      <div class="talent3">
-                        <select id="talent3" onchange="populateTalentInfo('talent3')" class="talentSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="talent3Description"></div>
-                    </div> 
-                  </div><!-- End Talent Wrapper -->
+
+                    <!-- Only keep the outer containers — JS fills everything inside -->
+                    <div id="talentTable1" class="ability-talent ent"></div>
+                    <div id="talentTable2" class="ability-talent ent" hidden></div>
+                    <div id="talentTable3" class="ability-talent ent" hidden></div>
+                  </div>
+
                   <div class="tricksWrapper">
                     <div id="tricksHeader">
                       Tricks
-                      <select id="tricksAmount" onchange="tricksAmount(event); setAbilityAmount(event);">
+                      <select id="tricksAmount">
                         <option value="1">2</option>
                         <option value="2">3</option>
                         <option value="3">4</option>
                       </select>
                     </div>
-                    <div id="tricksTable1" class="ability-trick">
-                      <div class="tricks">
-                        <select id="tricks1" class="tricksSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="tricks1Description"></div>
-                    </div>
-                    <div id="tricksTable2" class="ability-trick" hidden>
-                      <div class="tricks2 tricks">
-                        <select id="tricks2" class="tricksSelector">
-                          <option value="None"></option>
-                        </select>
-                      </div>
-                      <div id="tricks2Description"></div>
-                    </div>
-                    <div id="tricksTable3" class="ability-trick" hidden>
-                      <div class="tricks3 tricks">
-                        <select id="tricks3" class="tricksSelector">
-                          <option value="0"></option>
-                        </select>
-                      </div>
-                      <div id="tricks3Description"></div>
-                    </div>
+
+                    <div id="tricksTable1" class="ability-trick" hidden></div>
+                    <div id="tricksTable2" class="ability-trick" hidden></div>
+                    <div id="tricksTable3" class="ability-trick" hidden></div>
                   </div>
-              </div> 
+                </div>
               <!-- End abilityWrapper-->
       </article>
     <script src="script.js"></script>

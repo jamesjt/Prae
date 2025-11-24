@@ -38,15 +38,8 @@
     flex-direction: row;
 }
 
-#column1 {
-    margin-left: -2px;
-    margin-right: 15px;
-}
-
-#column3 {
-    margin-left: 15px;
-
-}
+#column1 {margin-right: 15px;width:410px}
+#column3 {margin-left: 15px;}
 
 .statsWrapper { 
   display: flex;
@@ -730,7 +723,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #atkManAmount, #talentAmount, #exploitAmount, #nonAtkManAmount {width:40px;}
         
-.talentWrapper {width: 50%;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
+.talentWrapper {width: 410px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 .talent, .talentSelector{ background-color:#6a877d !important;color:white;border:none;width:100%;}
 .trick, .trickSelector {background-color:#369180 !important;color:white;border:none;width:100%;}
 .atkMan, .atkManSelector{background-color:#0a614e ; color:white;}

@@ -130,9 +130,7 @@ fetch(ABILITIES_CSV_URL)
                         saveAbility(skill, currentAbility);
                     }
                     currentType = key;
-                    if (value && value.match(/\w+ \(.+\)$/)) { // Name like "Fit (Athletics)"
-                        currentAbility = { type: currentType, name: value.split(' (')[0], details: {} };
-                    }
+                    currentAbility = { type: currentType, name: value || '', details: {} };
                 } else if (currentAbility && key && value) {
                     currentAbility.details[key] = value;
                 } else if (!key && !value && currentAbility) { // Empty row ends block
@@ -538,8 +536,8 @@ function populateRoleInfo(event) {
         const skillId = SKILL_ID_MAP[attackSkill];
         if (skillId) {
             const skillSelect = document.getElementById(skillId);
-            if (skillSelect && parseInt(skillSelect.value) < 3) {
-                skillSelect.value = '3';
+            if (skillSelect && parseInt(skillSelect.value) < 2) {
+                skillSelect.value = '2';
                 skillSelect.dispatchEvent(new Event('change'));
             }
         }

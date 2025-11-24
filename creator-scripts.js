@@ -433,18 +433,59 @@ function getQualifiedAbilities(abilityType) {
     return qualified;
 }
 
-// Function to populate description/details
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId).value;
     const ability = abilities.find(a => a.name === value);
-    if (ability) {
-        const descId = selectId + 'Description';
-        const descElement = document.getElementById(descId);
-        if (descElement) {
-            const descText = Object.values(ability.details).join('\n');
-            descElement.innerText = descText.trim();
+    if (!ability) return;
+
+    const descElement = document.getElementById(selectId + 'Description');
+    if (!descElement) return;
+
+    descElement.innerHTML = ''; // Clear previous
+
+    const keyOrder = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    const labelMap = {
+        keywords: 'Keywords',
+        description: 'Description',
+        passive: 'Passive',
+        active: 'Active',
+        cost: 'Cost',
+        trigger: 'Trigger',
+        effect: 'Effect',
+        enhancements: 'Enhancements',
+        augments: 'Augments'
+    };
+
+    const sortedKeys = Object.keys(ability.details).sort((a, b) => {
+        const ia = keyOrder.indexOf(a.toLowerCase());
+        const ib = keyOrder.indexOf(b.toLowerCase());
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+    });
+
+    sortedKeys.forEach(rawKey => {
+        const key = rawKey.toLowerCase();
+        let val = ability.details[rawKey];
+
+        if (!val) return;
+
+        const label = labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
+
+        // Strip duplicate label if present in value
+        const labelPrefix = label + ':';
+        if (val.toLowerCase().startsWith(labelPrefix.toLowerCase())) {
+            val = val.slice(labelPrefix.length).trim();
+        } else if (val.toLowerCase().startsWith(label.toLowerCase())) {
+            val = val.slice(label.length).trim();
         }
-    }
+
+        const child = document.createElement('div');
+        child.className = `ability-${key}`;
+        child.innerHTML = `<strong>${label}:</strong> ${val}`;
+        descElement.appendChild(child);
+    });
 }
 
 // Define missing functions

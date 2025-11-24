@@ -164,10 +164,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     background-color: white !important;
 }
 
-select:has(> option[value="profUnassigned"]:checked)  {
-    background-color: white !important;
-}
-
 .attributeWrapper {
     width: 65px;
     height: 136px;

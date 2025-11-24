@@ -931,7 +931,7 @@
                       0
                     </div>
                     <div id="invokeSkillDamage" class="skillPassive filledField">
-                      3
+                      3/die
                     </div>
                   </div>
 
@@ -954,110 +954,62 @@
                   </div><!-- End invokeWrapper -->
                 </div> <!-- End Column 2 -->
                 <div id="column3">
-                  <div id='weaponList'>
-                    <div id="weaponHeader">
-                      Weapons
-                      <select id="weaponAmount" style="width:40px" onchange="weaponAmount(event);">
-                        <option value="1" selected="selected">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                      </select>
-                      Rituals
-                      <select id="ritualAmount" style="width:40px" onchange="ritualAmount(event);">
-                        <option value="1" selected="selected">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                      </select>
-                      Armor
-                      <select id="armorAmount" style="width:40px" onchange="armorAmount(event);">
-                        <option value="0">0</option>
-                        <option value="1" selected="selected">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                      </select>
+                  <div id="gear-list-container">
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
                     </div>
-                    <div id="weapon1" class="weaponListing">
-                      <input  id="weapon1Name" class="weaponName" type="text" value="Weapon Name">
-                      <select id="weapon1Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon1');">
-                        <option value="">Type</option>
-                        <option value="Axe">Axe</option>
-                        <option value="Backsword">Backsword</option>
-                        <option value="Bolas">Bolas</option>
-                        <option value="Bow">Bow</option>
-                        <option value="Club">Club</option>
-                        <option value="Dagger">Dagger</option>
-                        <option value="Flail">Flail</option>
-                        <option value="Hammer">Hammer</option>
-                        <option value="Sling">Sling</option>
-                        <option value="Spear">Spear</option>
-                        <option value="Straight_Sword">Str_Sword</option>
-                        <option value="Thrusting_Sword">Thr_Sword</option>
-                      </select>
-
-                      <select id="weapon1Size" class="weaponSize">
-                        <option value="">Size</option>
-                        <option value="2">Sm: (3)</option>
-                        <option value="3">Md: (4)</option>
-                        <option value="4">Lg: (5)</option>
-                      </select>
-                      <input id="weapon1Damage" class="weaponDamage" type="text" value="Dmg">
-                      <div class="weaponExploit"><span id="weapon1ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon1ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 1 -->      
-                    <div id="weapon2" hidden class="weaponListing">
-                      <input  id="weapon2Name" class="weaponName" type="text" value="Weapon Name">
-                      <select id="weapon2Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon2');">
-                        <option value="">Type</option>
-                        <option value="Axe">Axe</option>
-                        <option value="Backsword">Backsword</option>
-                        <option value="Bolas">Bolas</option>
-                        <option value="Bow">Bow</option>
-                        <option value="Club">Club</option>
-                        <option value="Dagger">Dagger</option>
-                        <option value="Flail">Flail</option>
-                        <option value="Hammer">Hammer</option>
-                        <option value="Sling">Sling</option>
-                        <option value="Spear">Spear</option>
-                        <option value="Straight_Sword">Str_Sword</option>
-                        <option value="Thrusting_Sword">Thr_Sword</option>
-                      </select>
-                      <select id="weapon2Size" class="weaponSize">
-                        <option value="">Size</option>
-                        <option value="2">Sm: (3)</option>
-                        <option value="3">Md: (4)</option>
-                        <option value="4">Lg: (5)</option>
-                      </select>
-                      <input id="weapon2Damage" class="weaponDamage" type="text" value="Dmg">
-                     <div class="weaponExploit"><span id="weapon2ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon2ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 2 --> 
-                    <div id="weapon3" hidden class="weaponListing">
-                      <input  id="weapon3Name" class="weaponName" type="text" value="Weapon Name">
-                      <select id="weapon3Type" class="weaponType" onchange="populateWeaponExploitInfo('weapon3');">
-                        <option value="">Type</option>
-                        <option value="Axe">Axe</option>
-                        <option value="Backsword">Backsword</option>
-                        <option value="Bolas">Bolas</option>
-                        <option value="Bow">Bow</option>
-                        <option value="Club">Club</option>
-                        <option value="Dagger">Dagger</option>
-                        <option value="Flail">Flail</option>
-                        <option value="Hammer">Hammer</option>
-                        <option value="Sling">Sling</option>
-                        <option value="Spear">Spear</option>
-                        <option value="Straight_Sword">Str_Sword</option>
-                        <option value="Thrusting_Sword">Thr_Sword</option>
-                      </select>
-                      <select id="weapon3Size" class="weaponSize">
-                        <option value="">Size</option>
-                        <option value="2">Sm: (3)</option>
-                        <option value="3">Md: (4)</option>
-                        <option value="4">Lg: (5)</option>
-                      </select>
-                      <input id="weapon3Damage" class="weaponDamage" type="text" value="Dmg">
-                      <div class="weaponExploit"><span id="weapon3ExploitName" class="weaponCS">Critical Effect</span>: <span id="weapon3ExploitDescription" class="weaponExploitDescription"></span></div>
-                    </div> <!-- End Weapon 3 --> 
-                  </div> <!-- End Weapon List   onchange="populateExploitInfo('invokeProfSelector5');"-->
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                    <div class="gear-entry">
+                      <div class="gear-name">
+                      </div>
+                      <div class="gear-load">
+                      </div>
+                    </div>
+                  </div>
 
                   <div id='ritualList'>
                     <div id="ritual1" class="ritualListing">

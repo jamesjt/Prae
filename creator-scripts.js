@@ -1,5 +1,6 @@
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
+const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
 function parseWaysCSV(csvText) {
@@ -107,6 +108,55 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
+let abilitiesData = {}; // { skillLower: [{type: 'talent'|'trick', name, details: {keywords, description, passive, active, effect, cost, effectSm, effectBig}}] }
+
+// Fetch and process abilities (talents and tricks)
+fetch(ABILITIES_CSV_URL)
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(text => {
+        const rows = parseWaysCSV(text);
+        console.log('Parsed Abilities Rows:', rows);
+
+        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase()); // Skills from row 0, col 1+
+
+        skills.forEach((skill, colIndex) => {
+            let currentType = '';
+            let currentAbility = null;
+            rows.slice(1).forEach(row => {
+                const key = row[0].trim().toLowerCase();
+                const value = row[colIndex + 1] ? row[colIndex + 1].trim() : '';
+                if (key === 'talent' || key === 'trick') {
+                    if (currentAbility) {
+                        saveAbility(skill, currentAbility);
+                    }
+                    currentType = key;
+                    if (value && value.match(/\w+ \(.+\)$/)) { // Name like "Fit (Athletics)"
+                        currentAbility = { type: currentType, name: value.split(' (')[0], details: {} };
+                    }
+                } else if (currentAbility && key && value) {
+                    currentAbility.details[key] = value;
+                } else if (!key && !value && currentAbility) { // Empty row ends block
+                    saveAbility(skill, currentAbility);
+                    currentAbility = null;
+                }
+            });
+            if (currentAbility) {
+                saveAbility(skill, currentAbility);
+            }
+        });
+
+        function saveAbility(skill, ability) {
+            if (!abilitiesData[skill]) abilitiesData[skill] = [];
+            abilitiesData[skill].push(ability);
+        }
+
+        console.log('Abilities Data:', abilitiesData);
+        updateTalentSelectors(); // Initial
+        updateTrickSelectors();
+    })
+    .catch(err => {
+        console.error('Error loading Abilities CSV:', err);
+    });
 
 // Fetch and process ways
 fetch(WAYS_CSV_URL)
@@ -230,15 +280,13 @@ fetch(PROF_CSV_URL)
 function populateProfSelects(type, options) {
     const maxSelectors = 5; // Assume max rank is 5; adjust if needed
     for (let i = 1; i <= maxSelectors; i++) {
-        const select = document.getElementById(type + 'ProfSelector' + i);
+        const select = document.getElementById(type + 'ProfSelect' + i);
         if (select) {
             let html = '<option value=""></option>';
             options.forEach(opt => {
                 html += `<option value="${opt}">${opt}</option>`;
             });
             select.innerHTML = html;
-        } else {
-            console.log('Select not found: ' + type + 'ProfSelector' + i);
         }
     }
 }
@@ -263,9 +311,23 @@ function populateGearSelects() {
                 if (loadDiv) {
                     loadDiv.innerText = load;
                 }
+                calculateLoad();
             });
         }
     }
+    calculateLoad(); // Initial
+}
+
+// Function to calculate total load
+function calculateLoad() {
+    let totalLoad = 0;
+    for (let i = 1; i <= 12; i++) {
+        const loadDiv = document.getElementById('gearLoad' + i);
+        if (loadDiv) {
+            totalLoad += parseInt(loadDiv.innerText) || 0;
+        }
+    }
+    document.getElementById('totalLoad').innerText = totalLoad;
 }
 
 // Populate dropdown
@@ -296,6 +358,8 @@ function addSkillListeners() {
                     const rankValue = parseInt(skillSelect.value) || 0;
                     updateProficiencySelectors(attackType, rankValue);
                 }
+                updateTalentSelectors();
+                updateTrickSelectors();
             });
         }
     });
@@ -321,6 +385,69 @@ function updateWayOptions() {
             option.disabled = !isQualified;
         }
     });
+}
+
+// Function to populate talent selectors
+function updateTalentSelectors() {
+    const qualified = getQualifiedAbilities('talent');
+    ['talent1', 'talent2', 'talent3'].forEach((id, index) => {
+        const select = document.getElementById('talent' + (index + 1));
+        if (select) {
+            let html = '<option value=""></option>';
+            qualified.forEach(a => {
+                html += `<option value="${a.name}">${a.name}</option>`;
+            });
+            select.innerHTML = html;
+            select.addEventListener('change', () => populateAbilityInfo('talent' + (index + 1), qualified, 'talent'));
+        }
+    });
+}
+
+// Function to populate trick selectors
+function updateTrickSelectors() {
+    const qualified = getQualifiedAbilities('trick');
+    ['tricks1', 'tricks2', 'tricks3'].forEach((id, index) => {
+        const select = document.getElementById('tricks' + (index + 1));
+        if (select) {
+            let html = '<option value=""></option>';
+            qualified.forEach(a => {
+                html += `<option value="${a.name}">${a.name}</option>`;
+            });
+            select.innerHTML = html;
+            select.addEventListener('change', () => populateAbilityInfo('tricks' + (index + 1), qualified, 'trick'));
+        }
+    });
+}
+
+// Helper to get qualified abilities by type
+function getQualifiedAbilities(abilityType) {
+    const qualified = [];
+    Object.keys(SKILL_ID_MAP).forEach(skillName => {
+        const lowerSkill = skillName.toLowerCase();
+        const skillId = SKILL_ID_MAP[skillName];
+        const select = document.getElementById(skillId);
+        if (select && parseInt(select.value) >= 2 && abilitiesData[lowerSkill]) {
+            qualified.push(...abilitiesData[lowerSkill].filter(a => a.type === abilityType));
+        }
+    });
+    return qualified;
+}
+
+// Function to populate description/details
+function populateAbilityInfo(selectId, abilities, type) {
+    const value = document.getElementById(selectId).value;
+    const ability = abilities.find(a => a.name === value);
+    if (ability) {
+        const descId = selectId + 'Description';
+        const descElement = document.getElementById(descId);
+        if (descElement) {
+            let descText = '';
+            Object.keys(ability.details).forEach(key => {
+                descText += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${ability.details[key]}\n`;
+            });
+            descElement.innerText = descText.trim();
+        }
+    }
 }
 
 // Define missing functions
@@ -435,14 +562,13 @@ function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
 
     const talentAdd = parseInt(document.getElementById('talentAmount').value) || 1;
-    const fociAdd = parseInt(document.getElementById('nonAtkManAmount').value) || 1;
-    const arcanaAdd = parseInt(document.getElementById('atkManAmount').value) || 2;
+    const tricksAdd = parseInt(document.getElementById('tricksAmount').value) || 1;
 
-    const totalAbilities = talentAdd + fociAdd + arcanaAdd + 2; // + way talent & foci; adjust if needed to match 7
+    const totalAbilities = talentAdd + tricksAdd + 2; // + way talent & foci; adjust if needed to match 7
     document.getElementById('abilityNumber').innerText = totalAbilities;
 
     const freePoints = level + 1; // For level 1 = 2
-    const extra = (talentAdd - 1) + (fociAdd - 1) + (arcanaAdd - 2);
+    const extra = (talentAdd - 1) + (tricksAdd - 1);
     const remaining = freePoints - Math.max(0, extra); // Prevent negative
     document.getElementById('remainingAbilities').innerText = remaining;
 }
@@ -455,20 +581,11 @@ function talentAmount(event) {
     calculateAbilities();
 }
 
-function nonAtkManAmount(event) {
+function tricksAmount(event) {
     const value = parseInt(event.target.value) || 1;
-    document.getElementById('nonAtkManTable1').style.display = '';
-    document.getElementById('nonAtkManTable2').style.display = value >= 2 ? '' : 'none';
-    document.getElementById('nonAtkManTable3').style.display = value >= 3 ? '' : 'none';
-    calculateAbilities();
-}
-
-function atkManAmount(event) {
-    const value = parseInt(event.target.value) || 2;
-    document.getElementById('atkManTable1').style.display = '';
-    document.getElementById('atkManTable2').style.display = '';
-    document.getElementById('atkManTable3').style.display = value >= 3 ? '' : 'none';
-    document.getElementById('atkManTable4').style.display = value >= 4 ? '' : 'none';
+    document.getElementById('tricksTable1').style.display = '';
+    document.getElementById('tricksTable2').style.display = value >= 2 ? '' : 'none';
+    document.getElementById('tricksTable3').style.display = value >= 3 ? '' : 'none';
     calculateAbilities();
 }
 

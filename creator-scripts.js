@@ -825,4 +825,17 @@ function updateProficiencySelectors(attackType, rankValue) {
             profElement.hidden = i > rankValue;
         }
     }
+// Add event listeners for talent/trick amount changes (replaces missing HTML onchange)
+document.getElementById('talentAmount').addEventListener('change', (event) => {
+    talentAmount(event);
+    setAbilityAmount(event);
+});
+document.getElementById('tricksAmount').addEventListener('change', (event) => {
+    tricksAmount(event);
+    setAbilityAmount(event);
+});
+
+// Set initial visibility based on default amounts
+talentAmount({ target: document.getElementById('talentAmount') });
+tricksAmount({ target: document.getElementById('tricksAmount') });
 }

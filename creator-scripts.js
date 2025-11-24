@@ -441,10 +441,7 @@ function populateAbilityInfo(selectId, abilities, type) {
         const descId = selectId + 'Description';
         const descElement = document.getElementById(descId);
         if (descElement) {
-            let descText = '';
-            Object.keys(ability.details).forEach(key => {
-                descText += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${ability.details[key]}\n`;
-            });
+            const descText = Object.values(ability.details).join('\n');
             descElement.innerText = descText.trim();
         }
     }

@@ -1,5 +1,6 @@
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
+const GEAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 
 // Adapted parseCSV to return 2D array
 function parseWaysCSV(csvText) {
@@ -106,6 +107,7 @@ const ATTRIBUTE_GROUPS = {
 
 let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
+let gearData = [];
 
 // Fetch and process ways
 fetch(WAYS_CSV_URL)
@@ -212,6 +214,35 @@ fetch(PROF_CSV_URL)
         console.error('Error loading Proficiency CSV:', err);
     });
 
+// Fetch and process gear options
+fetch(GEAR_CSV_URL)
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(text => {
+        const rows = parseWaysCSV(text);
+
+        // Assume first row is headers
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+
+        const gearCol = headers.indexOf('gear');
+        const loadCol = headers.indexOf('load');
+
+        if (gearCol !== -1 && loadCol !== -1) {
+            gearData = rows.slice(1).map(row => ({
+                gear: row[gearCol].trim(),
+                load: row[loadCol].trim()
+            })).filter(g => g.gear);
+        }
+
+        // Log for debugging
+        console.log('Gear Data:', gearData);
+
+        // Populate all gear selects
+        populateGearSelects();
+    })
+    .catch(err => {
+        console.error('Error loading Gear CSV:', err);
+    });
+
 // Function to populate selects for a type
 function populateProfSelects(type, options) {
     const maxSelectors = 5; // Assume max rank is 5; adjust if needed
@@ -221,6 +252,21 @@ function populateProfSelects(type, options) {
             let html = '<option value=""></option>';
             options.forEach(opt => {
                 html += `<option value="${opt}">${opt}</option>`;
+            });
+            select.innerHTML = html;
+        }
+    }
+}
+
+// Function to populate gear selects
+function populateGearSelects() {
+    const maxGear = 12; // Assuming 12 gear slots
+    for (let i = 1; i <= maxGear; i++) {
+        const select = document.getElementById('gearSelect' + i);
+        if (select) {
+            let html = '<option value=""></option>';
+            gearData.forEach(g => {
+                html += `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`;
             });
             select.innerHTML = html;
         }
@@ -523,7 +569,7 @@ function updateSkillModAndPassive(skillId) {
     if (!subInput) return;
 
     const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
-    const skillName = skillId.replace('Rank', '');
+    const skillName = skillId.replace('SkillRank', '');
 
     // Update main mod display (div)
     const modDisplay = document.getElementById(skillName + 'Mod');
@@ -611,7 +657,7 @@ function updateProficiencySelectors(attackType, rankValue) {
     // Assume up to a reasonable max, e.g., 5; adjust if needed
     const maxProf = 5;
     for (let i = 1; i <= maxProf; i++) {
-        const profElement = document.getElementById(attackType + 'ProfSelect' + i);
+        const profElement = document.getElementById(attackType + 'ProfSelector' + i);
         if (profElement) {
             profElement.hidden = i > rankValue;
         }

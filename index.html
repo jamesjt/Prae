@@ -1192,7 +1192,7 @@
 
                 </div> <!-- End Row Wrapper -->
                 <div class="abilityWrapper">
-                  <div class="talentWrapper">
+                  <div class="ability-talent">
                     <div id="talentHeader">
                       Talents
                       <select id="talentAmount" onchange="talentAmount(event); setAbilityAmount(event);">
@@ -1201,10 +1201,12 @@
                         <option value="3">4</option>
                       </select>
                     </div>
-                    <div id="wayTalent" class="ability-talent">
+                    <div id="wayTalent">
                       <div id="wayTalentName" class="talent">Choose a Way</div>
                       <div id="wayTalentDesc"></div>
                     </div>
+                  </div>
+                  <div class="ability-talent">
                     <div id="talentTable1" class="ability-talent">
                       <div class="talent1 talent">
                         <select id="talent1" onchange="populateTalentInfo('talent1')" class="talentSelector">
@@ -1213,6 +1215,7 @@
                       </div>
                       <div id="talent1Description"></div>
                     </div>
+                  </div>
                     <div id="talentTable2" class="ability-talent" hidden>
                       <div class="talent2 talent">
                         <select id="talent2" onchange="populateTalentInfo('talent2')" class="talentSelector">

@@ -187,11 +187,11 @@ fetch(PROF_CSV_URL)
         // Assume first row is headers
         const headers = rows[0].map(h => h.trim().toLowerCase());
 
-        const strikeCol = headers.indexOf('strike');
-        const blastCol = headers.indexOf('blast');
-        const invokeCol = headers.indexOf('invoke');
-        const gearCol = headers.indexOf('gear');
-        const loadCol = headers.indexOf('load');
+        const strikeCol = headers.findIndex(h => h.includes('strike'));
+        const blastCol = headers.findIndex(h => h.includes('blast'));
+        const invokeCol = headers.findIndex(h => h.includes('invoke'));
+        const gearCol = headers.findIndex(h => h.includes('gear'));
+        const loadCol = headers.findIndex(h => h.includes('load'));
 
         if (strikeCol !== -1) {
             profData.strike = rows.slice(1).map(row => row[strikeCol].trim()).filter(v => v);

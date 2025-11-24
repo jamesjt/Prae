@@ -1192,58 +1192,42 @@
 
                 </div> <!-- End Row Wrapper -->
                 <div class="abilityWrapper">
-                  <div class="talentWrapper">
-                    <div id="talentAmount">
-                      Talents
-                      <select id="talentAmount">
-                        <option value="1">2</option>
-                        <option value="2">3</option>
-                        <option value="3">4</option>
-                      </select>
-                    </div>
+                 <div class="talentWrapper">
+                      <div id="talentAmount">
+                          Talents
+                          <select id="talentAmount">
+                              <option value="1">2</option>
+                              <option value="2">3</option>
+                              <option value="3">4</option>
+                          </select>
+                      </div>
 
-                    <div id="wayTalent">
-                      <div id="wayTalentName" class="talent">Choose a Way</div>
-                      <div id="wayTalentDesc" class="talentInfo"></div>
-                    </div>
+                      <div id="wayTalent">
+                          <div id="wayTalentName" class="talent">Choose a Way</div>
+                          <div id="wayTalentDesc" class="talentInfo"></div>
+                      </div>
 
-                    <!-- REQUIRED: Keep the select + description div inside -->
-                    <div id="talentTable1" class="talent">
-                      <div class="talentHeader"><select id="talent1" class="talentSelector"></select></div>
-                      <div id="talent1Description" class="talentInfo"></div>
-                    </div>
-                    <div id="talentTable2" class="talent">
-                      <div class="talentHeader"><select id="talent2" class="talentSelector"></select></div>
-                      <div id="talent2Description" class="talentInfo"></div>
-                    </div>
-                    <div id="talentTable3" class="talent">
-                      <div class="talentHeader"><select id="talent3" class="talentSelector"></select></div>
-                      <div id="talent3Description" class="talentInfo"></div>
-                    </div>
+                      <!-- talentTable1 is now the Way Talent — keep it in HTML -->
+                      <div id="talentTable1" class="talent">
+                          <div class="talentHeader">
+                              <select id="talent1" class="talentSelector"></select>
+                          </div>
+                          <div id="talent1Description" class="talentInfo"></div>
+                      </div>
+
+                      <!-- JS will inject talentTable2, talentTable3, talentTable4 here if needed -->
                   </div>
 
                   <div class="tricksWrapper">
-                    <div id="tricksHeader">
-                      Tricks
-                      <select id="tricksAmount">
-                        <option value="1">2</option>
-                        <option value="2">3</option>
-                        <option value="3">4</option>
-                      </select>
-                    </div>
-
-                    <div id="tricksTable1" class="ability-trick">
-                      <select id="tricks1" class="tricksSelector"></select>
-                      <div id="tricks1Description"></div>
-                    </div>
-                    <div id="tricksTable2" class="ability-trick">
-                      <select id="tricks2" class="tricksSelector"></select>
-                      <div id="tricks2Description"></div>
-                    </div>
-                    <div id="tricksTable3" class="ability-trick">
-                      <select id="tricks3" class="tricksSelector"></select>
-                      <div id="tricks3Description"></div>
-                    </div>
+                      <div id="tricksHeader">
+                          Tricks
+                          <select id="tricksAmount">
+                              <option value="1">2</option>
+                              <option value="2">3</option>
+                              <option value="3">4</option>
+                          </select>
+                      </div>
+                      <!-- JS injects all trick tables here -->
                   </div>
                 </div>
               <!-- End abilityWrapper-->

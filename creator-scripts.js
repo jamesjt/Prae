@@ -385,35 +385,31 @@ function updateWayOptions() {
     });
 }
 
-// Function to populate talent selectors
+// Function to populate talent selectors (now dynamic)
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
-    ['talent1', 'talent2', 'talent3'].forEach((id, index) => {
-        const select = document.getElementById('talent' + (index + 1));
-        if (select) {
-            let html = '<option value=""></option>';
-            qualified.forEach(a => {
-                html += `<option value="${a.name}">${a.name}</option>`;
-            });
-            select.innerHTML = html;
-            select.addEventListener('change', () => populateAbilityInfo('talent' + (index + 1), qualified, 'talent'));
-        }
+    const selects = document.querySelectorAll('.talentSelector');
+    selects.forEach((select) => {
+        let html = '<option value=""></option>';
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
+        select.innerHTML = html;
+        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'talent'));
     });
 }
 
-// Function to populate trick selectors
+// Function to populate trick selectors (now dynamic)
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
-    ['tricks1', 'tricks2', 'tricks3'].forEach((id, index) => {
-        const select = document.getElementById('tricks' + (index + 1));
-        if (select) {
-            let html = '<option value=""></option>';
-            qualified.forEach(a => {
-                html += `<option value="${a.name}">${a.name}</option>`;
-            });
-            select.innerHTML = html;
-            select.addEventListener('change', () => populateAbilityInfo('tricks' + (index + 1), qualified, 'trick'));
-        }
+    const selects = document.querySelectorAll('.tricksSelector');
+    selects.forEach((select) => {
+        let html = '<option value=""></option>';
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
+        select.innerHTML = html;
+        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'trick'));
     });
 }
 
@@ -472,7 +468,6 @@ function populateAbilityInfo(selectId, abilities, type) {
 
         const label = labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
 
-        // Strip duplicate label if present in value
         const child = document.createElement('div');
         child.className = `${type}${label}`;
         child.innerHTML = val;
@@ -624,19 +619,70 @@ function calculateAbilities() {
     document.getElementById('remainingAbilities').innerText = remaining;
 }
 
-function talentAmount(event) {
-    const value = parseInt(event.target.value) || 1;
-    document.getElementById('talentTable1').style.display = '';
-    document.getElementById('talentTable2').style.display = value >= 2 ? '' : 'none';
-    document.getElementById('talentTable3').style.display = value >= 3 ? '' : 'none';
+function talentAmount() {
+    updateTalentTables();
+}
+
+function tricksAmount() {
+    updateTrickTables();
+}
+
+// === TALENTS (Way Talent + Extra Talents) ===
+function updateTalentTables() {
+    const amountSelect = document.getElementById('talentAmount');
+    const extraCount = parseInt(amountSelect.value) || 1;  // 1 = 1 extra → total 2 talents (Way +1)
+
+    const container = document.querySelector('.talentWrapper');
+
+    // Remove only the dynamically created talent tables (keep wayTalent and amount selector)
+    container.querySelectorAll('[id^="talentTable"]').forEach(el => el.remove());
+
+    // Create the correct number of extra talent slots
+    for (let i = 1; i <= extraCount; i++) {
+        const table = document.createElement('div');
+        table.id = `talentTable${i}`;
+        table.className = 'talent';
+
+        table.innerHTML = `
+            <div class="talentHeader">
+                <select id="talent${i}" class="talentSelector"></select>
+            </div>
+            <div id="talent${i}Description" class="talentInfo"></div>
+        `;
+
+        container.appendChild(table);
+    }
+
+    // Re-populate all talent selectors
+    updateTalentSelectors();
     calculateAbilities();
 }
 
-function tricksAmount(event) {
-    const value = parseInt(event.target.value) || 1;
-    document.getElementById('tricksTable1').style.display = '';
-    document.getElementById('tricksTable2').style.display = value >= 2 ? '' : 'none';
-    document.getElementById('tricksTable3').style.display = value >= 3 ? '' : 'none';
+// === TRICKS ===
+function updateTrickTables() {
+    const amountSelect = document.getElementById('tricksAmount');
+    const totalTricks = (parseInt(amountSelect.value) || 1) + 1;  // value=1 → 2 tricks
+
+    const container = document.querySelector('.tricksWrapper');
+
+    // Remove all existing trick tables
+    container.querySelectorAll('[id^="tricksTable"]').forEach(el => el.remove());
+
+    // Create exactly the number needed
+    for (let i = 1; i <= totalTricks; i++) {
+        const table = document.createElement('div');
+        table.id = `tricksTable${i}`;
+        table.className = 'ability-trick';
+
+        table.innerHTML = `
+            <select id="tricks${i}" class="tricksSelector"></select>
+            <div id="tricks${i}Description"></div>
+        `;
+
+        container.appendChild(table);
+    }
+
+    updateTrickSelectors();
     calculateAbilities();
 }
 
@@ -813,6 +859,14 @@ window.addEventListener('load', () => {
             updateProficiencySelectors(type, rankValue);
         }
     });
+
+    // Add event listeners for talent/trick amount changes
+    document.getElementById('talentAmount').addEventListener('change', talentAmount);
+    document.getElementById('tricksAmount').addEventListener('change', tricksAmount);
+
+    // Set initial state
+    updateTalentTables();
+    updateTrickTables();
 });
 
 // New function to handle proficiency selectors visibility
@@ -825,17 +879,4 @@ function updateProficiencySelectors(attackType, rankValue) {
             profElement.hidden = i > rankValue;
         }
     }
-// Add event listeners for talent/trick amount changes (replaces missing HTML onchange)
-document.getElementById('talentAmount').addEventListener('change', (event) => {
-    talentAmount(event);
-    setAbilityAmount(event);
-});
-document.getElementById('tricksAmount').addEventListener('change', (event) => {
-    tricksAmount(event);
-    setAbilityAmount(event);
-});
-
-// Set initial visibility based on default amounts
-talentAmount({ target: document.getElementById('talentAmount') });
-tricksAmount({ target: document.getElementById('tricksAmount') });
 }

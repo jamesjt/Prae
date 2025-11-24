@@ -709,7 +709,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   flex-wrap: wrap;
 }
 
-.gearEntryHeader{background-color: black;}
+.gearEntryHeader{background-color: black; display: flex;}
 .gearEntry {display:flex;margin: 3px; height: 13px; width: 147px;}
 .gearName{width:90%;}
 

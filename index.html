@@ -1196,7 +1196,7 @@
                   <div class="talentWrapper">
                     <div id="talentHeader">
                       Talents
-                      <select id="talentAmount">
+                      <select id="talentAmount" onchange="talentAmount(event); setAbilityAmount(event);">
                         <option value="1">2</option>
                         <option value="2">3</option>
                         <option value="3">4</option>
@@ -1208,7 +1208,7 @@
                     </div>
                     <div id="talentTable1" class="abilityTable">
                       <div class="talent1 talent">
-                        <select id="talent1" class="talentSelector">
+                        <select id="talent1" onchange="populateTalentInfo('talent1')" class="talentSelector">
                           <option value="0"></option>
                         </select>
                       </div>
@@ -1216,7 +1216,7 @@
                     </div>
                     <div id="talentTable2" class="abilityTable" hidden>
                       <div class="talent2 talent">
-                        <select id="talent2" class="talentSelector">
+                        <select id="talent2" onchange="populateTalentInfo('talent2')" class="talentSelector">
                           <option value="0"></option>
                         </select>
                       </div>
@@ -1224,7 +1224,7 @@
                     </div>
                     <div id="talentTable3" class="abilityTable" hidden>
                       <div class="talent3">
-                        <select id="talent3" class="talentSelector">
+                        <select id="talent3" onchange="populateTalentInfo('talent3')" class="talentSelector">
                           <option value="0"></option>
                         </select>
                       </div>
@@ -1234,7 +1234,7 @@
                   <div class="nonAtkManWrapper">
                     <div id="nonAtkManHeader">
                       Tricks
-                      <select id="nonAtkManAmount">
+                      <select id="nonAtkManAmount" onchange="nonAtkManAmount(event); setAbilityAmount(event);">
                         <option value="1">2</option>
                         <option value="2">3</option>
                         <option value="3">4</option>
@@ -1247,7 +1247,7 @@
                     </div>
                     <div id="nonAtkManTable1" class="abilityTable">
                       <div class="nonAtkMan">
-                        <select id="nonAtkMan1" class="nonAtkManSelector">
+                        <select id="nonAtkMan1" onchange="populateNonAtkManInfo('nonAtkMan1')" class="nonAtkManSelector">
                           <option value="0"></option>
                         </select>
                       </div>
@@ -1257,7 +1257,7 @@
                     </div>
                     <div id="nonAtkManTable2" class="abilityTable" hidden>
                       <div class="nonAtkMan2 nonAtkMan">
-                        <select id="nonAtkMan2" class="nonAtkManSelector">
+                        <select id="nonAtkMan2" onchange="populateNonAtkManInfo('nonAtkMan2')" class="nonAtkManSelector">
                           <option value="None"></option>
                         </select>
                       </div>
@@ -1267,7 +1267,7 @@
                     </div>
                     <div id="nonAtkManTable3" class="abilityTable" hidden>
                       <div class="nonAtkMan3 nonAtkMan">
-                        <select id="nonAtkMan3"class="nonAtkManSelector">
+                        <select id="nonAtkMan3" onchange="populateNonAtkManInfo('nonAtkMan3')" class="nonAtkManSelector">
                           <option value="0"></option>
                         </select>
                       </div>
@@ -1275,7 +1275,57 @@
                       <div id="nonAtkMan3Trigger"></div>
                       <div id="nonAtkMan3Effect"></div>
                     </div>
-                  </div>        
+                  </div>
+                  <div id="atkManWrapper">
+                    <div id="atkManHeader">
+                      Arcana
+                      <select id="atkManAmount" onchange="atkManAmount(event); setAbilityAmount(event);">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                      </select>
+                    </div>
+                    <div id="atkManTable1" class="abilityTable">
+                      <div class="atkMan1 atkMan">
+                        <select id="atkMan1" onchange="populateAtkManInfo('atkMan1')" class="atkManSelector">
+                          <option value="0"></option>
+                        </select>
+                      </div>
+                      <div id="atkMan1Cost"></div>
+                      <div id="atkMan1EffectSm"></div>
+                      <div id="atkMan1EffectBg"></div>
+                    </div>
+                    <div id="atkManTable2" class="abilityTable">
+                      <div class="atkMan2 atkMan">
+                        <select id="atkMan2" onchange="populateAtkManInfo('atkMan2')" class="atkManSelector">
+                          <option value="0"></option>
+                        </select>
+                      </div>
+                      <div id="atkMan2Cost"></div>
+                      <div id="atkMan2EffectSm"></div>
+                      <div id="atkMan2EffectBg"></div>
+                    </div>
+                    <div id="atkManTable3" class="abilityTable" hidden>
+                      <div class="atkMan3 atkMan">
+                        <select id="atkMan3" onchange="populateAtkManInfo('atkMan3')" class="atkManSelector">
+                          <option value="None"></option>
+                        </select>
+                      </div>
+                      <div id="atkMan3Cost"></div>
+                      <div id="atkMan3EffectSm"></div>
+                      <div id="atkMan3EffectBg"></div>
+                    </div>
+                    <div id="atkManTable4" class="abilityTable" hidden>
+                      <div class="atkMan4 atkMan">
+                        <select id="atkMan4" onchange="populateAtkManInfo('atkMan4')" class="atkManSelector">
+                          <option value="None"></option>
+                        </select>
+                      </div>
+                      <div id="atkMan4Cost"></div>
+                      <div id="atkMan4EffectSm"></div>
+                      <div id="atkMan4EffectBg"></div>
+                    </div>
+                  </div>          
                 </div> 
               </div> <!-- End abilityWrapper -->
       </article>

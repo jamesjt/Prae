@@ -734,7 +734,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .talent, .talentSelector{ background-color:#6a877d !important;color:white;border:none;width:100%;}
 .trick, .trickSelector {background-color:#369180 !important;color:white;border:none;width:100%;}
 .atkMan, .atkManSelector{background-color:#0a614e ; color:white;}
-
+.talentInfo div:nth-of-type(2n+1){color:black;background-color: rgba(217,217,217,1);padding:0px 7px;}
+.talentInfo div:nth-of-type(2n){color:black;background-color: rgba(239,239,239,1);padding:0px 7px;}
 
 .nonAtkManWrapper {width: 330px; height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
 

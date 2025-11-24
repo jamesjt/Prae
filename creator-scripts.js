@@ -484,7 +484,7 @@ function populateAbilityInfo(selectId, abilities, type) {
 
         const child = document.createElement('div');
         child.className = `${type}${label}`;
-        child.innerHTML = `<strong>${label}:</strong> ${val}`;
+        child.innerHTML = val;
         descElement.appendChild(child);
     });
 }

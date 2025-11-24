@@ -1207,10 +1207,19 @@
                       <div id="wayTalentDesc" class="talentInfo"></div>
                     </div>
 
-                    <!-- Only keep the outer containers — JS fills everything inside -->
-                    <div id="talentTable1" class="ability-talent ent"></div>
-                    <div id="talentTable2" class="ability-talent ent" hidden></div>
-                    <div id="talentTable3" class="ability-talent ent" hidden></div>
+                    <!-- REQUIRED: Keep the select + description div inside -->
+                    <div id="talentTable1" class="ability-talent">
+                      <div class="talentHeader"><select id="talent1" class="talentSelector"></select></div>
+                      <div id="talent1Description" class="talentInfo"></div>
+                    </div>
+                    <div id="talentTable2" class="ability-talent" hidden>
+                      <div class="talentHeader"><select id="talent2" class="talentSelector"></select></div>
+                      <div id="talent2Description" class="talentInfo"></div>
+                    </div>
+                    <div id="talentTable3" class="ability-talent" hidden>
+                      <div class="talentHeader"><select id="talent3" class="talentSelector"></select></div>
+                      <div id="talent3Description" class="talentInfo"></div>
+                    </div>
                   </div>
 
                   <div class="tricksWrapper">
@@ -1223,9 +1232,18 @@
                       </select>
                     </div>
 
-                    <div id="tricksTable1" class="ability-trick" hidden></div>
-                    <div id="tricksTable2" class="ability-trick" hidden></div>
-                    <div id="tricksTable3" class="ability-trick" hidden></div>
+                    <div id="tricksTable1" class="ability-trick">
+                      <select id="tricks1" class="tricksSelector"></select>
+                      <div id="tricks1Description"></div>
+                    </div>
+                    <div id="tricksTable2" class="ability-trick" hidden>
+                      <select id="tricks2" class="tricksSelector"></select>
+                      <div id="tricks2Description"></div>
+                    </div>
+                    <div id="tricksTable3" class="ability-trick" hidden>
+                      <select id="tricks3" class="tricksSelector"></select>
+                      <div id="tricks3Description"></div>
+                    </div>
                   </div>
                 </div>
               <!-- End abilityWrapper-->

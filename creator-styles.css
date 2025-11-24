@@ -697,6 +697,11 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   margin-bottom:5px;
 }
 
+.gear-list-container{
+    background-color: #5E4634;
+    width:100%;
+}
+
 .gearListing {
   background-color:silver;
   border-style: double;
@@ -704,7 +709,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   flex-wrap: wrap;
 }
 
+.gearEntryHeader{background-color: black;}
 .gearEntry {display:flex;margin: 3px; height: 13px; width: 147px;}
+.gearName{width:90%;}
 
 
 /* abilities */

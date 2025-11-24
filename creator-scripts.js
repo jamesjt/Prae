@@ -506,6 +506,7 @@ function populateRoleInfo(event) {
         const focusKey = Object.keys(way.props).find(k => k.toLowerCase().includes('focus'));
         const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
         const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
+        const criticalEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('critical effect'));
 
         document.getElementById('wayTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
 
@@ -515,14 +516,12 @@ function populateRoleInfo(event) {
             descElement.innerHTML = ''; // Clear previous
 
             const details = {
-                'short description': shortDescKey ? way.props[shortDescKey] : '',
-                'keywords': keywordsKey ? way.props[keywordsKey] : '',
-                'description': descKey ? way.props[descKey] : '',
                 'passive': passiveKey ? way.props[passiveKey] : '',
-                'focus': focusKey ? way.props[focusKey] : ''
+                'focus': focusKey ? way.props[focusKey] : '',
+                'critical effect': criticalEffectKey ? way.props[criticalEffectKey] : '',
             };
 
-            const keyOrder = ['short description', 'keywords', 'description', 'passive', 'focus'];
+            const keyOrder = ['passive', 'focus','critical effect'];
             keyOrder.forEach(key => {
                 const val = details[key];
                 if (val) {

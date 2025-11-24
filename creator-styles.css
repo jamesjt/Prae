@@ -730,9 +730,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #atkManAmount, #talentAmount, #exploitAmount, #nonAtkManAmount {width:40px;}
         
-.talentWrapper {width: 330px;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
-.talent, .talentSelector{ background-color:#6a877d !important;color:white;}
-.nonAtkMan, .nonAtkManSelector {background-color:#369180 !important;color:white;}
+.talentWrapper {width: 50%;height: 250px;border-radius: 8px 8px 0px 0px;margin-right:4px;}
+.talent, .talentSelector{ background-color:#6a877d !important;color:white;border:none;width:100%;}
+.trick, .trickSelector {background-color:#369180 !important;color:white;border:none;width:100%;}
 .atkMan, .atkManSelector{background-color:#0a614e ; color:white;}
 
 

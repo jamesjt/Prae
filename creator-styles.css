@@ -699,7 +699,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 .gearListContainer{
     background-color: #5E4634;
-    width:100%;
+    width:240px;
 }
 
 .gearListing {
@@ -710,7 +710,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 
 .gearEntryHeader{background-color: black; display: flex;}
-.gearEntry {display:flex;margin: 3px; height: 13px; width: 147px;}
+.gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
 
 

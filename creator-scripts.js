@@ -333,7 +333,7 @@ function calculateLoad() {
 // Populate dropdown
 function populateRoleSelector() {
     const selector = document.getElementById('roleSelector');
-    selector.innerHTML = '<option value=""></option>';
+    selector.innerHTML = '<option value="">Select Way</option>';
     waysData.forEach(way => {
         const option = document.createElement('option');
         option.value = way.name;

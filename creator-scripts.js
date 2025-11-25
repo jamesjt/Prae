@@ -223,7 +223,7 @@ function updateTalentTables() {
         amountInputId: 'talentAmount',
         containerSelector: '.talentWrapper',
         itemPrefix: 'talent',
-        itemClass: 'talent',
+        itemClass: 'talentAbility',
         selectorClass: 'talentSelector',
         populateFunction: updateTalentSelectors,
         abilityType: 'talent'
@@ -235,7 +235,7 @@ function updateTrickTables() {
         amountInputId: 'tricksAmount',
         containerSelector: '.tricksWrapper',
         itemPrefix: 'tricks',
-        itemClass: 'ability-trick',
+        itemClass: 'trickAbility',
         selectorClass: 'tricksSelector',
         extraOffset: 1,
         populateFunction: updateTrickSelectors,

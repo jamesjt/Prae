@@ -561,6 +561,123 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTalentTables();  // Initial build for talents
-    updateTrickTables();   // Initial build for tricks
+    updateTalentTables();
+    updateTrickTables();
+});
+
+// Internal counters
+let talentExtra = 1; // start with 1 extra talent
+let trickCount = 2; // start with 2 tricks
+
+function addTalent() {
+    talentExtra++;
+    updateTalentTables();
+    calculateAbilities();
+}
+
+function deleteTalent(i) {
+    if (talentExtra > 1) {
+        talentExtra--;
+        updateTalentTables();
+        calculateAbilities();
+    }
+}
+
+function addTrick() {
+    trickCount++;
+    updateTrickTables();
+    calculateAbilities();
+}
+
+function deleteTrick(i) {
+    if (trickCount > 2) {
+        trickCount--;
+        updateTrickTables();
+        calculateAbilities();
+    }
+}
+
+// Update rebuild to use counters and add delete buttons
+function rebuildDynamicSelectors(config) {
+    const {
+        containerSelector, itemPrefix, itemClass, selectorClass,
+        descriptionSuffix = 'Description', minSlots = 0, populateFunction, abilityType
+    } = config;
+
+    const totalSlots = (itemPrefix === 'talent' ? talentExtra : trickCount);
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    const saved = {};
+    for (let i = 1; i <= 20; i++) {
+        const sel = document.getElementById(`${itemPrefix}${i}`);
+        if (sel) saved[i] = sel.value;
+    }
+
+    container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
+
+    for (let i = 1; i <= totalSlots; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.id = `${itemPrefix}sTable${i}`;
+        wrapper.className = itemClass;
+
+        let html = '';
+        if (itemPrefix === 'talent' && i > 1) {
+            html += `<button class="deleteSlot left" onclick="deleteTalent(${i})">Delete</button>`;
+        }
+        html += `
+            <select id="${itemPrefix}${i}" class="${selectorClass}"></select>
+            <div id="${itemPrefix}${i}${descriptionSuffix}"></div>
+        `;
+        if (itemPrefix === 'tricks' && i > 2) {
+            html += `<button class="deleteSlot right" onclick="deleteTrick(${i})">Delete</button>`;
+        }
+
+        wrapper.innerHTML = html;
+        container.appendChild(wrapper);
+    }
+
+    populateFunction();
+
+    for (let i = 1; i <= totalSlots; i++) {
+        const select = document.getElementById(`${itemPrefix}${i}`);
+        if (select && saved[i]) {
+            select.value = saved[i];
+            populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
+        }
+    }
+
+    calculateAbilities();
+}
+
+// Update calls
+function updateTalentTables() {
+    rebuildDynamicSelectors({
+        containerSelector: '.talentWrapper',
+        itemPrefix: 'talent',
+        itemClass: 'talent',
+        selectorClass: 'talentSelector',
+        populateFunction: updateTalentSelectors,
+        abilityType: 'talent'
+    });
+}
+
+function updateTrickTables() {
+    rebuildDynamicSelectors({
+        containerSelector: '.tricksWrapper',
+        itemPrefix: 'tricks',
+        itemClass: 'ability-trick',
+        selectorClass: 'tricksSelector',
+        populateFunction: updateTrickSelectors,
+        abilityType: 'trick'
+    });
+}
+
+// In load, add button listeners
+window.addEventListener('load', () => {
+    // ... other init
+    updateTalentTables();
+    updateTrickTables();
+    document.getElementById('addTalent').addEventListener('click', addTalent);
+    document.getElementById('addTrick').addEventListener('click', addTrick);
 });

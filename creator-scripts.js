@@ -20,8 +20,8 @@ function parseWaysCSV(csvText) {
             else if (char === '\r' || char === '\n') {
                 currentRow.push(currentValue.trim());
                 if (currentRow.some(v => v !== '')) rows.push(currentRow);
-                currentRow = []; currentValue = ''; i++;
-                if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
+                currentRow = []; currentValue = ''; i++
+                if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++
                 continue;
             } else { currentValue += char; i++; continue; }
         }
@@ -136,230 +136,157 @@ fetch(PROF_CSV_URL)
         const gearCol = headers.findIndex(h => h.includes('gear'));
         const loadCol = headers.findIndex(h => h.includes('load'));
 
-        if (strikeCol !== -1) profData.strike = rows.slice(1).map(r => r[strikeCol]).filter(v => v);
-        if (blastCol !== -1) profData.blast = rows.slice(1).map(r => r[blastCol]).filter(v => v);
-        if (invokeCol !== -1) profData.invoke = rows.slice(1).map(r => r[invokeCol]).filter(v => v);
+        if (strikeCol !== -1) profData.strike = rows.slice(1).map(row => row[strikeCol].trim()).filter(Boolean);
+        if (blastCol !== -1) profData.blast = rows.slice(1).map(row => row[blastCol].trim()).filter(Boolean);
+        if (invokeCol !== -1) profData.invoke = rows.slice(1).map(row => row[invokeCol].trim()).filter(Boolean);
+
         if (gearCol !== -1 && loadCol !== -1) {
-            gearData = rows.slice(1).map(r => ({ gear: r[gearCol].trim(), load: r[loadCol].trim() })).filter(g => g.gear);
+            gearData = rows.slice(1).map(row => ({
+                name: row[gearCol].trim(),
+                load: parseInt(row[loadCol]) || 0
+            })).filter(g => g.name);
         }
 
-        ['strike', 'blast', 'invoke'].forEach(type => {
-            for (let i = 1; i <= 5; i++) {
-                const sel = document.getElementById(type + 'ProfSelector' + i);
-                if (sel) {
-                    sel.innerHTML = '<option value=""></option>' + profData[type].map(o => `<option>${o}</option>`).join('');
-                }
-            }
-        });
-
-        for (let i = 1; i <= 12; i++) {
-            const sel = document.getElementById('gearSelect' + i);
-            if (sel) {
-                sel.innerHTML = '<option value=""></option>' + gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`).join('');
-            }
-        }
+        populateProfSelectors();
+        populateGearSelectors();
     })
-    .catch(err => console.error('Error loading Prof/Gear CSV:', err));
+    .catch(err => console.error('Error loading Prof CSV:', err));
 
-// ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 
-function rebuildDynamicSelectors(config) {
-    const {
-        amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
-        descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
-    } = config;
+// ———————————————————————— SKILLS GENERATION ————————————————————————
 
-    const inputEl = document.getElementById(amountInputId);
-    if (!inputEl) return;
+const SKILLS_DATA = {
+    physical: [
+        { name: 'Athletics', id: 'athleticsSkillRank', color: 'mightColor mightSkill' },
+        { name: 'Force', id: 'forceSkillRank', color: 'mightColor mightSkill' },
+        { name: 'Acrobatics', id: 'acrobaticsSkillRank', color: 'agilityColor agilitySkill' },
+        { name: 'Sneak', id: 'sneakSkillRank', color: 'agilityColor agilitySkill' },
+        { name: 'Endurance', id: 'enduranceSkillRank', color: 'brawnColor brawnSkill' },
+        { name: 'Poise', id: 'poiseSkillRank', color: 'brawnColor brawnSkill' }
+    ],
+    mental: [
+        { name: 'Lore', id: 'loreSkillRank', color: 'willColor willSkill' },
+        { name: 'Tinkering', id: 'tinkeringSkillRank', color: 'willColor willSkill' },
+        { name: 'Deception', id: 'deceptionSkillRank', color: 'witColor witSkill' },
+        { name: 'Insight', id: 'insightSkillRank', color: 'witColor witSkill' },
+        { name: 'Awareness', id: 'awarenessSkillRank', color: 'resolveColor resolveSkill' },
+        { name: 'Survival', id: 'survivalSkillRank', color: 'resolveColor resolveSkill' }
+    ],
+    social: [
+        { name: 'Compel', id: 'compelSkillRank', color: 'vigorColor vigorSkill' },
+        { name: 'Rouse', id: 'rouseSkillRank', color: 'vigorColor vigorSkill' },
+        { name: 'Assure', id: 'assureSkillRank', color: 'empathyColor empathySkill' },
+        { name: 'Charm', id: 'charmSkillRank', color: 'empathyColor empathySkill' },
+        { name: 'Calm', id: 'calmSkillRank', color: 'faithColor faithSkill' },
+        { name: 'Command', id: 'commandSkillRank', color: 'faithColor faithSkill' }
+    ],
+    attack: [
+        { name: 'Strike', id: 'strikeSkillRank', color: 'bodyColor', container: 'strikeSkillsContainer', passiveText: '3/die' },
+        { name: 'Blast', id: 'blastSkillRank', color: 'mindColor', container: 'blastSkillsContainer', passiveText: '3/die' },
+        { name: 'Invoke', id: 'invokeSkillRank', color: 'spiritColor', container: 'invokeSkillsContainer', passiveText: '3/die' }
+    ]
+};
 
-    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Clamp to 0+
-    inputEl.value = currentAmount;  // Update input to reflect clamped value
-    const totalSlots = currentAmount + extraOffset;
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-
-    // Save current selections
-    const saved = {};
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById(`${itemPrefix}${i}`);
-        if (sel) saved[i] = sel.value;
-    }
-
-    // Remove ALL dynamic slots
-    if (itemPrefix === 'talent') {
-        container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
-    } else {
-        container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
-    }
-
-    // Build exactly the number of slots we need
-    for (let i = 1; i <= totalSlots; i++) {
-        const wrapper = document.createElement('div');
-        wrapper.id = `${itemPrefix}sTable${i}`;
-        wrapper.className = itemClass;
-        wrapper.innerHTML = `
-            <select id="${itemPrefix}${i}" class="${selectorClass}"></select>
-            <div id="${itemPrefix}${i}${descriptionSuffix}"></div>
-        `;
-        container.appendChild(wrapper);
-    }
-
-    populateFunction();
-
-    // Restore saved values
-    for (let i = 1; i <= totalSlots; i++) {
-        const select = document.getElementById(`${itemPrefix}${i}`);
-        if (select && saved[i]) {
-            select.value = saved[i];
-            populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
-        }
-    }
-
-    calculateAbilities();
-}
-
-function updateTalentTables() {
-    rebuildDynamicSelectors({
-        amountInputId: 'talentAmount',
-        containerSelector: '.talentWrapper',
-        itemPrefix: 'talent',
-        itemClass: 'talent',
-        selectorClass: 'talentSelector',
-        populateFunction: updateTalentSelectors,
-        abilityType: 'talent'
+function generateSkills(category) {
+    const skills = SKILLS_DATA[category];
+    const template = document.getElementById('skillTemplate').content.cloneNode(true);
+    
+    skills.forEach(skill => {
+        const container = document.getElementById(category === 'attack' ? skill.container : `${category}SkillsContainer`);
+        if (!container) return;
+        
+        const clone = template.cloneNode(true);
+        clone.querySelector('.skillListing').classList.add(skill.color);
+        clone.querySelector('.skillName').textContent = skill.name;
+        const select = clone.querySelector('select');
+        select.id = skill.id;
+        select.classList.add(category === 'attack' ? 'attackSkills' : `${category}Skills`, skill.color);
+        const mod = clone.querySelector('.skillMod');
+        mod.id = `${skill.name.toLowerCase()}Mod`;
+        const passive = clone.querySelector('.skillPassive');
+        passive.id = `${skill.name.toLowerCase()}Passive`;
+        if (skill.passiveText) passive.textContent = skill.passiveText; // For attack skills dmg
+        container.appendChild(clone);
     });
 }
 
-function updateTrickTables() {
-    rebuildDynamicSelectors({
-        amountInputId: 'tricksAmount',
-        containerSelector: '.tricksWrapper',
-        itemPrefix: 'tricks',
-        itemClass: 'ability-trick',
-        selectorClass: 'tricksSelector',
-        extraOffset: 1,
-        populateFunction: updateTrickSelectors,
-        abilityType: 'trick'
-    });
-}
 
-// ———————————————————————— ONE EVENT LISTENER (CLEAN & FIXED) ————————————————————————
-
-document.addEventListener('change', e => {
-    const t = e.target;
-
-    // TALENT AMOUNT — FIXED
-    if (t.matches('#talentAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value;  // Clamp input
-        document.getElementById('totalTalents').textContent = 1 + value;
-        updateTalentTables();
-        calculateAbilities();
-        return;
-    }
-
-    // TRICK AMOUNT — FIXED
-    if (t.matches('#tricksAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value;  // Clamp input
-        document.getElementById('totalTricks').textContent = 1 + value;
-        updateTrickTables();
-        calculateAbilities();
-        return;
-    }
-
-    // Talent/Trick selection
-    if (t.matches('.talentSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
-        calculateAbilities();
-    }
-    else if (t.matches('.tricksSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
-        calculateAbilities();
-    }
-
-    // Skill Ranks
-    else if (t.matches('select[id$="SkillRank"]')) {
-        updateSkillModAndPassive(t.id);
-        updateWayOptions();
-        calculateSkillPoints();
-
-        if (t.id === 'strikeSkillRank' || t.id === 'blastSkillRank' || t.id === 'invokeSkillRank') {
-            const type = t.id.replace('SkillRank', '').toLowerCase();
-            updateProficiencySelectors(type, parseInt(t.value) || 0);
-        }
-
-        updateTalentSelectors();
-        updateTrickSelectors();
-    }
-
-    // Priorities & Level
-    else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
-        calculateAttributeValues();
-        updateAttributeGroups();
-        updateAllSkillModsAndPassives();
-        calculateSkillPoints();
-        calculateAbilities();
-    }
-
-    // Sub-attributes
-    else if (t.matches('input[id$="Value"][type="number"]')) {
-        const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
-                     t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
-                     ATTRIBUTE_GROUPS.spirit;
-        updateAttributeGroup(group);
-        updateSkillsForMod(t.id);
-    }
-
-    // Way Selector
-    else if (t.matches('#roleSelector')) {
-        populateRoleInfo(e);
-    }
-
-    // Gear
-    else if (t.matches('.gearSelector')) {
-        const i = t.id.replace('gearSelect', '');
-        const selectedOption = t.options[t.selectedIndex];
-        const load = selectedOption.getAttribute('data-load') || '';
-        const loadDiv = document.getElementById('gearLoad' + i);
-        if (loadDiv) loadDiv.textContent = load;
-        calculateLoad();
-    }
-});
-
-// ———————————————————————— CORE FUNCTIONS ————————————————————————
+// ———————————————————————— UI UPDATES ————————————————————————
 
 function populateRoleSelector() {
-    const sel = document.getElementById('roleSelector');
-    sel.innerHTML = '<option value="">Select Way</option>';
-    waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
+    const selector = document.getElementById('roleSelector');
+    selector.innerHTML = '<option value="">Way</option>';
+    waysData.forEach(way => {
+        const opt = document.createElement('option');
+        opt.value = way.name;
+        opt.textContent = way.name;
+        selector.appendChild(opt);
+    });
 }
 
 function updateWayOptions() {
-    const sel = document.getElementById('roleSelector');
-    waysData.forEach(way => {
-        let qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
-            : document.getElementById(way.skillId)?.value > 1;
-        const opt = sel.querySelector(`option[value="${way.name}"]`);
-        if (opt) opt.disabled = !qualified;
+    // Logic for updating ways if needed
+}
+
+function populateProfSelectors() {
+    ['strike', 'blast', 'invoke'].forEach(type => {
+        for (let i = 1; i <= 5; i++) {
+            const sel = document.getElementById(`${type}ProfSelector${i}`);
+            if (sel) {
+                sel.innerHTML = '<option value="profUnassigned"></option>';
+                profData[type].forEach(prof => {
+                    const opt = document.createElement('option');
+                    opt.value = prof;
+                    opt.textContent = prof;
+                    sel.appendChild(opt);
+                });
+            }
+        }
     });
+}
+
+function populateGearSelectors() {
+    for (let i = 1; i <= 12; i++) {
+        const sel = document.getElementById(`gearSelect${i}`);
+        if (sel) {
+            sel.innerHTML = '<option value="">Gear Slots</option>';
+            gearData.forEach(gear => {
+                const opt = document.createElement('option');
+                opt.value = gear.name;
+                opt.textContent = gear.name;
+                opt.setAttribute('data-load', gear.load);
+                sel.appendChild(opt);
+            });
+        }
+    }
 }
 
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(sel => {
-        const cur = sel.value;
-        sel.innerHTML = '<option value="">—</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        sel.innerHTML = '<option value="">Select Talent</option>';
+        qualified.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.name;
+            opt.textContent = a.name;
+            sel.appendChild(opt);
+        });
+        const cur = sel.dataset.current || '';
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
 
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
-    document.querySelectorAll('.tricksSelector').forEach(sel => {
-        const cur = sel.value;
-        sel.innerHTML = '<option value="">—</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+    document.querySelectorAll('.trickSelector').forEach(sel => {
+        sel.innerHTML = '<option value="">Select Trick</option>';
+        qualified.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.name;
+            opt.textContent = a.name;
+            sel.appendChild(opt);
+        });
+        const cur = sel.dataset.current || '';
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
@@ -552,6 +479,10 @@ function calculateLoad() {
 // ———————————————————————— INIT ————————————————————————
 
 window.addEventListener('load', () => {
+    generateSkills('physical');
+    generateSkills('mental');
+    generateSkills('social');
+    generateSkills('attack');
     calculateSkillPoints();
     calculateAbilities();
     calculateAttributeValues();

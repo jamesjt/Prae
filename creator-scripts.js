@@ -450,14 +450,14 @@ function updateSkillModAndPassive(skillId) {
     const rank = parseInt(sel.value) || 0;
     const modId = SKILL_MOD_MAP[skillId];
     const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
-    const name = skillId.replace('SkillRank', '').toLowerCase();
+    const name = skillId.replace('SkillRank', '');
     const modEl = document.getElementById(name + 'Mod');
     if (modEl) modEl.textContent = modVal;
     const passiveEl = document.getElementById(name + 'Passive');
-    if (passiveEl) passiveEl.textContent = rank + modVal + 2;
-    if (['strike', 'blast', 'invoke'].includes(name)) {
-        const dmgEl = document.getElementById(name + 'Damage');
-        if (dmgEl) dmgEl.textContent = '3/die';
+    if (passiveEl) passiveEl.textContent = 2 + rank + modVal;
+    if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
+        const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
+        if (dmgEl) dmgEl.textContent = modVal;
     }
 }
 

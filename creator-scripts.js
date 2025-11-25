@@ -483,89 +483,89 @@ function populateAbilityInfo(selectId, abilities, type) {
     });
 }
 
-// Define missing functions
 function populateRoleInfo(event) {
     const value = event.target.value;
     if (!value) return;
+
     const way = waysData.find(w => w.name === value);
-    if (way) {
-        // Find keys case-insensitively for talent, foci, etc.
-        const talentNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent name'));
-        const shortDescKey = Object.keys(way.props).find(k => k.toLowerCase().includes('short description'));
-        const keywordsKey = Object.keys(way.props).find(k => k.toLowerCase().includes('keywords'));
-        const descKey = Object.keys(way.props).find(k => k.toLowerCase().includes('description'));
-        const passiveKey = Object.keys(way.props).find(k => k.toLowerCase().includes('passive'));
-        const focusKey = Object.keys(way.props).find(k => k.toLowerCase().includes('focus'));
-        const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
-        const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
-        const criticalEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('critical effect'));
-        document.getElementById('wayTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
-        // Populate wayTalentDesc with divs
-        const descElement = document.getElementById('wayTalentDesc');
-        if (descElement) {
-            descElement.innerHTML = ''; // Clear previous
-            const details = {
-                'passive': passiveKey ? way.props[passiveKey] : '',
-                'focus': focusKey ? way.props[focusKey] : '',
-                'critical effect': criticalEffectKey ? way.props[criticalEffectKey] : '',
-            };
-            const keyOrder = ['passive', 'focus','critical effect'];
-            keyOrder.forEach(key => {
-                const val = details[key];
-                if (val) {
-                    const child = document.createElement('div');
-                    child.className = `talent${key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '')}`;
-                    child.innerText = val;
-                    descElement.appendChild(child);
-                }
-            });
-        }
-        // Set the attack/required skill to 3:Trained if not already higher
-        const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
-        const skillId = SKILL_ID_MAP[attackSkill];
-        if (skillId) {
-            const skillSelect = document.getElementById(skillId);
-            if (skillSelect && parseInt(skillSelect.value) < 2) {
-                skillSelect.value = '2';
-                skillSelect.dispatchEvent(new Event('change'));
-            }
-        }
-        // Set the attack type skill rank to 2 if not already higher
-        const attackType = attackSkillKey ? way.props[attackSkillKey].trim() : '';
-        const attackRankIdMap = {
-            'Strike': 'strikeSkillRank',
-            'Blast': 'blastSkillRank',
-            'Invoke': 'invokeSkillRank'
-        };
-        const attackRankId = attackRankIdMap[attackType];
-        if (attackRankId) {
-            const attackSelect = document.getElementById(attackRankId);
-            if (attackSelect && parseInt(attackSelect.value) < 2) {
-                attackSelect.value = '2';
-                attackSelect.dispatchEvent(new Event('change'));
-            }
-        }
-        // Set primary attribute priority to value '1'
-        const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
-        let priorityId;
-        if (primaryAttr === 'Body') {
-            priorityId = 'bodyPriority';
-        } else if (primaryAttr === 'Mind') {
-            priorityId = 'mindPriority';
-        } else if (primaryAttr === 'Spirit') {
-            priorityId = 'spiritPriority';
-        }
-        if (priorityId) {
-            const select = document.getElementById(priorityId);
-            if (select) {
-                select.value = '1';
-                select.dispatchEvent(new Event('change'));
-            }
-        }
-        calculateAttributeValues(); // Recalculate after changes
-        updateAttributeGroups();
-        updateAllSkillModsAndPassives(); // Ensure updates after potential subattribute adjustments
+    if (!way) return;
+
+    // 1. WAY TALENT NAME
+    const talentNameKey = Object.keys(way.props).find(k => k.toLowerCase().includes('talent name'));
+    const wayTalentNameEl = document.getElementById('wayTalentName');
+    if (wayTalentNameEl) {
+        wayTalentNameEl.innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
     }
+
+    // 2. WAY TALENT DESCRIPTION (Passive / Focus / Critical Effect)
+    const descEl = document.getElementById('wayTalentDesc');
+    if (descEl) {
+        descEl.innerHTML = ''; // Clear old
+
+        const keys = ['passive', 'focus', 'critical effect'];
+        keys.forEach(key => {
+            const propKey = Object.keys(way.props).find(k => k.toLowerCase().includes(key));
+            if (propKey && way.props[propKey]) {
+                const div = document.createElement('div');
+                div.className = `talent${key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '')}`;
+                div.innerText = way.props[propKey];
+                descEl.appendChild(div);
+            }
+        });
+    }
+
+    // 3. REQUIRED SKILL → TRAINED (value = 2)
+    const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
+    const reqSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
+    const skillId = SKILL_ID_MAP[reqSkill];
+
+    if (skillId) {
+        const skillSelect = document.getElementById(skillId);
+        if (skillSelect && parseInt(skillSelect.value) < 2) {
+            skillSelect.value = '2';  // Trained = value 2
+            skillSelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+    // 4. ATTACK TYPE RANK → 2 (if Strike/Blast/Invoke)
+    const attackType = attackSkillKey ? way.props[attackSkillKey].trim() : '';
+    const attackRankMap = {
+        'Strike': 'strikeSkillRank',
+        'Blast': 'blastSkillRank',
+        'Invoke': 'invokeSkillRank'
+    };
+    const attackRankId = attackRankMap[attackType];
+    if (attackRankId) {
+        const attackSelect = document.getElementById(attackRankId);
+        if (attackSelect && parseInt(attackSelect.value) < 2) {
+            attackSelect.value = '2';
+            attackSelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+    // 5. PRIMARY ATTRIBUTE PRIORITY → 1 (THIS WAS BROKEN)
+    const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
+    const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
+
+    const priorityMap = {
+        'Body': 'bodyPriority',
+        'Mind': 'mindPriority',
+        'Spirit': 'spiritPriority'
+    };
+    const priorityId = priorityMap[primaryAttr];
+
+    if (priorityId) {
+        const prioritySelect = document.getElementById(priorityId);
+        if (prioritySelect && prioritySelect.value !== '1') {
+            prioritySelect.value = '1';
+            prioritySelect.dispatchEvent(new Event('change')); // Critical!
+        }
+    }
+
+    // Final recalc
+    calculateAttributeValues();
+    updateAttributeGroups();
+    updateAllSkillModsAndPassives();
 }
 function calculateSkillPoints() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;

@@ -629,14 +629,6 @@ function populateRoleInfo(event) {
     }
 }
 
-function setSkillValues(event) {
-    calculateSkillPoints();
-}
-
-function skillPoints(event) {
-    calculateSkillPoints();
-}
-
 function calculateSkillPoints() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const totalPoints = level * 3 + 9; // Adjust formula if needed; for level 1 = 12
@@ -896,7 +888,16 @@ function addPriorityListeners() {
             elem.addEventListener('change', () => {
                 calculateAttributeValues();
                 updateAttributeGroups();
-                updateAllSkillModsAndPassives(); // Ensure updates after changes
+                updateAllSkillModsAndPassives();
+                calculateSkillPoints();      // ← ADD THIS
+                calculateAbilities();        // ← ADD THIS (replaces setAbilityAmount)
+            });
+            elem.addEventListener('input', () => {  // ← ADD for live updates on number inputs
+                calculateAttributeValues();
+                updateAttributeGroups();
+                updateAllSkillModsAndPassives();
+                calculateSkillPoints();
+                calculateAbilities();
             });
         }
     });

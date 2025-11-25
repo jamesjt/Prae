@@ -171,7 +171,7 @@ function rebuildDynamicSelectors(config) {
     const inputEl = document.getElementById(amountInputId);
     if (!inputEl) return;
 
-    const currentAmount = parseInt(inputEl.value) || 1;
+    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Never negative
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -183,14 +183,14 @@ function rebuildDynamicSelectors(config) {
         if (sel) saved[i] = sel.value;
     }
 
-    // Remove ALL dynamic slots
+    // Remove ALL dynamic slots (clean slate)
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
 
-    // Build exactly the number needed
+    // Build exactly the number of slots we need
     for (let i = 1; i <= totalSlots; i++) {
         const wrapper = document.createElement('div');
         wrapper.id = `${itemPrefix}sTable${i}`;
@@ -202,6 +202,7 @@ function rebuildDynamicSelectors(config) {
         container.appendChild(wrapper);
     }
 
+    // Repopulate options
     populateFunction();
 
     // Restore saved values
@@ -246,18 +247,18 @@ function updateTrickTables() {
 document.addEventListener('change', e => {
     const t = e.target;
 
-    // Talent Amount
+    // TALENT AMOUNT — FIXED
     if (t.matches('#talentAmount')) {
-        const value = parseInt(t.value) || 1;
+        const value = Math.max(0, parseInt(t.value) || 0);
         document.getElementById('totalTalents').textContent = 1 + value;
         updateTalentTables();
         calculateAbilities();
         return;
     }
 
-    // Trick Amount
+    // TRICK AMOUNT — FIXED
     if (t.matches('#tricksAmount')) {
-        const value = parseInt(t.value) || 1;
+        const value = Math.max(0, parseInt(t.value) || 0);
         document.getElementById('totalTricks').textContent = 1 + value;
         updateTrickTables();
         calculateAbilities();
@@ -316,7 +317,7 @@ document.addEventListener('change', e => {
     else if (t.matches('.gearSelector')) {
         const i = t.id.replace('gearSelect', '');
         const selectedOption = t.options[t.selectedIndex];
-        const load = selectedOption.getAttribute('data-load') || '';
+        const load = selectedOption?.getAttribute('data-load') || '';
         const loadDiv = document.getElementById('gearLoad' + i);
         if (loadDiv) loadDiv.textContent = load;
         calculateLoad();

@@ -112,7 +112,7 @@ let abilitiesData = {}; // { skillLower: [{type: 'talent'|'trick', name, details
 
 // Fetch and process abilities (talents and tricks)
 fetch(ABILITIES_CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r crucially.status); return r.text(); })
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
         const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
@@ -400,43 +400,39 @@ function updateWayOptions() {
 
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
-    document.querySelectorAll('.talentSelector').forEach(select => {
-        const currentValue = select.value;  // Save what was selected
 
-        // Rebuild options
+    document.querySelectorAll('.talentSelector').forEach(select => {
+        const currentValue = select.value;
+
         let html = '<option value="">—</option>';
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        // Re-select if still valid
         if (currentValue && qualified.some(a => a.name === currentValue)) {
             select.value = currentValue;
         } else {
-            select.value = '';  // Clear if no longer valid
+            select.value = '';
         }
 
-        // Always clear + repopulate description on change
         const desc = document.getElementById(select.id + 'Description');
         if (desc) {
-            desc.innerHTML = '';  // Clear old
+            desc.innerHTML = '';
             if (select.value) {
                 const ability = qualified.find(a => a.name === select.value);
                 if (ability) populateAbilityInfo(select.id, [ability], 'talent');
             }
         }
 
-        // Re-attach handler
         select.onchange = () => {
-            const descEl = document.getElementById(select.id + 'Description');
-            if (descEl) descEl.innerHTML = '';
-            if (select.value) {
-                populateAbilityInfo(select.id, qualified, 'talent');
+            const ability = qualified.find(a => a.name === select.value);
+            if (desc) {
+                desc.innerHTML = '';
+                if (ability) populateAbilityInfo(select.id, [ability], 'talent');
             }
         };
     });
 }
+
 
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');

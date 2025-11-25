@@ -385,47 +385,49 @@ function updateWayOptions() {
     });
 }
 
+// TALENTS
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(select => {
         const wasSelected = select.value;
         let html = '<option value="">—</option>';
-
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        // Clear description if previously selected talent is no longer available
         const desc = document.getElementById(select.id + 'Description');
         if (desc && (!select.value || !qualified.some(a => a.name === wasSelected))) {
             desc.innerHTML = '';
         }
 
-        // Re-attach handler with auto-clear
         select.onchange = () => {
             const descEl = document.getElementById(select.id + 'Description');
             if (descEl) descEl.innerHTML = '';
-            if (select.value) {
-                populateAbilityInfo(select.id, qualified, 'talent');
-            }
+            if (select.value) populateAbilityInfo(select.id, qualified, 'talent');
         };
     });
 }
-// Function to populate trick selectors (now dynamic)
+
+// TRICKS — EXACT SAME LOGIC
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
-    const selects = document.querySelectorAll('.tricksSelector');
-    selects.forEach((select) => {
-        let html = '<option value=""></option>';
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+    document.querySelectorAll('.tricksSelector').forEach(select => {
+        const wasSelected = select.value;
+        let html = '<option value="">—</option>';
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
-        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'trick'));
+
+        const desc = document.getElementById(select.id + 'Description');
+        if (desc && (!select.value || !qualified.some(a => a.name === wasSelected))) {
+            desc.innerHTML = '';
+        }
+
+        select.onchange = () => {
+            const descEl = document.getElementById(select.id + 'Description');
+            if (descEl) descEl.innerHTML = '';
+            if (select.value) populateAbilityInfo(select.id, qualified, 'trick');
+        };
     });
 }
-
 // Helper to get qualified abilities by type
 function getQualifiedAbilities(abilityType) {
     const qualified = [];

@@ -159,6 +159,7 @@
                       <input id="gear12" class="gearInput" type="text">
                       <br/>
                       <textarea id="gearBucket"></textarea>
+
                     </div>
                     <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="imgs/notes.png">
                     <div id="notes" class="charDetails draggable">
@@ -168,8 +169,9 @@
                       <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
                       <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
                     </div>
-                    <button id="charSave" onclick="saveCharacter();">Save</button>
+                    <button id="charSave" onclick="saveCharacter();">Save</button>                    
                 </div>
+
                 <div class="secondaryAttributesWrapper">
                   <div class="secondaryAttributes">
                     <div class="image" id="HP">
@@ -177,16 +179,16 @@
                     </div>
                     <div id="recovery">
                       <img id="recPtsImg" src="imgs/recPts.png" width="40px" height="40px">
-                      <input type="text" id="recoveryValue" value="1">
+                      <input type="text" id="recoveryValue" value="1">       
                     </div>
                     <div id="mana">
                       <img id="manaImg" src="imgs/mana.png" height="40px">
-                      <input type="text" id="manaValue" value="3">
-                    </div>
+                      <input type="text" id="manaValue" value="3">  
+                    </div> 
                     <div id="conversion">
                       <img id="manaImg" src="imgs/conversion.png" height="40px">
-                      <div id="conversionValue">3</div>
-                    </div>
+                      <div id="conversionValue">3</div> 
+                    </div> 
                     <div id="initialMomentum">
                       <img id="initialMomentumImg" src="imgs/initialMomentum.png" width="40px">
                       <div id="initialMomentumValue">3</div>
@@ -198,7 +200,7 @@
                     <div id="armor">
                       <img id="armorImg" src="imgs/armour.png" width="45px" height="40px">
                       <input type="text" id="armorValue" value="0">
-                    </div>
+                    </div>            
                     <div id="pace">
                       <img id="paceImg" src="imgs/pace.png" width="45px" height="30px">
                       <div id="paceValue">6</div>
@@ -207,8 +209,9 @@
                       <img id="initiativeImg" src="imgs/initiative.png" width="40px">
                       <div id="initiativeValue">0</div>
                     </div>
-                            
+                             
                   </div>
+
                   <div id="secondaryAttributeValues">
                     <div id="maxHPDesc">
                       Max HP
@@ -239,7 +242,7 @@
                     </div>
                     <div id="armorDesc">
                       Armor
-                    </div>
+                    </div>            
                     <div id="paceDesc">
                       Pace
                     </div>
@@ -248,6 +251,7 @@
                     </div>
                   </div>
                 </div> <!-- End Secondary Attributes Wrapper -->
+
                 <div class="columnWrapper">
                 <div id="column1">
                     <div id="skillHeader" class="skillListing">
@@ -264,8 +268,10 @@
                         Passive
                       </div>
                     </div>
+
                   <!-- Physical Stats Wrapper -->
-                  <div id="physicalStatsWrapper" class="statsWrapper">
+                  <div id="physicalStatsWrapper" class="statsWrapper"> 
+
                     <!-- Physical Attributes -->
                     <div class="attributeWrapper physicalAtt">
                       <select id="bodyPriority" class="attributeSelect">
@@ -282,25 +288,27 @@
                       </div>
                       <div id="physicalAttributePoints" class="attributePoints">UA</div>
                     </div>
+
                     <!-- Physical Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute mightSkill">
                         Might
                         <!-- Replace any <input type="number"> with this -->
-                        <input class="inputField mightSkill" id="mightValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField mightSkill"  id="mightValue" type="number" min="0" max="0" step="1" value="0"/>
                       </div>
                       <div class="subAttribute subMiddle agilitySkill">
                         Agility
-                        <input class="inputField agilitySkill" id="agilityValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField agilitySkill"  id="agilityValue" type="number" min="0" max="0" step="1" value="0"/>
                       </div>
                       <div class="subAttribute brawnSkill">
                         Brawn
-                        <input class="inputField brawnSkill" id="brawnValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField brawnSkill"  id="brawnValue" type="number" min="0" max="0" step="1" value="0"/>
                       </div>
                     </div>
-                   
+                    
                     <!-- Physical Skills -->
                     <div class="skillWrapper">
+
                     <!-- Athletics -->
                       <div class="skillListing mightSkill">
                         <div class="skillName">
@@ -323,6 +331,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Force -->
                       <div class="skillListing mightSkill">
                         <div class="skillName">
@@ -345,6 +354,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Acrobatics -->
                       <div class="skillListing agilitySkill skillListingMidTop">
                         <div class="skillName">
@@ -367,6 +377,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Sneak -->
                       <div class="skillListing agilitySkill skillListingMidBot">
                         <div class="skillName">
@@ -389,6 +400,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Endurance -->
                       <div class="skillListing brawnSkill">
                         <div class="skillName">
@@ -411,6 +423,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Poise -->
                       <div class="skillListing brawnSkill">
                         <div class="skillName">
@@ -433,10 +446,13 @@
                           3
                         </div>
                       </div>
+
                     </div> <!-- End Physical Skills Wrapper-->
                   </div> <!-- End Physical Stats Wrapper -->
+
                   <!-- Mental Stats Wrapper -->
-                  <div id="mentalStatsWrapper" class="statsWrapper">
+                  <div id="mentalStatsWrapper" class="statsWrapper"> 
+
                     <!-- Mental Attributes -->
                     <div class="attributeWrapper mentalAtt">
                       <select id="mindPriority" class="attributeSelect">
@@ -453,24 +469,26 @@
                       </div>
                       <div id="mentalAttributePoints" class="attributePoints">UA</div>
                     </div>
+
                     <!-- Mental Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute willSkill">
                         Will
-                        <input class="inputField willSkill" id="willValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField willSkill"  id="willValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                       <div class="subAttribute subMiddle witSkill">
                         Wit
-                        <input class="inputField witSkill" id="witValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField witSkill"  id="witValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                       <div class="subAttribute resolveSkill">
                         Resolve
-                        <input class="inputField resolveSkill" id="resolveValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField resolveSkill"  id="resolveValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                     </div>
-                   
+                    
                     <!-- Mental Skills -->
                     <div class="skillWrapper">
+
                     <!-- lore -->
                       <div class="skillListing willSkill">
                         <div class="skillName">
@@ -493,6 +511,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Tinkering -->
                       <div class="skillListing willSkill">
                         <div class="skillName">
@@ -515,6 +534,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Deception -->
                       <div class="skillListing witSkill skillListingMidTop">
                         <div class="skillName">
@@ -530,13 +550,14 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="deceptionMod" class="skillMod filledField">
+                        <div id="deceptionSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="deceptionPassive" class="skillPassive filledField">
+                        <div id="deceptionSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>
+
                     <!-- Insight -->
                       <div class="skillListing witSkill skillListingMidBot">
                         <div class="skillName">
@@ -559,6 +580,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Awareness -->
                       <div class="skillListing resolveSkill">
                         <div class="skillName">
@@ -581,6 +603,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Survival -->
                       <div class="skillListing willSkill">
                         <div class="skillName">
@@ -603,11 +626,13 @@
                           3
                         </div>
                       </div>
-                     
+                      
                     </div> <!-- End Mental Skills Wrapper-->
                   </div> <!-- End Mental Stats Wrapper -->
+
                   <!-- Social Stats Wrapper -->
-                  <div id="socialStatsWrapper" class="statsWrapper">
+                  <div id="socialStatsWrapper" class="statsWrapper"> 
+
                     <!-- Social Attributes -->
                     <div class="attributeWrapper socialAtt">
                       <select id="spiritPriority" class="attributeSelect">
@@ -624,24 +649,26 @@
                       </div>
                       <div id="spiritAttributePoints" class="attributePoints">UA</div>
                     </div>
+
                     <!-- Social Sub-Attributes -->
                     <div class="subAttributeWrapper">
                       <div class="subAttribute vigorSkill">
                         Vigor
-                        <input class="inputField vigorSkill" id="vigorValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField vigorSkill"  id="vigorValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                       <div class="subAttribute subMiddle empathySkill">
                         Empathy
-                        <input class="inputField empathySkill" id="empathyValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField empathySkill"  id="empathyValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                       <div class="subAttribute faithSkill">
                         Faith
-                        <input class="inputField faithSkill" id="faithValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField faithSkill"  id="faithValue" type="number" min="0" max="4" step="1" value="0"/>
                       </div>
                     </div>
-                   
+                    
                     <!-- Social Skills -->
                     <div class="skillWrapper">
+
                     <!-- Compel -->
                       <div class="skillListing vigorSkill">
                         <div class="skillName">
@@ -664,6 +691,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Rouse -->
                       <div class="skillListing vigorSkill">
                         <div class="skillName">
@@ -686,6 +714,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Assure -->
                       <div class="skillListing empathySkill skillListingMidTop">
                         <div class="skillName">
@@ -708,6 +737,7 @@
                           3
                         </div>
                       </div>
+
                     <!-- Charm -->
                       <div class="skillListing empathySkill skillListingMidBot">
                         <div class="skillName">
@@ -730,6 +760,9 @@
                           3
                         </div>
                       </div>
+
+
+
                     <!-- Calm -->
                       <div class="skillListing faithSkill">
                         <div class="skillName">
@@ -745,13 +778,14 @@
                             <option value="6">6: Master</option>
                           </select>
                         </div>
-                        <div id="calmMod" class="skillMod filledField">
+                        <div id="calmSkillMod" class="skillMod filledField">
                           0
                         </div>
-                        <div id="calmPassive" class="skillPassive filledField">
+                        <div id="calmSkillPassive" class="skillPassive filledField">
                           3
                         </div>
                       </div>
+
                     <!-- Command -->
                       <div class="skillListing faithSkill">
                         <div class="skillName">
@@ -774,12 +808,13 @@
                           3
                         </div>
                       </div>
-                     
-                    </div> <!-- End Social Skills Wrapper-->
-                  </div> <!-- End Social Stats Wrapper -->
+                      
+                    </div> <!-- End Mental Skills Wrapper-->
+                  </div> <!-- End Mental Stats Wrapper -->
                 </div> <!-- End Column 1 -->
+
                 <div id="column2">
-                 
+                  
                   <div id="attackSkillHeader" class="skillListing">
                     <div class="attackSkillName">
                       Name
@@ -794,13 +829,14 @@
                       Dmg
                     </div>
                   </div>
+
                   <div id="strikeWrapper" class="skillListing bodyColor">
                     <div class="attackSkillName">
                       Strike
                     </div>
                     <div class="skillRank">
                       <select id="strikeSkillRank" class="attackSkills bodyColor">
-                        <option value="0">0: Unskilled</option>
+                        <option value="0">1: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
                         <option value="3">4: Adept</option>
@@ -815,6 +851,7 @@
                       B+W
                     </div>
                   </div>
+
                 <div id="strikeProfContainer" class="profContainer">
                     <select id="strikeProfSelector1" class="profSelector strikeProfSelector">
                       <option value="profUnassigned"></option>
@@ -832,6 +869,8 @@
                       <option value="profUnassigned"></option>
                     </select>
                   </div> <!-- End strikeProfContainer -->
+
+
                   <div id="blastWrapper" class="skillListing mindColor">
                     <div class="attackSkillName">
                       Blast
@@ -853,6 +892,7 @@
                       1
                     </div>
                   </div>
+
                   <div id="blastProfContainer" class="profContainer">
                     <select id="blastProfSelector1" class="profSelector blastProfSelector">
                       <option value="profUnassigned"></option>
@@ -868,8 +908,9 @@
                     </select>
                     <select id="blastProfSelector5" class="profSelector blastProfSelector">
                       <option value="profUnassigned"></option>
-                    </select>
+                    </select> 
                   </div> <!-- End blastWrapper -->
+
                   <div id="invokeWrapper" class="skillListing spiritColor">
                     <div class="attackSkillName">
                       Invoke
@@ -891,6 +932,7 @@
                       3/die
                     </div>
                   </div>
+
                   <div id="invokeProfContainer" class="profContainer">
                       <select id="invokeProfSelector1" class="profSelector invokeProfSelector">
                         <option value="profUnassigned"></option>
@@ -997,8 +1039,9 @@
                           <div id="ritual1SelectNotes" class="ritualNotes ritualDescLine"></div>
                         </div>
                       </div>
-                    </div>
-                   
+                    </div>  
+                    
+
                     <div id="ritual2" hidden class="ritualListing">
                       <select id="ritual2Select" class="ritualSelector">
                         <option value="0"></option>
@@ -1022,7 +1065,8 @@
                           <div id="ritual2SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>
+                    </div>  
+
                     <div id="ritual3" hidden class="ritualListing">
                       <select id="ritual3Select" class="ritualSelector">
                         <option value="0"></option>
@@ -1046,7 +1090,8 @@
                           <div id="ritual3SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>
+                    </div>  
+
                     <div id="ritual4" hidden class="ritualListing">
                       <select id="ritual4Select" class="ritualSelector">
                         <option value="0"></option>
@@ -1070,7 +1115,8 @@
                           <div id="ritual4SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>
+                    </div>  
+
                     <div id="ritual5" hidden class="ritualListing">
                       <select id="ritual5Select" class="ritualSelector">
                         <option value="0"></option>
@@ -1094,8 +1140,10 @@
                           <div id="ritual5SelectNotes" class="ritualNotes"></div>
                         </div>
                       </div>
-                    </div>
+                    </div>  
+
                   </div>
+
                   <div id='armorList'>
                     <div id="armor1" class="armorListing">
                       <input  id="armor1Name" class="armorName" type="text" value="Armor Name" >
@@ -1145,17 +1193,38 @@
                 <!-- ABILITIES SECTION — Updated with number inputs + live totals -->
                 <div class="abilityWrapper">
                     <div class="talentWrapper">
+                        <!-- Talent Amount with Live Total -->
+                        <div class="amountRow">
+                            <label class="amountLabel">Talents</label>
+                            <input type="number" id="talentAmount" min="1" max="10" value="1" step="1">
+                            <span class="totalDisplay">Total: <strong id="totalTalents">2</strong> (1 Way + 1 extra)</strong></span>
+                        </div>
+
                         <div id="wayTalent">
                             <div id="wayTalentName" class="talent">Choose a Way</div>
                             <div id="wayTalentDesc" class="talentInfo"></div>
                         </div>
+
+                        <!-- Way Talent (always visible) -->
+                        <div id="talentTable1" class="talent">
+                            <div class="talentHeader">
+                                <select id="talent1" class="talentSelector"></select>
+                            </div>
+                            <div id="talent1Description" class="talentInfo"></div>
+                        </div>
+
                         <!-- Extra talents injected here by JS -->
-                        <button id="addTalent">Add Talent</button>
                     </div>
 
                     <div class="tricksWrapper">
+                        <!-- Trick Amount with Live Total -->
+                        <div class="amountRow">
+                            <label class="amountLabel">Tricks</label>
+                            <input type="number" id="tricksAmount" min="1" max="10" value="1" step="1">
+                            <span class="totalDisplay">Total: <strong id="totalTricks">2</strong></span>
+                        </div>
+
                         <!-- All trick tables injected here by JS -->
-                        <button id="addTrick">Add Trick</button>
                     </div>
                 </div>
                 <!-- End abilityWrapper -->

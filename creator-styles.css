@@ -1049,18 +1049,3 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     color: #00ff00;
     font-size: 1.2em;
 }
-.deleteSlot {
-    background-color: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 5px 10px;
-    margin-left: 5px;
-    border-radius: 3px;
-}
-.deleteSlot.left {
-    float: left;
-}
-.deleteSlot.right {
-    float: right;
-}

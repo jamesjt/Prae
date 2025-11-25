@@ -1191,46 +1191,44 @@
 
 
                 </div> <!-- End Row Wrapper -->
+                <!-- ABILITIES SECTION — Updated with number inputs + live totals -->
                 <div class="abilityWrapper">
-                 <div class="talentWrapper">
-                      <div id="talentAmount">
-                          Talents
-                          <select id="talentAmount">
-                              <option value="1">2</option>
-                              <option value="2">3</option>
-                              <option value="3">4</option>
-                          </select>
-                      </div>
+                    <div class="talentWrapper">
+                        <!-- Talent Amount with Live Total -->
+                        <div class="amountRow">
+                            <label class="amountLabel">Talents</label>
+                            <input type="number" id="talentAmount" min="1" max="10" value="1" step="1">
+                            <span class="totalDisplay">Total: <strong id="totalTalents">2</strong> (1 Way + 1 extra)</strong></span>
+                        </div>
 
-                      <div id="wayTalent">
-                          <div id="wayTalentName" class="talent">Choose a Way</div>
-                          <div id="wayTalentDesc" class="talentInfo"></div>
-                      </div>
+                        <div id="wayTalent">
+                            <div id="wayTalentName" class="talent">Choose a Way</div>
+                            <div id="wayTalentDesc" class="talentInfo"></div>
+                        </div>
 
-                      <!-- talentTable1 is now the Way Talent — keep it in HTML -->
-                      <div id="talentTable1" class="talent">
-                          <div class="talentHeader">
-                              <select id="talent1" class="talentSelector"></select>
-                          </div>
-                          <div id="talent1Description" class="talentInfo"></div>
-                      </div>
+                        <!-- Way Talent (always visible) -->
+                        <div id="talentTable1" class="talent">
+                            <div class="talentHeader">
+                                <select id="talent1" class="talentSelector"></select>
+                            </div>
+                            <div id="talent1Description" class="talentInfo"></div>
+                        </div>
 
-                      <!-- JS will inject talentTable2, talentTable3, talentTable4 here if needed -->
-                  </div>
+                        <!-- Extra talents injected here by JS -->
+                    </div>
 
-                  <div class="tricksWrapper">
-                      <div id="tricksHeader">
-                          Tricks
-                          <select id="tricksAmount">
-                              <option value="1">2</option>
-                              <option value="2">3</option>
-                              <option value="3">4</option>
-                          </select>
-                      </div>
-                      <!-- JS injects all trick tables here -->
-                  </div>
+                    <div class="tricksWrapper">
+                        <!-- Trick Amount with Live Total -->
+                        <div class="amountRow">
+                            <label class="amountLabel">Tricks</label>
+                            <input type="number" id="tricksAmount" min="1" max="10" value="1" step="1">
+                            <span class="totalDisplay">Total: <strong id="totalTricks">2</strong></span>
+                        </div>
+
+                        <!-- All trick tables injected here by JS -->
+                    </div>
                 </div>
-              <!-- End abilityWrapper-->
+                <!-- End abilityWrapper -->
       </article>
     <script src="script.js"></script>
     <script src="creator-scripts.js"></script>

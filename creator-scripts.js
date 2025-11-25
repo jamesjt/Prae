@@ -842,7 +842,7 @@ function addPriorityListeners() {
     });
 }
 
-// Call initial calculations on load
+// Call initial calculations on load — FINAL CLEAN VERSION
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
@@ -850,28 +850,46 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     addPriorityListeners();
     addSubListeners();
-    updateAllSkillModsAndPassives(); // Add this line
-    // Initial proficiency setup for attack skills
+    updateAllSkillModsAndPassives();
+
+    // Initial proficiency setup
     ['strike', 'blast', 'invoke'].forEach(type => {
         const rankSelect = document.getElementById(type + 'SkillRank');
         if (rankSelect) {
-            const rankValue = parseInt(rankSelect.value) || 0;
-            updateProficiencySelectors(type, rankValue);
+            updateProficiencySelectors(type, parseInt(rankSelect.value) || 0);
         }
     });
 
-    // Add event listeners for talent/trick amount changes
-    document.getElementById('talentAmount').addEventListener('change', talentAmount);
-    document.getElementById('tricksAmount').addEventListener('change', tricksAmount);
+    // ONE PLACE to handle talent/trick amount changes
+    const talentInput = document.getElementById('talentAmount');
+    const tricksInput = document.getElementById('tricksAmount');
 
-    // Set initial state
-    updateTalentTables();
-    updateTrickTables();
+    if (talentInput) talentInput.addEventListener('input', updateTotals);
+    if (tricksInput) tricksInput.addEventListener('input', updateTotals);
+
+    // Initialize everything once
+    updateTotals();
 });
 
-// New function to handle proficiency selectors visibility
+// Live totals + dynamic table updates
+function updateTotals() {
+    const talentExtra = parseInt(document.getElementById('talentAmount').value) || 1;
+    const trickExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
+
+    // Update live total display
+    const totalTalentsEl = document.getElementById('totalTalents');
+    const totalTricksEl = document.getElementById('totalTricks');
+    if (totalTalentsEl) totalTalentsEl.textContent = 1 + talentExtra;
+    if (totalTricksEl) totalTricksEl.textContent = 1 + trickExtra;
+
+    // Rebuild talent/trick tables and recalculate
+    updateTalentTables();
+    updateTrickTables();
+    calculateAbilities();
+}
+
+// Keep this function (used by attack skills)
 function updateProficiencySelectors(attackType, rankValue) {
-    // Assume up to a reasonable max, e.g., 5; adjust if needed
     const maxProf = 5;
     for (let i = 1; i <= maxProf; i++) {
         const profElement = document.getElementById(attackType + 'ProfSelector' + i);

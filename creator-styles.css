@@ -1017,3 +1017,35 @@ abbr.shieldPen::after {content: "-1 to Blast";}
 abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
 
 .attvalue{width:30px;}
+
+.amountRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.amountRow label {
+    min-width: 80px;
+}
+
+.amountRow input[type="number"] {
+    width: 70px;
+    padding: 6px;
+    font-size: 1em;
+    text-align: center;
+    border: 2px solid #555;
+    border-radius: 6px;
+}
+
+.totalDisplay {
+    color: #00cc00;
+    font-size: 1em;
+}
+
+.totalDisplay strong {
+    color: #00ff00;
+    font-size: 1.2em;
+}

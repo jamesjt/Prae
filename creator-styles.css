@@ -721,7 +721,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   text-align:center;
 }
        
-.wayTalent{background-color:rgba(88, 89, 96, 1) !important;color:white;border:none;width:100%;height:25px;} 
+.wayTalent{background-color:rgba(88, 89, 96, 1) !important;color:white !important;border:none;height:25px;} 
 .talentWrapper {width: 410px;border-radius: 8px 8px 0px 0px;margin-right:15px;}
 .talentAbility {margin-top:10px;}
 .talentSelector{background-color:rgba(88, 89, 96, 1) !important;color:white;border:none;padding-left:5px;width:100%;height:25px;}
@@ -1024,6 +1024,7 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     margin: 12px 0;
     font-weight: bold;
     font-size: 1.1em;
+    justify-content: center;
 }
 
 .amountRow label {

@@ -233,10 +233,10 @@ function updateTalentTables() {
 function updateTrickTables() {
     rebuildDynamicSelectors({
         amountInputId: 'tricksAmount',
-        containerSelector: '.tricksWrapper',
+        containerSelector: '.trickWrapper',
         itemPrefix: 'tricks',
         itemClass: 'trickAbility',
-        selectorClass: 'tricksSelector',
+        selectorClass: 'trickSelector',
         extraOffset: 1,
         populateFunction: updateTrickSelectors,
         abilityType: 'trick'

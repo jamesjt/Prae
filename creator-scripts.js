@@ -273,7 +273,7 @@ document.addEventListener('change', e => {
         populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
         calculateAbilities();
     }
-    else if (t.matches('.tricksSelector')) {
+    else if (t.matches('.trickSelector')) {
         populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
         calculateAbilities();
     }
@@ -357,7 +357,7 @@ function updateTalentSelectors() {
 
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
-    document.querySelectorAll('.tricksSelector').forEach(sel => {
+    document.querySelectorAll('.trickSelector').forEach(sel => {
         const cur = sel.value;
         sel.innerHTML = '<option value="">—</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;

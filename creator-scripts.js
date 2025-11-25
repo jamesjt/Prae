@@ -399,19 +399,22 @@ function updateWayOptions() {
 }
 
 function updateTalentSelectors() {
+    // Capture existing selections
+    const previousValues = Array.from(document.querySelectorAll('.talentSelector'))
+        .map(s => s.value);
+
     const qualified = getQualifiedAbilities('talent');
 
-    document.querySelectorAll('.talentSelector').forEach(select => {
-        const currentValue = select.value;
+    document.querySelectorAll('.talentSelector').forEach((select, index) => {
+        const prev = previousValues[index];
 
         let html = '<option value="">—</option>';
         qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        if (currentValue && qualified.some(a => a.name === currentValue)) {
-            select.value = currentValue;
-        } else {
-            select.value = '';
+        // Restore selection if still valid
+        if (prev && qualified.some(a => a.name === prev)) {
+            select.value = prev;
         }
 
         const desc = document.getElementById(select.id + 'Description');
@@ -433,21 +436,24 @@ function updateTalentSelectors() {
     });
 }
 
+
 function updateTrickSelectors() {
+    // Capture existing selections
+    const previousValues = Array.from(document.querySelectorAll('.tricksSelector'))
+        .map(s => s.value);
+
     const qualified = getQualifiedAbilities('trick');
-    document.querySelectorAll('.tricksSelector').forEach(select => {
-        const currentValue = select.value;
+
+    document.querySelectorAll('.tricksSelector').forEach((select, index) => {
+        const prev = previousValues[index];
 
         let html = '<option value="">—</option>';
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        if (currentValue && qualified.some(a => a.name === currentValue)) {
-            select.value = currentValue;
-        } else {
-            select.value = '';
+        // Restore if still legal
+        if (prev && qualified.some(a => a.name === prev)) {
+            select.value = prev;
         }
 
         const desc = document.getElementById(select.id + 'Description');
@@ -460,14 +466,15 @@ function updateTrickSelectors() {
         }
 
         select.onchange = () => {
-            const descEl = document.getElementById(select.id + 'Description');
-            if (descEl) descEl.innerHTML = '';
-            if (select.value) {
-                populateAbilityInfo(select.id, qualified, 'trick');
+            const ability = qualified.find(a => a.name === select.value);
+            if (desc) {
+                desc.innerHTML = '';
+                if (ability) populateAbilityInfo(select.id, [ability], 'trick');
             }
         };
     });
 }
+
 // Helper to get qualified abilities by type
 function getQualifiedAbilities(abilityType) {
     const qualified = [];

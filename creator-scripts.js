@@ -87,6 +87,7 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
+        console.log('Abilities Data:', abilitiesData);
         updateTalentSelectors();
         updateTrickSelectors();
     })
@@ -165,7 +166,7 @@ fetch(PROF_CSV_URL)
 function rebuildDynamicSelectors(config) {
     const {
         amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
-        descriptionSuffix = 'Description', extraOffset = 0, populateFunction
+        descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
 
     const amount = (parseInt(document.getElementById(amountInputId)?.value) || 1) + extraOffset;
@@ -196,7 +197,10 @@ function rebuildDynamicSelectors(config) {
 
     for (let i = 1; i <= amount; i++) {
         const select = document.getElementById(`${itemPrefix}${i}`);
-        if (select && saved[i]) select.value = saved[i];
+        if (select && saved[i]) {
+            select.value = saved[i];
+            populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
+        }
     }
 
     calculateAbilities();
@@ -209,7 +213,8 @@ function updateTalentTables() {
         itemPrefix: 'talent',
         itemClass: 'talent',
         selectorClass: 'talentSelector',
-        populateFunction: updateTalentSelectors
+        populateFunction: updateTalentSelectors,
+        abilityType: 'talent'
     });
 }
 
@@ -221,7 +226,8 @@ function updateTrickTables() {
         itemClass: 'ability-trick',
         selectorClass: 'tricksSelector',
         extraOffset: 1,
-        populateFunction: updateTrickSelectors
+        populateFunction: updateTrickSelectors,
+        abilityType: 'trick'
     });
 }
 
@@ -230,7 +236,6 @@ function updateTrickTables() {
 document.addEventListener('change', e => {
     const t = e.target;
 
-    // Talents & Tricks
     if (t.matches('.talentSelector')) {
         populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
         calculateAbilities();
@@ -239,8 +244,6 @@ document.addEventListener('change', e => {
         populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
         calculateAbilities();
     }
-
-    // Skill Ranks
     else if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
         updateWayOptions();
@@ -254,8 +257,6 @@ document.addEventListener('change', e => {
         updateTalentSelectors();
         updateTrickSelectors();
     }
-
-    // Priorities & Level
     else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
         calculateAttributeValues();
         updateAttributeGroups();
@@ -263,8 +264,6 @@ document.addEventListener('change', e => {
         calculateSkillPoints();
         calculateAbilities();
     }
-
-    // Sub-attributes
     else if (t.matches('input[id$="Value"][type="number"]')) {
         const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
                      t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
@@ -272,15 +271,19 @@ document.addEventListener('change', e => {
         updateAttributeGroup(group);
         updateSkillsForMod(t.id);
     }
-
-    // Talent/Trick Amount
     else if (t.matches('#talentAmount, #tricksAmount')) {
         updateTotals();
     }
-
-    // Way Selector
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
+    }
+    else if (t.matches('.gearSelector')) {
+        const i = t.id.replace('gearSelect', '');
+        const selectedOption = t.options[t.selectedIndex];
+        const load = selectedOption.getAttribute('data-load') || '';
+        const loadDiv = document.getElementById('gearLoad' + i);
+        if (loadDiv) loadDiv.textContent = load;
+        calculateLoad();
     }
 });
 
@@ -339,7 +342,7 @@ function populateAbilityInfo(selectId, abilities, type) {
     if (!desc || !ability) { desc.innerHTML = ''; return; }
 
     desc.innerHTML = '';
-    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect'];
+    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
         const ia = order.indexOf(a.toLowerCase());
         const ib = order.indexOf(b.toLowerCase());
@@ -375,14 +378,20 @@ function populateRoleInfo(e) {
     const skillId = SKILL_ID_MAP[attackSkill];
     if (skillId) {
         const sel = document.getElementById(skillId);
-        if (sel && parseInt(sel.value) < 2) sel.value = '2';
+        if (sel && parseInt(sel.value) < 2) {
+            sel.value = '2';
+            sel.dispatchEvent(new Event('change'));
+        }
     }
 
     const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
     if (primary) {
         const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
         const pri = document.getElementById(map[primary]);
-        if (pri) pri.value = '1';
+        if (pri) {
+            pri.value = '1';
+            pri.dispatchEvent(new Event('change'));
+        }
     }
 
     calculateAttributeValues();
@@ -496,6 +505,18 @@ function updateProficiencySelectors(type, rank) {
         const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
+}
+
+function calculateLoad() {
+    let totalLoad = 0;
+    for (let i = 1; i <= 12; i++) {
+        const select = document.getElementById('gearSelect' + i);
+        if (select) {
+            const load = parseInt(select.options[select.selectedIndex]?.getAttribute('data-load')) || 0;
+            totalLoad += load;
+        }
+    }
+    console.log('Total Load:', totalLoad);
 }
 
 // ———————————————————————— INIT ————————————————————————

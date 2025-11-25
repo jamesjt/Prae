@@ -42,8 +42,8 @@
                 <div id="charInfo">
                     <input id="charName" class="charText" type="text" placeholder="Character name">
                     <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1">
-                    <input id="childhood" class="charText" type="text" placeholder="Childhood">
-                    <input id="training" class="charText" type="text" placeholder="Adolescence">
+                    <input id="childhood" class="charText" type="text" placeholder="Youth">
+                    <input id="training" class="charText" type="text" placeholder="Stirring">
                     <select id="roleSelector">
                       <option value="">Way</option>
                     </select>
@@ -116,7 +116,7 @@
                       </div>
                     </div>
 
-                    <img id="showCharDesc" class="charInfoHover" onclick="showDesc('charDesc');" src="imgs/charDesc.png">
+                    <img id="showCharDesc" class="charInfoHover" onclick="showDesc('charDesc');" src="images/details.png">
                     <div id="charDesc" class="charDetails draggable">
                       <div id="hideCharDesc" class="closeRitual" onclick="hideDesc('charDesc');">-</div>
                       Height <input id="charHeight" type="text">
@@ -127,7 +127,7 @@
                       <br/>
                       <textarea id="charDescription" placeholder="Describe yourself here..."></textarea>
                     </div>
-                    <img id="showCharStory" class="charInfoHover" onclick="showDesc('charStory');" src="imgs/charStory.png">
+                    <img id="showCharStory" class="charInfoHover" onclick="showDesc('charStory');" src="images/details.png">
                     <div id="charStory" class="charDetails draggable">
                       <div id="hideCharStory" class="closeRitual" onclick="hideDesc('charStory');">-</div>
                       Birth Place <input id="birthPlace" type="text">
@@ -135,33 +135,13 @@
                       <textarea id="trainingStory" placeholder="Story of your Training and how you came to your way..."></textarea>
                       <textarea id="journalStory" placeholder="Journal..."></textarea>
                     </div>
-                    <img id="showCharPersonality" class="charInfoHover" onclick="showDesc('charPersonality');" src="imgs/charStory.png">
+                    <img id="showCharPersonality" class="charInfoHover" onclick="showDesc('charPersonality');" src="images/details.png">
                     <div id="charPersonality" class="charDetails draggable">
                       <div id="hideCharPersonality" class="closeRitual" onclick="hideDesc('charPersonality');">-</div>
                       Current Goal in Life <input id="charPurpose" type="text">
                       Values...will be flushed out with world.
                     </div>
-                    <img id="showBackpack" class="charInfoHover" onclick="showDesc('backpack');" src="imgs/backpack.png">
-                    <div id="backpack" class="charDetails draggable flexRow">
-                      <div id="hideBackpack" class="closeRitual" onclick="hideDesc('backpack');">-</div>
-                      <br/>
-                      <input id="gear1" class="gearInput" type="text">
-                      <input id="gear2" class="gearInput" type="text">
-                      <input id="gear3" class="gearInput" type="text">
-                      <input id="gear4" class="gearInput" type="text">
-                      <input id="gear5" class="gearInput" type="text">
-                      <input id="gear6" class="gearInput" type="text">
-                      <input id="gear7" class="gearInput" type="text">
-                      <input id="gear8" class="gearInput" type="text">
-                      <input id="gear9" class="gearInput" type="text">
-                      <input id="gear10" class="gearInput" type="text">
-                      <input id="gear11" class="gearInput" type="text">
-                      <input id="gear12" class="gearInput" type="text">
-                      <br/>
-                      <textarea id="gearBucket"></textarea>
-
-                    </div>
-                    <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="imgs/notes.png">
+                    <img id="showNotes" class="charInfoHover" onclick="showDesc('notes');" src="images/details.png">
                     <div id="notes" class="charDetails draggable">
                       <div id="hideNotes" class="closeRitual" onclick="hideDesc('notes');">-</div>
                       <br/>
@@ -954,7 +934,7 @@
                 <div id="column3">
                   <div class="gearListContainer">
                     <div class="gearEntryHeader">
-                      <div style="width:130px">Gear Slots
+                      <div class="gearSelector">Gear
                       </div>
                       <div class="gearLoad">Load
                       </div>

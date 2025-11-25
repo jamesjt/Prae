@@ -284,7 +284,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #armorValue{
     position:relative;
-    top:-37px;
     left: 17px;
     width: 8px;
 }
@@ -340,7 +339,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #paceValue {
     position:relative;
-    top: -18px;
     left: 8px;
     color:white;
     font-size:20px;
@@ -354,7 +352,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #recoveryValue {
     position:relative;
-    top: -37px;
     left:14px;
     width: 8px;
 }
@@ -370,7 +367,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #initiativeValue {
     position:relative;
-    top:-36px;
     left: 10px;
     width: 20px;
     text-align:center;
@@ -389,7 +385,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #initialMomentumValue {
     position:relative;
-    top:-36px;
     left: 10px;
     width: 20px;
     text-align:center;
@@ -422,7 +417,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #manaValue{
     position:relative;
-    top:-17px;
+
     left: -23px;
     width: 8px;
 }
@@ -435,7 +430,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #conversionValue {
     position:relative;
-    top:-36px;
     left: 16px;
     color:whitesmoke;
     font-size: 20px;
@@ -536,7 +530,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 
 .gearListContainer{
-    background-color: #5C5650;
+    background-color: #6F6A63;
     width:240px;
 }
 /* gear colors 
@@ -553,10 +547,10 @@ dark leather: #5E4634
   flex-wrap: wrap;
 }
 
-.gearEntryHeader{background-color: black; display: flex;}
+.gearEntryHeader{background-color: black; display: flex;font-size:14px; color:white;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
-.gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #5C5650;color:whitesmoke;}
+.gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #6F6A63;color:whitesmoke;}
 
 #ritualList {
   background-color:#9BAABF;

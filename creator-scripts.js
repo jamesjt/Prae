@@ -674,17 +674,23 @@ function tricksAmount() {
     updateTrickTables();
 }
 
-// === TALENTS (Way Talent + Extra Talents) ===
 function updateTalentTables() {
     const amountSelect = document.getElementById('talentAmount');
-    const extraCount = parseInt(amountSelect.value) || 1;  // 1 = 1 extra → total 2 talents (Way +1)
+    const extraCount = parseInt(amountSelect.value) || 1;
 
     const container = document.querySelector('.talentWrapper');
 
-    // Remove only the dynamically created talent tables (keep wayTalent and amount selector)
-    container.querySelectorAll('[id^="talentTable"]').forEach(el => el.remove());
+    // 1. SAVE current selections before destroying anything
+    const savedSelections = {};
+    for (let i = 1; i <= 20; i++) {
+        const sel = document.getElementById(`talent${i}`);
+        if (sel) savedSelections[i] = sel.value;
+    }
 
-    // Create the correct number of extra talent slots
+    // Remove only dynamic talent tables (keep wayTalent and amount row)
+    container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
+
+    // Rebuild the correct number of slots
     for (let i = 1; i <= extraCount; i++) {
         const table = document.createElement('div');
         table.id = `talentTable${i}`;
@@ -700,22 +706,38 @@ function updateTalentTables() {
         container.appendChild(table);
     }
 
-    // Re-populate all talent selectors
     updateTalentSelectors();
+
+    // 2. RESTORE saved selections and update descriptions
+    for (let i = 1; i <= extraCount; i++) {
+        const select = document.getElementById(`talent${i}`);
+        if (select && savedSelections[i]) {
+            select.value = savedSelections[i];
+            select.dispatchEvent(new Event('change'));
+        }
+    }
+
     calculateAbilities();
 }
 
-// === TRICKS ===
+// FIXED: Tricks — now preserves your selections when changing amount
 function updateTrickTables() {
     const amountSelect = document.getElementById('tricksAmount');
-    const totalTricks = (parseInt(amountSelect.value) || 1) + 1;  // value=1 → 2 tricks
+    const totalTricks = (parseInt(amountSelect.value) || 1) + 1;
 
     const container = document.querySelector('.tricksWrapper');
+
+    // 1. SAVE current selections
+    const savedSelections = {};
+    for (let i = 1; i <= 20; i++) {
+        const sel = document.getElementById(`tricks${i}`);
+        if (sel) savedSelections[i] = sel.value;
+    }
 
     // Remove all existing trick tables
     container.querySelectorAll('[id^="tricksTable"]').forEach(el => el.remove());
 
-    // Create exactly the number needed
+    // Rebuild
     for (let i = 1; i <= totalTricks; i++) {
         const table = document.createElement('div');
         table.id = `tricksTable${i}`;
@@ -730,6 +752,16 @@ function updateTrickTables() {
     }
 
     updateTrickSelectors();
+
+    // 2. RESTORE saved selections
+    for (let i = 1; i <= totalTricks; i++) {
+        const select = document.getElementById(`tricks${i}`);
+        if (select && savedSelections[i]) {
+            select.value = savedSelections[i];
+            select.dispatchEvent(new Event('change'));
+        }
+    }
+
     calculateAbilities();
 }
 
@@ -942,12 +974,11 @@ function updateTotals() {
     if (totalTalentsEl) totalTalentsEl.textContent = 1 + talentExtra;
     if (totalTricksEl) totalTricksEl.textContent = 1 + trickExtra;
 
-    // Rebuild talent/trick tables and recalculate
+    // These now preserve selections!
     updateTalentTables();
     updateTrickTables();
     calculateAbilities();
 }
-
 // Keep this function (used by attack skills)
 function updateProficiencySelectors(attackType, rankValue) {
     const maxProf = 5;

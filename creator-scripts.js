@@ -112,10 +112,7 @@ let abilitiesData = {}; // { skillLower: [{type: 'talent'|'trick', name, details
 
 // Fetch and process abilities (talents and tricks)
 fetch(ABILITIES_CSV_URL)
-    .then(r => { 
-        if (!r.ok) throw new Error(`Failed to load abilities CSV: ${r.status} ${r.statusText}`);
-        return r.text(); 
-    })
+    .then(r => { if (!r.ok) throw Error(r crucially.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
         const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
@@ -130,9 +127,12 @@ fetch(ABILITIES_CSV_URL)
                 const key = keyCell ? keyCell.trim() : '';
                 const value = valueCell ? valueCell.trim() : '';
 
-                // Detect start of new ability: "Talent 1 Name", "Trick 2 Name", etc.
+                // Detect start of new ability: "Talent 1 Name", "Trick 2 Name", "Ritual 1 Name"
                 if (key.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
-                    if (currentAbility) saveAbility(skill, currentAbility);
+                    // Save previous ability
+                    if (currentAbility) {
+                        saveAbility(skill, currentAbility);
+                    }
 
                     const typeMatch = key.match(/^(Talent|Trick|Ritual)/i);
                     const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
@@ -144,13 +144,18 @@ fetch(ABILITIES_CSV_URL)
                         details: {}
                     };
                 }
-                // Add detail lines
+                // Add detail lines (Keywords, Cost, Effect, etc.)
                 else if (currentAbility && key && key.includes(' ')) {
+                    // Extract the actual key name: "Trick 1 Keywords" → "Keywords"
                     const detailKey = key.split(' ').slice(2).join(' ');
                     currentAbility.details[detailKey] = value;
                 }
             }
-            if (currentAbility) saveAbility(skill, currentAbility);
+
+            // Save the last ability
+            if (currentAbility) {
+                saveAbility(skill, currentAbility);
+            }
         });
 
         function saveAbility(skill, ability) {
@@ -162,9 +167,8 @@ fetch(ABILITIES_CSV_URL)
         updateTalentSelectors();
         updateTrickSelectors();
     })
-    .catch(err => {
-        console.error('Error loading Abilities CSV:', err);
-    });
+    .catch(err => console.error('Error loading Abilities CSV:', err));
+
 // Fetch and process ways
 fetch(WAYS_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })

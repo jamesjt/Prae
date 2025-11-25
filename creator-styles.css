@@ -720,15 +720,17 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   border-radius: 8px 8px 0px 0px;
   text-align:center;
 }
-        
+       
+.wayTalent{background-color:rgba(88, 89, 96, 1) !important;color:white;border:none;padding-left:5px;width:100%;height:25px;} 
 .talentWrapper {width: 410px;border-radius: 8px 8px 0px 0px;margin-right:15px;}
-.trickWrapper {width:500px;}
-.talent{margin-top:15px;}
+.talentAbility {margin-top:15px;}
 .talentSelector{background-color:rgba(88, 89, 96, 1) !important;color:white;border:none;padding-left:5px;width:100%;height:25px;}
-.trickSelector{background-color:#6a877d !important;color:white;border:none;padding-left:5px;width:100%;height:25px;}
-.trick {margin-top: 15px;}
 .talentAbility div:nth-of-type(2n+1){color:black;background-color: rgba(217,217,217,1);padding:0px 5px;}
 .talentAbility div:nth-of-type(2n){color:black;background-color: rgba(239,239,239,1);padding:0px 5px;}
+
+.trickWrapper {width:500px;}
+.trickAbility {margin-top: 15px;}
+.trickSelector {background-color:#6a877d !important;color:white;border:none;padding-left:5px;width:100%;height:25px;}
 .trickAbility div:nth-of-type(2n+1){color:black;background-color: rgba(217,217,217,1);padding:0px 5px;}
 .trickAbility div:nth-of-type(2n){color:black;background-color: rgba(239,239,239,1);padding:0px 5px;}
 

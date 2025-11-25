@@ -85,7 +85,7 @@
   padding:25px;
   border-radius:8px;
   box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
-  background: url('../imgs/scrollBackground4.png') no-repeat center top;
+  /*background: url('../imgs/scrollBackground4.png') no-repeat center top;*/
   background-size: 100% 100%;
   cursor: all-scroll;
   z-index: 100;

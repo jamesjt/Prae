@@ -433,7 +433,6 @@ function updateTalentSelectors() {
     });
 }
 
-
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
     document.querySelectorAll('.tricksSelector').forEach(select => {
@@ -916,6 +915,10 @@ window.addEventListener('load', () => {
             updateProficiencySelectors(type, parseInt(rankSelect.value) || 0);
         }
     });
+    const roleSelector = document.getElementById('roleSelector');
+    if (roleSelector) {
+        roleSelector.addEventListener('change', populateRoleInfo);
+    }
 
     // ONE PLACE to handle talent/trick amount changes
     const talentInput = document.getElementById('talentAmount');

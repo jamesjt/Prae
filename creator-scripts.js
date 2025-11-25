@@ -576,15 +576,16 @@ function populateRoleInfo(event) {
         }
 
         // Set the attack/required skill to 3:Trained if not already higher
-        const attackSkill = (way.props[Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'))] || way.reqSkill) || way.reqSkill;
+        const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
         const skillId = SKILL_ID_MAP[attackSkill];
         if (skillId) {
             const skillSelect = document.getElementById(skillId);
             if (skillSelect && parseInt(skillSelect.value) < 2) {
-                skillSelect.value = '2';  // ← Trained = value 2
+                skillSelect.value = '2';
                 skillSelect.dispatchEvent(new Event('change'));
             }
         }
+
         // Set the attack type skill rank to 2 if not already higher
         const attackType = attackSkillKey ? way.props[attackSkillKey].trim() : '';
         const attackRankIdMap = {

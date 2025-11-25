@@ -231,11 +231,12 @@ function updateTrickTables() {
     });
 }
 
-// ———————————————————————— ONE EVENT LISTENER FOR EVERYTHING ————————————————————————
+// ———————————————————————— ONE EVENT LISTENER FOR EVERYTHING (FIXED!) ————————————————————————
 
 document.addEventListener('change', e => {
     const t = e.target;
 
+    // Talents & Tricks — now only rebuild their own section!
     if (t.matches('.talentSelector')) {
         populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
         calculateAbilities();
@@ -244,6 +245,8 @@ document.addEventListener('change', e => {
         populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
         calculateAbilities();
     }
+
+    // Skill Ranks
     else if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
         updateWayOptions();
@@ -257,6 +260,8 @@ document.addEventListener('change', e => {
         updateTalentSelectors();
         updateTrickSelectors();
     }
+
+    // Priorities & Level
     else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
         calculateAttributeValues();
         updateAttributeGroups();
@@ -264,6 +269,8 @@ document.addEventListener('change', e => {
         calculateSkillPoints();
         calculateAbilities();
     }
+
+    // Sub-attributes
     else if (t.matches('input[id$="Value"][type="number"]')) {
         const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
                      t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
@@ -271,12 +278,29 @@ document.addEventListener('change', e => {
         updateAttributeGroup(group);
         updateSkillsForMod(t.id);
     }
-    else if (t.matches('#talentAmount, #tricksAmount')) {
-        updateTotals();
+
+    // Talent Amount — ONLY rebuild talents
+    else if (t.matches('#talentAmount')) {
+        const tExtra = parseInt(t.value) || 1;
+        document.getElementById('totalTalents').textContent = 1 + tExtra;
+        updateTalentTables();     // Only talents
+        calculateAbilities();
     }
+
+    // Trick Amount — ONLY rebuild tricks
+    else if (t.matches('#tricksAmount')) {
+        const trExtra = parseInt(t.value) || 1;
+        document.getElementById('totalTricks').textContent = 1 + trExtra;
+        updateTrickTables();      // Only tricks
+        calculateAbilities();
+    }
+
+    // Way Selector
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
     }
+
+    // Gear Selectors
     else if (t.matches('.gearSelector')) {
         const i = t.id.replace('gearSelect', '');
         const selectedOption = t.options[t.selectedIndex];
@@ -397,16 +421,6 @@ function populateRoleInfo(e) {
     calculateAttributeValues();
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
-}
-
-function updateTotals() {
-    const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
-    const trExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
-    document.getElementById('totalTalents').textContent = 1 + tExtra;
-    document.getElementById('totalTricks').textContent = 1 + trExtra;
-    updateTalentTables();
-    updateTrickTables();
-    calculateAbilities();
 }
 
 function calculateSkillPoints() {

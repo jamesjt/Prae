@@ -364,68 +364,28 @@ function updateWayOptions() {
 // Function to populate talent selectors
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
-    document.querySelectorAll('.talentSelector').forEach(select => {
-        const wasSelected = select.value;
-        let html = '<option value="">—</option>';
-        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
+    const selects = document.querySelectorAll('.talentSelector');
+    selects.forEach((select) => {
+        let html = '<option value=""></option>';
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
         select.innerHTML = html;
-
-        if (wasSelected && qualified.some(a => a.name === wasSelected)) {
-            select.value = wasSelected;
-        } else {
-            select.value = '';
-        }
-
-        const desc = document.getElementById(select.id + 'Description');
-        if (desc) {
-            desc.innerHTML = '';
-            if (select.value) {
-                const ability = qualified.find(a => a.name === select.value);
-                if (ability) populateAbilityInfo(select.id, [ability], 'talent');
-            }
-        }
-
-        select.onchange = () => {
-            const descEl = document.getElementById(select.id + 'Description');
-            if (descEl) descEl.innerHTML = '';
-            if (select.value) {
-                populateAbilityInfo(select.id, qualified, 'talent');
-            }
-        };
+        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'talent'));
     });
 }
 
 // Function to populate trick selectors
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
-    document.querySelectorAll('.tricksSelector').forEach(select => {
-        const wasSelected = select.value;
-        let html = '<option value="">—</option>';
-        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
+    const selects = document.querySelectorAll('.tricksSelector');
+    selects.forEach((select) => {
+        let html = '<option value=""></option>';
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
         select.innerHTML = html;
-
-        if (wasSelected && qualified.some(a => a.name === wasSelected)) {
-            select.value = wasSelected;
-        } else {
-            select.value = '';
-        }
-
-        const desc = document.getElementById(select.id + 'Description');
-        if (desc) {
-            desc.innerHTML = '';
-            if (select.value) {
-                const ability = qualified.find(a => a.name === select.value);
-                if (ability) populateAbilityInfo(select.id, [ability], 'trick');
-            }
-        }
-
-        select.onchange = () => {
-            const descEl = document.getElementById(select.id + 'Description');
-            if (descEl) descEl.innerHTML = '';
-            if (select.value) {
-                populateAbilityInfo(select.id, qualified, 'trick');
-            }
-        };
+        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'trick'));
     });
 }
 
@@ -760,25 +720,38 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     addPriorityListeners();
     addSubListeners();
-    updateAllSkillModsAndPassives();
-
-    // Initial proficiency setup
+    updateAllSkillModsAndPassives(); // Add this line
+    // Initial proficiency setup for attack skills
     ['strike', 'blast', 'invoke'].forEach(type => {
         const rankSelect = document.getElementById(type + 'SkillRank');
         if (rankSelect) {
-            updateProficiencySelectors(type, parseInt(rankSelect.value) || 0);
+            const rankValue = parseInt(rankSelect.value) || 0;
+            updateProficiencySelectors(type, rankValue);
         }
     });
+    // Add event listeners for talent/trick amount changes (replaces missing HTML onchange)
+    document.getElementById('talentAmount').addEventListener('change', (event) => {
+        talentAmount(event);
+        setAbilityAmount(event);
+    });
+    document.getElementById('tricksAmount').addEventListener('change', (event) => {
+        tricksAmount(event);
+        setAbilityAmount(event);
+    });
 
-    // === ALL LISTENERS IN ONE PLACE ===
-    const talentInput = document.getElementById('talentAmount');
-    const tricksInput = document.getElementById('tricksAmount');
-    const roleSelect = document.getElementById('roleSelector');
-
-    if (talentInput) talentInput.addEventListener('input', updateTotals);
-    if (tricksInput) tricksInput.addEventListener('input', updateTotals);
-    if (roleSelect) roleSelect.addEventListener('change', populateRoleInfo); 
-
-    // Initialize everything
-    updateTotals();
+    // Set initial visibility based on default amounts
+    talentAmount({ target: document.getElementById('talentAmount') });
+    tricksAmount({ target: document.getElementById('tricksAmount') });
 });
+
+// New function to handle proficiency selectors visibility
+function updateProficiencySelectors(attackType, rankValue) {
+    // Assume up to a reasonable max, e.g., 5; adjust if needed
+    const maxProf = 5;
+    for (let i = 1; i <= maxProf; i++) {
+        const profElement = document.getElementById(attackType + 'ProfSelector' + i);
+        if (profElement) {
+            profElement.hidden = i > rankValue;
+        }
+    }
+}

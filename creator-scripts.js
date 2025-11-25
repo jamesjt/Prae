@@ -112,86 +112,67 @@ let abilitiesData = {}; // { skillLower: [{type: 'talent'|'trick', name, details
 
 // Fetch and process abilities (talents and tricks)
 fetch(ABILITIES_CSV_URL)
-    .then(r => { 
-        if (!r.ok) throw new Error(`Failed to load abilities CSV: ${r.status} ${r.statusText}`);
-        return r.text(); 
-    })
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
-        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
-
+        console.log('Parsed Abilities Rows:', rows);
+        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase()); // Skills from row 0, col 1+
         skills.forEach((skill, colIndex) => {
+            let currentType = '';
             let currentAbility = null;
-
-            for (let r = 1; r < rows.length; r++) {
-                const keyCell = rows[r][0];
-                const valueCell = rows[r][colIndex + 1];
-
-                const key = keyCell ? keyCell.trim() : '';
-                const value = valueCell ? valueCell.trim() : '';
-
-                // Detect start of new ability: "Talent 1 Name", "Trick 2 Name", etc.
-                if (key.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
-                    if (currentAbility) saveAbility(skill, currentAbility);
-
-                    const typeMatch = key.match(/^(Talent|Trick|Ritual)/i);
-                    const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
-
-                    currentAbility = {
-                        type: type,
-                        name: value || `(Unnamed ${type})`,
-                        skill: skill,
-                        details: {}
-                    };
+            rows.slice(1).forEach(row => {
+                const key = row[0].trim().toLowerCase();
+                const value = row[colIndex + 1] ? row[colIndex + 1].trim() : '';
+                if (key === 'talent' || key === 'trick') {
+                    if (currentAbility) {
+                        saveAbility(skill, currentAbility);
+                    }
+                    currentType = key;
+                    currentAbility = { type: currentType, name: value || '', details: {} };
+                } else if (currentAbility && key && value) {
+                    currentAbility.details[key] = value;
+                } else if (!key && !value && currentAbility) { // Empty row ends block
+                    saveAbility(skill, currentAbility);
+                    currentAbility = null;
                 }
-                // Add detail lines
-                else if (currentAbility && key && key.includes(' ')) {
-                    const detailKey = key.split(' ').slice(2).join(' ');
-                    currentAbility.details[detailKey] = value;
-                }
+            });
+            if (currentAbility) {
+                saveAbility(skill, currentAbility);
             }
-            if (currentAbility) saveAbility(skill, currentAbility);
         });
-
         function saveAbility(skill, ability) {
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
-
         console.log('Abilities Data:', abilitiesData);
-        updateTalentSelectors();
+        updateTalentSelectors(); // Initial
         updateTrickSelectors();
     })
     .catch(err => {
         console.error('Error loading Abilities CSV:', err);
     });
+
 // Fetch and process ways
 fetch(WAYS_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
-
         // Log rows for debugging
         console.log('Parsed Rows:', rows);
-
         // Find include row - make matching case-insensitive and trim
         let includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
-
         if (includeRowIdx === -1) {
             console.error('Missing "Include" row in Ways CSV');
             return;
         }
-
         const includeRow = rows[includeRowIdx];
-
         // Log include row
         console.log('Include Row:', includeRow);
-
         // Collect ways where include === 'TRUE' or 'true' or '1'
         for (let col = 1; col < includeRow.length; col++) {
             const includeValue = (includeRow[col] || '').toUpperCase().trim();
             console.log(`Column ${col} Include: ${includeValue}`);
-            if (includeValue === 'TRUE' || includeValue === '1') {  // Handle possible '1' for checkbox
+            if (includeValue === 'TRUE' || includeValue === '1') { // Handle possible '1' for checkbox
                 const props = {};
                 rows.forEach((row, rowIdx) => {
                     const key = (row[0] || '').trim().toLowerCase();
@@ -199,16 +180,12 @@ fetch(WAYS_CSV_URL)
                         props[key] = (row[col] || '').trim();
                     }
                 });
-
                 // Log props for this column
                 console.log(`Props for Column ${col}:`, props);
-
                 const nameKey = Object.keys(props).find(k => k.includes('way name'));
                 const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
-
                 const name = nameKey ? props[nameKey] : '';
                 const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
-
                 if (name && reqSkill) {
                     const normalizedReqSkill = reqSkill.trim(); // Exact match
                     const skillId = normalizedReqSkill === 'Any' ? 'Any' : SKILL_ID_MAP[normalizedReqSkill];
@@ -223,10 +200,8 @@ fetch(WAYS_CSV_URL)
                 }
             }
         }
-
         // Log final waysData
         console.log('Final Ways Data:', waysData);
-
         populateRoleSelector();
         addSkillListeners();
         updateWayOptions(); // Initial check
@@ -240,16 +215,13 @@ fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
-
         // Assume first row is headers
         const headers = rows[0].map(h => h.trim().toLowerCase());
-
         const strikeCol = headers.findIndex(h => h.includes('strike'));
         const blastCol = headers.findIndex(h => h.includes('blast'));
         const invokeCol = headers.findIndex(h => h.includes('invoke'));
         const gearCol = headers.findIndex(h => h.includes('gear'));
         const loadCol = headers.findIndex(h => h.includes('load'));
-
         if (strikeCol !== -1) {
             profData.strike = rows.slice(1).map(row => row[strikeCol].trim()).filter(v => v);
         }
@@ -259,23 +231,19 @@ fetch(PROF_CSV_URL)
         if (invokeCol !== -1) {
             profData.invoke = rows.slice(1).map(row => row[invokeCol].trim()).filter(v => v);
         }
-
         if (gearCol !== -1 && loadCol !== -1) {
             gearData = rows.slice(1).map(row => ({
                 gear: row[gearCol].trim(),
                 load: row[loadCol].trim()
             })).filter(g => g.gear);
         }
-
         // Log for debugging
         console.log('Proficiency Data:', profData);
         console.log('Gear Data:', gearData);
-
         // Populate all selects for each type
         populateProfSelects('strike', profData.strike);
         populateProfSelects('blast', profData.blast);
         populateProfSelects('invoke', profData.invoke);
-
         // Populate gear selects
         populateGearSelects();
     })
@@ -309,7 +277,6 @@ function populateGearSelects() {
                 html += `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`;
             });
             select.innerHTML = html;
-
             // Add change listener
             select.addEventListener('change', () => {
                 const selectedOption = select.options[select.selectedIndex];
@@ -394,36 +361,30 @@ function updateWayOptions() {
     });
 }
 
+// Function to populate talent selectors
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(select => {
-        const currentValue = select.value;  // Save what was selected
-
-        // Rebuild options
+        const wasSelected = select.value;
         let html = '<option value="">—</option>';
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        // Re-select if still valid
-        if (currentValue && qualified.some(a => a.name === currentValue)) {
-            select.value = currentValue;
+        if (wasSelected && qualified.some(a => a.name === wasSelected)) {
+            select.value = wasSelected;
         } else {
-            select.value = '';  // Clear if no longer valid
+            select.value = '';
         }
 
-        // Always clear + repopulate description on change
         const desc = document.getElementById(select.id + 'Description');
         if (desc) {
-            desc.innerHTML = '';  // Clear old
+            desc.innerHTML = '';
             if (select.value) {
                 const ability = qualified.find(a => a.name === select.value);
                 if (ability) populateAbilityInfo(select.id, [ability], 'talent');
             }
         }
 
-        // Re-attach handler
         select.onchange = () => {
             const descEl = document.getElementById(select.id + 'Description');
             if (descEl) descEl.innerHTML = '';
@@ -434,19 +395,17 @@ function updateTalentSelectors() {
     });
 }
 
+// Function to populate trick selectors
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
     document.querySelectorAll('.tricksSelector').forEach(select => {
-        const currentValue = select.value;
-
+        const wasSelected = select.value;
         let html = '<option value="">—</option>';
-        qualified.forEach(a => {
-            html += `<option value="${a.name}">${a.name}</option>`;
-        });
+        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
         select.innerHTML = html;
 
-        if (currentValue && qualified.some(a => a.name === currentValue)) {
-            select.value = currentValue;
+        if (wasSelected && qualified.some(a => a.name === wasSelected)) {
+            select.value = wasSelected;
         } else {
             select.value = '';
         }
@@ -469,6 +428,7 @@ function updateTrickSelectors() {
         };
     });
 }
+
 // Helper to get qualified abilities by type
 function getQualifiedAbilities(abilityType) {
     const qualified = [];
@@ -488,12 +448,9 @@ function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId).value;
     const ability = abilities.find(a => a.name === value);
     if (!ability) return;
-
     const descElement = document.getElementById(selectId + 'Description');
     if (!descElement) return;
-
     descElement.innerHTML = ''; // Clear previous
-
     const keyOrder = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     const labelMap = {
         keywords: 'Keywords',
@@ -506,7 +463,6 @@ function populateAbilityInfo(selectId, abilities, type) {
         enhancements: 'Enhancements',
         augments: 'Augments'
     };
-
     const sortedKeys = Object.keys(ability.details).sort((a, b) => {
         const ia = keyOrder.indexOf(a.toLowerCase());
         const ib = keyOrder.indexOf(b.toLowerCase());
@@ -515,15 +471,11 @@ function populateAbilityInfo(selectId, abilities, type) {
         if (ib === -1) return -1;
         return ia - ib;
     });
-
     sortedKeys.forEach(rawKey => {
         const key = rawKey.toLowerCase();
         let val = ability.details[rawKey];
-
         if (!val) return;
-
         const label = labelMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
-
         const child = document.createElement('div');
         child.className = `${type}${label}`;
         child.innerHTML = val;
@@ -532,11 +484,9 @@ function populateAbilityInfo(selectId, abilities, type) {
 }
 
 // Define missing functions
-
 function populateRoleInfo(event) {
     const value = event.target.value;
     if (!value) return;
-
     const way = waysData.find(w => w.name === value);
     if (way) {
         // Find keys case-insensitively for talent, foci, etc.
@@ -549,20 +499,16 @@ function populateRoleInfo(event) {
         const attackSkillKey = Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'));
         const primaryAttrKey = Object.keys(way.props).find(k => k.toLowerCase().includes('primary attribute'));
         const criticalEffectKey = Object.keys(way.props).find(k => k.toLowerCase().includes('critical effect'));
-
         document.getElementById('wayTalentName').innerText = talentNameKey ? way.props[talentNameKey] || way.name : way.name;
-
         // Populate wayTalentDesc with divs
         const descElement = document.getElementById('wayTalentDesc');
         if (descElement) {
             descElement.innerHTML = ''; // Clear previous
-
             const details = {
                 'passive': passiveKey ? way.props[passiveKey] : '',
                 'focus': focusKey ? way.props[focusKey] : '',
                 'critical effect': criticalEffectKey ? way.props[criticalEffectKey] : '',
             };
-
             const keyOrder = ['passive', 'focus','critical effect'];
             keyOrder.forEach(key => {
                 const val = details[key];
@@ -574,14 +520,13 @@ function populateRoleInfo(event) {
                 }
             });
         }
-
         // Set the attack/required skill to 3:Trained if not already higher
-        const attackSkill = (way.props[Object.keys(way.props).find(k => k.toLowerCase().includes('attack skill'))] || way.reqSkill) || way.reqSkill;
+        const attackSkill = (attackSkillKey ? way.props[attackSkillKey] : way.reqSkill) || way.reqSkill;
         const skillId = SKILL_ID_MAP[attackSkill];
         if (skillId) {
             const skillSelect = document.getElementById(skillId);
             if (skillSelect && parseInt(skillSelect.value) < 2) {
-                skillSelect.value = '2';  // ← Trained = value 2
+                skillSelect.value = '2';
                 skillSelect.dispatchEvent(new Event('change'));
             }
         }
@@ -600,7 +545,6 @@ function populateRoleInfo(event) {
                 attackSelect.dispatchEvent(new Event('change'));
             }
         }
-
         // Set primary attribute priority to value '1'
         const primaryAttr = primaryAttrKey ? way.props[primaryAttrKey].trim() : '';
         let priorityId;
@@ -623,22 +567,18 @@ function populateRoleInfo(event) {
         updateAllSkillModsAndPassives(); // Ensure updates after potential subattribute adjustments
     }
 }
-
 function calculateSkillPoints() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const totalPoints = level * 3 + 9; // Adjust formula if needed; for level 1 = 12
     let spent = 0;
-
     Object.values(SKILL_ID_MAP).forEach(id => {
         const select = document.getElementById(id);
         if (select) {
             spent += parseInt(select.value) || 0;
         }
     });
-
     const remaining = totalPoints - spent;
     document.getElementById('skillPoints').innerText = remaining;
-
     const maxRankValue = level + 2;
     const rankNames = ['Untrained', 'Basic', 'Trained', 'Expert', 'Master']; // Adjust if ranks differ
     const maxRankName = rankNames[maxRankValue] || 'Legendary';
@@ -646,146 +586,77 @@ function calculateSkillPoints() {
 }
 
 // Additional functions for abilities and attributes (to complete)
-
 function setAbilityAmount(event) {
     calculateAbilities();
 }
-
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-
     const talentAdd = parseInt(document.getElementById('talentAmount').value) || 1;
     const tricksAdd = parseInt(document.getElementById('tricksAmount').value) || 1;
-
     const totalAbilities = talentAdd + tricksAdd + 2; // + way talent & foci; adjust if needed to match 7
     document.getElementById('abilityNumber').innerText = totalAbilities;
-
     const freePoints = level + 1; // For level 1 = 2
     const extra = (talentAdd - 1) + (tricksAdd - 1);
     const remaining = freePoints - Math.max(0, extra); // Prevent negative
     document.getElementById('remainingAbilities').innerText = remaining;
 }
-
-function talentAmount() {
-    updateTalentTables();
-}
-
-function tricksAmount() {
-    updateTrickTables();
-}
-
-// === TALENTS (Way Talent + Extra Talents) ===
-function updateTalentTables() {
-    const amountSelect = document.getElementById('talentAmount');
-    const extraCount = parseInt(amountSelect.value) || 1;  // 1 = 1 extra → total 2 talents (Way +1)
-
-    const container = document.querySelector('.talentWrapper');
-
-    // Remove only the dynamically created talent tables (keep wayTalent and amount selector)
-    container.querySelectorAll('[id^="talentTable"]').forEach(el => el.remove());
-
-    // Create the correct number of extra talent slots
-    for (let i = 1; i <= extraCount; i++) {
-        const table = document.createElement('div');
-        table.id = `talentTable${i}`;
-        table.className = 'talent';
-
-        table.innerHTML = `
-            <div class="talentHeader">
-                <select id="talent${i}" class="talentSelector"></select>
-            </div>
-            <div id="talent${i}Description" class="talentInfo"></div>
-        `;
-
-        container.appendChild(table);
-    }
-
-    // Re-populate all talent selectors
-    updateTalentSelectors();
+function talentAmount(event) {
+    const value = parseInt(event.target.value) || 1;
+    document.getElementById('talentTable1').style.display = '';
+    document.getElementById('talentTable2').style.display = value >= 2 ? '' : 'none';
+    document.getElementById('talentTable3').style.display = value >= 3 ? '' : 'none';
     calculateAbilities();
 }
-
-// === TRICKS ===
-function updateTrickTables() {
-    const amountSelect = document.getElementById('tricksAmount');
-    const totalTricks = (parseInt(amountSelect.value) || 1) + 1;  // value=1 → 2 tricks
-
-    const container = document.querySelector('.tricksWrapper');
-
-    // Remove all existing trick tables
-    container.querySelectorAll('[id^="tricksTable"]').forEach(el => el.remove());
-
-    // Create exactly the number needed
-    for (let i = 1; i <= totalTricks; i++) {
-        const table = document.createElement('div');
-        table.id = `tricksTable${i}`;
-        table.className = 'ability-trick';
-
-        table.innerHTML = `
-            <select id="tricks${i}" class="tricksSelector"></select>
-            <div id="tricks${i}Description"></div>
-        `;
-
-        container.appendChild(table);
-    }
-
-    updateTrickSelectors();
+function tricksAmount(event) {
+    const value = parseInt(event.target.value) || 1;
+    document.getElementById('tricksTable1').style.display = '';
+    document.getElementById('tricksTable2').style.display = value >= 2 ? '' : 'none';
+    document.getElementById('tricksTable3').style.display = value >= 3 ? '' : 'none';
     calculateAbilities();
 }
-
 function setAttPoints(event) {
     calculateAttributeValues();
     updateAttributeGroups();
     updateAllSkillModsAndPassives(); // Ensure updates after potential changes
 }
-
 function calculateAttributeValues() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-
     const priVal = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
     const secVal = 2 + (level >= 6 ? 1 : 0);
     const terVal = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
-
     const bodyPri = document.getElementById('bodyPriority').value || '';
     let bodyVal = 0;
     if (bodyPri === '1') bodyVal = priVal;
     else if (bodyPri === '2') bodyVal = secVal;
     else if (bodyPri === '3') bodyVal = terVal;
     document.getElementById('bodyValue').innerText = bodyVal;
-
     const mindPri = document.getElementById('mindPriority').value || '';
     let mindVal = 0;
     if (mindPri === '1') mindVal = priVal;
     else if (mindPri === '2') mindVal = secVal;
     else if (mindPri === '3') mindVal = terVal;
     document.getElementById('mindValue').innerText = mindVal;
-
     const spiritPri = document.getElementById('spiritPriority').value || '';
     let spiritVal = 0;
     if (spiritPri === '1') spiritVal = priVal;
     else if (spiritPri === '2') spiritVal = secVal;
     else if (spiritPri === '3') spiritVal = terVal;
     document.getElementById('spiritValue').innerText = spiritVal;
-
     // Update attack skill mods after primary values change
     updateSkillsForMod('bodyValue');
     updateSkillsForMod('mindValue');
     updateSkillsForMod('spiritValue');
 }
-
 function updateAttributeGroups() {
     Object.values(ATTRIBUTE_GROUPS).forEach(group => updateAttributeGroup(group));
 }
-
 function updateAttributeGroup(group) {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = document.getElementById(group.priorityId).value || '3';
     let totalPoints = 1 + Math.floor((level - 1) / 3);
     if (pri === '1') totalPoints = 3 + Math.floor((level + 1) / 3);
     else if (pri === '2') totalPoints = 2 + Math.floor(level / 3);
-
     const primaryMax = parseInt(document.getElementById(group.primaryValueId).innerText) || 0;
-
     let sum = 0;
     group.subIds.forEach(id => {
         const input = document.getElementById(id);
@@ -798,7 +669,6 @@ function updateAttributeGroup(group) {
             sum += val;
         }
     });
-
     const remaining = totalPoints - sum;
     const pointsElement = document.getElementById(group.pointsId);
     pointsElement.innerText = remaining;
@@ -816,23 +686,18 @@ function updateAttributeGroup(group) {
 function updateSkillModAndPassive(skillId) {
     const skillSelect = document.getElementById(skillId);
     if (!skillSelect) return;
-
     const skillValue = parseInt(skillSelect.value) || 0;
     const subId = SKILL_MOD_MAP[skillId];
     if (!subId) return;
-
     const subInput = document.getElementById(subId);
     if (!subInput) return;
-
     const modValue = parseInt(subInput.tagName === 'INPUT' ? subInput.value : subInput.innerText) || 0;
     const skillName = skillId.replace('SkillRank', '');
-
     // Update main mod display (div)
     const modDisplay = document.getElementById(skillName + 'Mod');
     if (modDisplay) {
         modDisplay.innerText = modValue;
     }
-
     // Update damage mod span if it's an attack skill
     const attackSkills = ['strike', 'blast', 'invoke'];
     if (attackSkills.includes(skillName.toLowerCase())) {
@@ -841,7 +706,6 @@ function updateSkillModAndPassive(skillId) {
             damageModSpan.innerText = modValue;
         }
     }
-
     // Update passive if needed
     const passiveDisplay = document.getElementById(skillName + 'Passive');
     if (passiveDisplay) {
@@ -884,21 +748,12 @@ function addPriorityListeners() {
                 calculateAttributeValues();
                 updateAttributeGroups();
                 updateAllSkillModsAndPassives();
-                calculateSkillPoints();      // ← ADD THIS
-                calculateAbilities();        // ← ADD THIS (replaces setAbilityAmount)
-            });
-            elem.addEventListener('input', () => {  // ← ADD for live updates on number inputs
-                calculateAttributeValues();
-                updateAttributeGroups();
-                updateAllSkillModsAndPassives();
-                calculateSkillPoints();
-                calculateAbilities();
             });
         }
     });
 }
 
-// Call initial calculations on load — FINAL CLEAN VERSION
+// Call initial calculations on load
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
@@ -906,46 +761,33 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     addPriorityListeners();
     addSubListeners();
-    updateAllSkillModsAndPassives();
-
-    // Initial proficiency setup
+    updateAllSkillModsAndPassives(); // Add this line
+    // Initial proficiency setup for attack skills
     ['strike', 'blast', 'invoke'].forEach(type => {
         const rankSelect = document.getElementById(type + 'SkillRank');
         if (rankSelect) {
-            updateProficiencySelectors(type, parseInt(rankSelect.value) || 0);
+            const rankValue = parseInt(rankSelect.value) || 0;
+            updateProficiencySelectors(type, rankValue);
         }
     });
+    // Add event listeners for talent/trick amount changes (replaces missing HTML onchange)
+    document.getElementById('talentAmount').addEventListener('change', (event) => {
+        talentAmount(event);
+        setAbilityAmount(event);
+    });
+    document.getElementById('tricksAmount').addEventListener('change', (event) => {
+        tricksAmount(event);
+        setAbilityAmount(event);
+    });
 
-    // ONE PLACE to handle talent/trick amount changes
-    const talentInput = document.getElementById('talentAmount');
-    const tricksInput = document.getElementById('tricksAmount');
-
-    if (talentInput) talentInput.addEventListener('input', updateTotals);
-    if (tricksInput) tricksInput.addEventListener('input', updateTotals);
-
-    // Initialize everything once
-    updateTotals();
+    // Set initial visibility based on default amounts
+    talentAmount({ target: document.getElementById('talentAmount') });
+    tricksAmount({ target: document.getElementById('tricksAmount') });
 });
 
-// Live totals + dynamic table updates
-function updateTotals() {
-    const talentExtra = parseInt(document.getElementById('talentAmount').value) || 1;
-    const trickExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
-
-    // Update live total display
-    const totalTalentsEl = document.getElementById('totalTalents');
-    const totalTricksEl = document.getElementById('totalTricks');
-    if (totalTalentsEl) totalTalentsEl.textContent = 1 + talentExtra;
-    if (totalTricksEl) totalTricksEl.textContent = 1 + trickExtra;
-
-    // Rebuild talent/trick tables and recalculate
-    updateTalentTables();
-    updateTrickTables();
-    calculateAbilities();
-}
-
-// Keep this function (used by attack skills)
+// New function to handle proficiency selectors visibility
 function updateProficiencySelectors(attackType, rankValue) {
+    // Assume up to a reasonable max, e.g., 5; adjust if needed
     const maxProf = 5;
     for (let i = 1; i <= maxProf; i++) {
         const profElement = document.getElementById(attackType + 'ProfSelector' + i);

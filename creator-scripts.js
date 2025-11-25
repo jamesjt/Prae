@@ -87,6 +87,7 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
+        console.log('Abilities Data:', abilitiesData);
         updateTalentSelectors();
         updateTrickSelectors();
     })
@@ -171,7 +172,8 @@ function rebuildDynamicSelectors(config) {
     const inputEl = document.getElementById(amountInputId);
     if (!inputEl) return;
 
-    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Never negative
+    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Clamp to 0+
+    inputEl.value = currentAmount;  // Update input to reflect clamped value
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -183,7 +185,7 @@ function rebuildDynamicSelectors(config) {
         if (sel) saved[i] = sel.value;
     }
 
-    // Remove ALL dynamic slots (clean slate)
+    // Remove ALL dynamic slots
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
@@ -202,7 +204,6 @@ function rebuildDynamicSelectors(config) {
         container.appendChild(wrapper);
     }
 
-    // Repopulate options
     populateFunction();
 
     // Restore saved values
@@ -250,6 +251,7 @@ document.addEventListener('change', e => {
     // TALENT AMOUNT — FIXED
     if (t.matches('#talentAmount')) {
         const value = Math.max(0, parseInt(t.value) || 0);
+        t.value = value;  // Clamp input
         document.getElementById('totalTalents').textContent = 1 + value;
         updateTalentTables();
         calculateAbilities();
@@ -259,6 +261,7 @@ document.addEventListener('change', e => {
     // TRICK AMOUNT — FIXED
     if (t.matches('#tricksAmount')) {
         const value = Math.max(0, parseInt(t.value) || 0);
+        t.value = value;  // Clamp input
         document.getElementById('totalTricks').textContent = 1 + value;
         updateTrickTables();
         calculateAbilities();
@@ -317,14 +320,14 @@ document.addEventListener('change', e => {
     else if (t.matches('.gearSelector')) {
         const i = t.id.replace('gearSelect', '');
         const selectedOption = t.options[t.selectedIndex];
-        const load = selectedOption?.getAttribute('data-load') || '';
+        const load = selectedOption.getAttribute('data-load') || '';
         const loadDiv = document.getElementById('gearLoad' + i);
         if (loadDiv) loadDiv.textContent = load;
         calculateLoad();
     }
 });
 
-// ———————————————————————— CORE FUNCTIONS (unchanged) ————————————————————————
+// ———————————————————————— CORE FUNCTIONS ————————————————————————
 
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');
@@ -558,4 +561,6 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
+    updateTalentTables();  // Initial build for talents
+    updateTrickTables();   // Initial build for tricks
 });

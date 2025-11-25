@@ -536,10 +536,16 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 
 .gearListContainer{
-    background-color: #5E4634;
+    background-color: #5C5650;
     width:240px;
 }
-
+/* gear colors 
+warm graphite: #6F6A63
+slate: #5C5650
+soft umber: #847E76
+leather? rgba(89, 72, 54, 1)
+dark leather: #5E4634
+*/
 .gearListing {
   background-color:silver;
   border-style: double;
@@ -550,7 +556,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearEntryHeader{background-color: black; display: flex;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
-.gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1);}
+.gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #5C5650;color:whitesmoke;}
 
 #ritualList {
   background-color:#9BAABF;

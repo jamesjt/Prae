@@ -169,33 +169,45 @@ function rebuildDynamicSelectors(config) {
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
 
-    const amount = (parseInt(document.getElementById(amountInputId)?.value) || 1) + extraOffset;
+    const inputEl = document.getElementById(amountInputId);
+    if (!inputEl) return;
+
+    const currentAmount = parseInt(inputEl.value) || 1;
+    const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
 
+    // Save current selections
     const saved = {};
     for (let i = 1; i <= 20; i++) {
         const sel = document.getElementById(`${itemPrefix}${i}`);
         if (sel) saved[i] = sel.value;
     }
 
+    // Remove ALL dynamic slots (clean slate every time)
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
 
-    for (let i = 1; i <= amount; i++) {
+    // Build exactly the number of slots we need
+    for (let i = 1; i <= totalSlots; i++) {
         const wrapper = document.createElement('div');
         wrapper.id = `${itemPrefix}sTable${i}`;
         wrapper.className = itemClass;
-        wrapper.innerHTML = `<select id="${itemPrefix}${i}" class="${selectorClass}"></select><div id="${itemPrefix}${i}${descriptionSuffix}"></div>`;
+        wrapper.innerHTML = `
+            <select id="${itemPrefix}${i}" class="${selectorClass}"></select>
+            <div id="${itemPrefix}${i}${descriptionSuffix}"></div>
+        `;
         container.appendChild(wrapper);
     }
 
+    // Repopulate options
     populateFunction();
 
-    for (let i = 1; i <= amount; i++) {
+    // Restore saved values
+    for (let i = 1; i <= totalSlots; i++) {
         const select = document.getElementById(`${itemPrefix}${i}`);
         if (select && saved[i]) {
             select.value = saved[i];
@@ -236,16 +248,21 @@ function updateTrickTables() {
 document.addEventListener('change', e => {
     const t = e.target;
 
-    // Talents & Tricks — now only rebuild their own section!
-    if (t.matches('.talentSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
-        calculateAbilities();
-    }
-    else if (t.matches('.tricksSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
+    // Talent Amount — fixed increment/decrement
+    else if (t.matches('#talentAmount')) {
+        const value = parseInt(t.value) || 1;
+        document.getElementById('totalTalents').textContent = 1 + value;
+        updateTalentTables();
         calculateAbilities();
     }
 
+    // Trick Amount — fixed increment/decrement
+    else if (t.matches('#tricksAmount')) {
+        const value = parseInt(t.value) || 1;
+        document.getElementById('totalTricks').textContent = 1 + value;
+        updateTrickTables();
+        calculateAbilities();
+    }
     // Skill Ranks
     else if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);

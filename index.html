@@ -16,23 +16,6 @@
         </div>
     </nav>
 
-<template id="skillTemplate">
-    <div class="skillListing">
-        <div class="skillName"></div>
-        <select class="skills">
-            <option value="0">0: Unskilled</option>
-            <option value="1">1: Basic</option>
-            <option value="2">2: Trained</option>
-            <option value="3">3: Adept</option>
-            <option value="4">4: Expert</option>
-            <option value="5">5: Master</option>
-        </select>
-        <div class="skillMod filledField">0</div>
-        <div class="skillPassive filledField">2</div>
-    </div>
-</template>
-
-
     <div class="container">
         <!-- Prae Rulebook -->
         <div id="prae-rulebook" class="content-section active">
@@ -324,7 +307,147 @@
                     </div>
                     
                     <!-- Physical Skills -->
-                    <div id="physicalSkillsContainer"></div> <!-- End Physical Skills Wrapper-->
+                    <div class="skillWrapper">
+
+                    <!-- Athletics -->
+                      <div class="skillListing mightSkill">
+                        <div class="skillName">
+                          Athletics
+                        </div>
+                        <div class="skillRank">
+                          <select id="athleticsSkillRank" class="nonAttackSkills mightSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="athleticsMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="athleticsPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Force -->
+                      <div class="skillListing mightSkill">
+                        <div class="skillName">
+                          Force
+                        </div>
+                        <div class="skillRank">
+                          <select id="forceSkillRank" class="nonAttackSkills mightSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="forceMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="forcePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Acrobatics -->
+                      <div class="skillListing agilitySkill skillListingMidTop">
+                        <div class="skillName">
+                          Acrobatics
+                        </div>
+                        <div class="skillRank">
+                          <select id="acrobaticsSkillRank" class="nonAttackSkills agilitySkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="acrobaticsMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="acrobaticsPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Sneak -->
+                      <div class="skillListing agilitySkill skillListingMidBot">
+                        <div class="skillName">
+                          Sneak
+                        </div>
+                        <div class="skillRank">
+                          <select id="sneakSkillRank" class="nonAttackSkills agilitySkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="sneakMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="sneakPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Endurance -->
+                      <div class="skillListing brawnSkill">
+                        <div class="skillName">
+                          Endurance
+                        </div>
+                        <div class="skillRank">
+                          <select id="enduranceSkillRank" class="nonAttackSkills brawnSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="enduranceMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="endurancePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Poise -->
+                      <div class="skillListing brawnSkill">
+                        <div class="skillName">
+                          Poise
+                        </div>
+                        <div class="skillRank">
+                          <select id="poiseSkillRank" class="nonAttackSkills brawnSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="poiseMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="poisePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    </div> <!-- End Physical Skills Wrapper-->
                   </div> <!-- End Physical Stats Wrapper -->
 
                   <!-- Mental Stats Wrapper -->
@@ -364,7 +487,147 @@
                     </div>
                     
                     <!-- Mental Skills -->
-                    <div id="mentalSkillsContainer"></div> <!-- End Mental Skills Wrapper-->
+                    <div class="skillWrapper">
+
+                    <!-- lore -->
+                      <div class="skillListing willSkill">
+                        <div class="skillName">
+                          Lore
+                        </div>
+                        <div class="skillRank">
+                          <select id="loreSkillRank" class="nonAttackSkills willSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="loreMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="lorePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Tinkering -->
+                      <div class="skillListing willSkill">
+                        <div class="skillName">
+                          Tinkering
+                        </div>
+                        <div class="skillRank">
+                          <select id="tinkeringSkillRank" class="nonAttackSkills willSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="tinkeringMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="tinkeringPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Deception -->
+                      <div class="skillListing witSkill skillListingMidTop">
+                        <div class="skillName">
+                          Deception
+                        </div>
+                        <div class="skillRank">
+                          <select id="deceptionSkillRank" class="nonAttackSkills witSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="deceptionSkillMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="deceptionSkillPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Insight -->
+                      <div class="skillListing witSkill skillListingMidBot">
+                        <div class="skillName">
+                          Insight
+                        </div>
+                        <div class="skillRank">
+                          <select id="insightSkillRank" class="nonAttackSkills witSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="insightMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="insightPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Awareness -->
+                      <div class="skillListing resolveSkill">
+                        <div class="skillName">
+                          Awareness
+                        </div>
+                        <div class="skillRank">
+                          <select id="awarenessSkillRank" class="nonAttackSkills resolveSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="awarenessMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="awarenessPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Survival -->
+                      <div class="skillListing willSkill">
+                        <div class="skillName">
+                          Survival
+                        </div>
+                        <div class="skillRank">
+                          <select id="survivalSkillRank" class="nonAttackSkills resolveSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="survivalMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="survivalPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+                      
+                    </div> <!-- End Mental Skills Wrapper-->
                   </div> <!-- End Mental Stats Wrapper -->
 
                   <!-- Social Stats Wrapper -->
@@ -404,7 +667,149 @@
                     </div>
                     
                     <!-- Social Skills -->
-                    <div id="socialSkillsContainer"></div> <!-- End Social Skills Wrapper-->
+                    <div class="skillWrapper">
+
+                    <!-- Compel -->
+                      <div class="skillListing vigorSkill">
+                        <div class="skillName">
+                          Compel
+                        </div>
+                        <div class="skillRank">
+                          <select id="compelSkillRank" class="nonAttackSkills vigorSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="compelMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="compelPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Rouse -->
+                      <div class="skillListing vigorSkill">
+                        <div class="skillName">
+                          Rouse
+                        </div>
+                        <div class="skillRank">
+                          <select id="rouseSkillRank" class="nonAttackSkills vigorSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="rouseMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="rousePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Assure -->
+                      <div class="skillListing empathySkill skillListingMidTop">
+                        <div class="skillName">
+                          Assure
+                        </div>
+                        <div class="skillRank">
+                          <select id="assureSkillRank" class="nonAttackSkills empathySkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="assureMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="assurePassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Charm -->
+                      <div class="skillListing empathySkill skillListingMidBot">
+                        <div class="skillName">
+                          Charm
+                        </div>
+                        <div class="skillRank">
+                          <select id="charmSkillRank" class="nonAttackSkills empathySkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="charmMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="charmPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+
+
+                    <!-- Calm -->
+                      <div class="skillListing faithSkill">
+                        <div class="skillName">
+                          Calm
+                        </div>
+                        <div class="skillRank">
+                          <select id="calmSkillRank" class="nonAttackSkills faithSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="calmSkillMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="calmSkillPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+
+                    <!-- Command -->
+                      <div class="skillListing faithSkill">
+                        <div class="skillName">
+                          Command
+                        </div>
+                        <div class="skillRank">
+                          <select id="commandSkillRank" class="nonAttackSkills faithSkill">
+                            <option value="1">1: Unskilled</option>
+                            <option value="2">2: Basic</option>
+                            <option value="3">3: Trained</option>
+                            <option value="4">4: Adept</option>
+                            <option value="5">5: Expert</option>
+                            <option value="6">6: Master</option>
+                          </select>
+                        </div>
+                        <div id="commandMod" class="skillMod filledField">
+                          0
+                        </div>
+                        <div id="commandPassive" class="skillPassive filledField">
+                          3
+                        </div>
+                      </div>
+                      
+                    </div> <!-- End Mental Skills Wrapper-->
                   </div> <!-- End Mental Stats Wrapper -->
                 </div> <!-- End Column 1 -->
 
@@ -425,7 +830,27 @@
                     </div>
                   </div>
 
-                  <div id="strikeSkillsContainer" class="skillListing bodyColor"></div>
+                  <div id="strikeWrapper" class="skillListing bodyColor">
+                    <div class="attackSkillName">
+                      Strike
+                    </div>
+                    <div class="skillRank">
+                      <select id="strikeSkillRank" class="attackSkills bodyColor">
+                        <option value="0">1: Unskilled</option>
+                        <option value="1">2: Basic</option>
+                        <option value="2">3: Trained</option>
+                        <option value="3">4: Adept</option>
+                        <option value="4">5: Expert</option>
+                        <option value="5">6: Master</option>
+                      </select>
+                    </div>
+                    <div id="strikeMod" class="skillMod filledField">
+                      0
+                    </div>
+                    <div id="strikeDamage" class="skillPassive filledField">
+                      B+W
+                    </div>
+                  </div>
 
                 <div id="strikeProfContainer" class="profContainer">
                     <select id="strikeProfSelector1" class="profSelector strikeProfSelector">
@@ -446,7 +871,27 @@
                   </div> <!-- End strikeProfContainer -->
 
 
-                  <div id="blastSkillsContainer" class="skillListing mindColor"></div>
+                  <div id="blastWrapper" class="skillListing mindColor">
+                    <div class="attackSkillName">
+                      Blast
+                    </div>
+                    <div class="skillRank">
+                      <select id="blastSkillRank" class="attackSkills mindColor">
+                        <option value="0">0: Unskilled</option>
+                        <option value="1">2: Basic</option>
+                        <option value="2">3: Trained</option>
+                        <option value="3">4: Adept</option>
+                        <option value="4">5: Expert</option>
+                        <option value="5">6: Master</option>
+                      </select>
+                    </div>
+                    <div id="blastMod" class="skillMod filledField">
+                      0
+                    </div>
+                    <div id="blastDamage" class="skillPassive filledField">
+                      1
+                    </div>
+                  </div>
 
                   <div id="blastProfContainer" class="profContainer">
                     <select id="blastProfSelector1" class="profSelector blastProfSelector">
@@ -466,7 +911,27 @@
                     </select> 
                   </div> <!-- End blastWrapper -->
 
-                  <div id="invokeSkillsContainer" class="skillListing spiritColor"></div>
+                  <div id="invokeWrapper" class="skillListing spiritColor">
+                    <div class="attackSkillName">
+                      Invoke
+                    </div>
+                    <div class="skillRank">
+                      <select id="invokeSkillRank" class="attackSkills spiritColor">
+                        <option value="0">0: Unskilled</option>
+                        <option value="1">2: Basic</option>
+                        <option value="2">3: Trained</option>
+                        <option value="3">4: Adept</option>
+                        <option value="4">5: Expert</option>
+                        <option value="5">6: Master</option>
+                      </select>
+                    </div>
+                    <div id="invokeMod" class="skillMod filledField">
+                      0
+                    </div>
+                    <div id="invokeDamage" class="skillPassive filledField">
+                      3/die
+                    </div>
+                  </div>
 
                   <div id="invokeProfContainer" class="profContainer">
                       <select id="invokeProfSelector1" class="profSelector invokeProfSelector">
@@ -575,6 +1040,151 @@
                         </div>
                       </div>
                     </div>  
+                    
+
+                    <div id="ritual2" hidden class="ritualListing">
+                      <select id="ritual2Select" class="ritualSelector">
+                        <option value="0"></option>
+                      </select>
+                      <div id="ritual2SelectShortCost" class="filledField ritualCost">Cost</div>
+                      <div id="ritual2SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
+                      <div id="ritual2SelectShortDuration" class="filledField ritualDuration">Duration</div>
+                      <img id="showritual2Details" class="showRitualDetails" onclick="showDesc('ritual2Details');" src="imgs/details2.png">
+                      <div id="ritual2Details" class="draggable ritualDetails">
+                        <div id="hideritual2Details" class="closeRitual" onclick="hideDesc('ritual2Details');">X</div>
+                        <div class="ritualBody">
+                          <div class="mentalExploit" id="ritual2SelectName"></div>
+                          <div id="ritual2SelectKeywords"></div>
+                          <div id="ritual2SelectCost"></div>
+                          <div id="ritual2SelectCastTime"></div>
+                          <div id="ritual2SelectDuration"></div>
+                          <div id="ritual2SelectEffect"></div>
+                          <div id="ritual2SelectEnhancements"></div>
+                          <div id="ritual2SelectAugments"></div>
+                          <div id="ritual2SelectResist"></div>
+                          <div id="ritual2SelectNotes" class="ritualNotes"></div>
+                        </div>
+                      </div>
+                    </div>  
+
+                    <div id="ritual3" hidden class="ritualListing">
+                      <select id="ritual3Select" class="ritualSelector">
+                        <option value="0"></option>
+                      </select>
+                      <div id="ritual3SelectShortCost" class="filledField ritualCost">Cost</div>
+                      <div id="ritual3SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
+                      <div id="ritual3SelectShortDuration" class="filledField ritualDuration">Duration</div>
+                      <img id="showritual3Details" class="showRitualDetails" onclick="showDesc('ritual3Details');" src="imgs/details2.png">
+                      <div id="ritual3Details" class="draggable ritualDetails">
+                        <div id="hideritual3Details" class="closeRitual" onclick="hideDesc('ritual3Details');">X</div>
+                        <div class="ritualBody">
+                          <div class="mentalExploit" id="ritual3SelectName"></div>
+                          <div id="ritual3SelectKeywords"></div>
+                          <div id="ritual3SelectCost"></div>
+                          <div id="ritual3SelectCastTime"></div>
+                          <div id="ritual3SelectDuration"></div>
+                          <div id="ritual3SelectEffect"></div>
+                          <div id="ritual3SelectEnhancements"></div>
+                          <div id="ritual3SelectAugments"></div>
+                          <div id="ritual3SelectResist"></div>
+                          <div id="ritual3SelectNotes" class="ritualNotes"></div>
+                        </div>
+                      </div>
+                    </div>  
+
+                    <div id="ritual4" hidden class="ritualListing">
+                      <select id="ritual4Select" class="ritualSelector">
+                        <option value="0"></option>
+                      </select>
+                      <div id="ritual4SelectShortCost" class="filledField ritualCost">Cost</div>
+                      <div id="ritual4SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
+                      <div id="ritual4SelectShortDuration" class="filledField ritualDuration">Duration</div>
+                      <img id="showritual4Details" class="showRitualDetails" onclick="showDesc('ritual4Details');" src="imgs/details2.png">
+                      <div id="ritual4Details" class="draggable ritualDetails">
+                        <div id="hideritual4Details" class="closeRitual" onclick="hideDesc('ritual4Details');">X</div>
+                        <div class="ritualBody">
+                          <div class="mentalExploit" id="ritual4SelectName"></div>
+                          <div id="ritual4SelectKeywords"></div>
+                          <div id="ritual4SelectCost"></div>
+                          <div id="ritual4SelectCastTime"></div>
+                          <div id="ritual4SelectDuration"></div>
+                          <div id="ritual4SelectEffect"></div>
+                          <div id="ritual4SelectEnhancements"></div>
+                          <div id="ritual4SelectAugments"></div>
+                          <div id="ritual4SelectResist"></div>
+                          <div id="ritual4SelectNotes" class="ritualNotes"></div>
+                        </div>
+                      </div>
+                    </div>  
+
+                    <div id="ritual5" hidden class="ritualListing">
+                      <select id="ritual5Select" class="ritualSelector">
+                        <option value="0"></option>
+                      </select>
+                      <div id="ritual5SelectShortCost" class="filledField ritualCost">Cost</div>
+                      <div id="ritual5SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
+                      <div id="ritual5SelectShortDuration" class="filledField ritualDuration">Duration</div>
+                      <img id="showritual5Details" class="showRitualDetails" onclick="showDesc('ritual5Details');" src="imgs/details2.png">
+                      <div id="ritual5Details" class="draggable ritualDetails">
+                        <div id="hideritual5Details" class="closeRitual" onclick="hideDesc('ritual5Details');">X</div>
+                        <div class="ritualBody">
+                          <div class="mentalExploit" id="ritual5SelectName"></div>
+                          <div id="ritual5SelectKeywords"></div>
+                          <div id="ritual5SelectCost"></div>
+                          <div id="ritual5SelectCastTime"></div>
+                          <div id="ritual5SelectDuration"></div>
+                          <div id="ritual5SelectEffect"></div>
+                          <div id="ritual5SelectEnhancements"></div>
+                          <div id="ritual5SelectAugments"></div>
+                          <div id="ritual5SelectResist"></div>
+                          <div id="ritual5SelectNotes" class="ritualNotes"></div>
+                        </div>
+                      </div>
+                    </div>  
+
+                  </div>
+
+                  <div id='armorList'>
+                    <div id="armor1" class="armorListing">
+                      <input  id="armor1Name" class="armorName" type="text" value="Armor Name" >
+                      <select id="armor1Type" class="armorType">
+                        <option value="0">Type</option>
+                        <option value="1">Light Armor</option>
+                        <option value="2">Medium Armor</option>
+                        <option value="3">Heavy Armor</option>
+                        <option value="4">Shield</option>
+                      </select>
+                      <span id="armor1Bonus" class="filledField armorBonus">-</span>
+                      <input  id="armor1Notes" class="armorNotes" type="text" value="notes">
+                      <span id="armor1Penalty"  class="filledField armorPen">-</span>
+                    </div> 
+                    <div id="armor2" hidden class="armorListing">
+                      <input  id="armor2Name" class="armorName" type="text" value="Armor Name">
+                      <select id="armor2Type" class="armorType">
+                        <option value="0">Type</option>
+                        <option value="1">Light Armor</option>
+                        <option value="2">Medium Armor</option>
+                        <option value="3">Heavy Armor</option>
+                        <option value="4">Shield</option>
+                      </select>
+                      <span id="armor2Bonus" class="filledField armorBonus">-</span>
+                      <input  id="armor2Notes" class="armorNotes" type="text" value="notes">
+                      <span id="armor2Penalty" class="filledField armorPen">-</span>
+                    </div> 
+                    <div id="armor3" hidden class="armorListing">
+                      <input  id="armor3Name" class="armorName" type="text" value="Armor Name">
+                      <select id="armor3Type" class="armorType">
+                        <option value="0">Type</option>
+                        <option value="1">Light Armor</option>
+                        <option value="2">Medium Armor</option>
+                        <option value="3">Heavy Armor</option>
+                        <option value="4">Shield</option>
+                      </select>
+                      <span id="armor3Bonus" class="filledField armorBonus">-</span>
+                      <input  id="armor3Notes" class="armorNotes" type="text" value="notes">
+                      <span id="armor3Penalty" class="filledField armorPen">-</span>
+                    </div> 
+                  </div>
                   End of column 3  --> 
                 </div> 
 

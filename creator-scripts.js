@@ -753,7 +753,6 @@ function addPriorityListeners() {
     });
 }
 
-// Call initial calculations on load
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();
@@ -761,38 +760,25 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     addPriorityListeners();
     addSubListeners();
-    updateAllSkillModsAndPassives(); // Add this line
-    // Initial proficiency setup for attack skills
+    updateAllSkillModsAndPassives();
+
+    // Initial proficiency setup
     ['strike', 'blast', 'invoke'].forEach(type => {
         const rankSelect = document.getElementById(type + 'SkillRank');
         if (rankSelect) {
-            const rankValue = parseInt(rankSelect.value) || 0;
-            updateProficiencySelectors(type, rankValue);
+            updateProficiencySelectors(type, parseInt(rankSelect.value) || 0);
         }
     });
-    // Add event listeners for talent/trick amount changes (replaces missing HTML onchange)
-    document.getElementById('talentAmount').addEventListener('change', (event) => {
-        talentAmount(event);
-        setAbilityAmount(event);
-    });
-    document.getElementById('tricksAmount').addEventListener('change', (event) => {
-        tricksAmount(event);
-        setAbilityAmount(event);
-    });
 
-    // Set initial visibility based on default amounts
-    talentAmount({ target: document.getElementById('talentAmount') });
-    tricksAmount({ target: document.getElementById('tricksAmount') });
+    // === ALL LISTENERS IN ONE PLACE ===
+    const talentInput = document.getElementById('talentAmount');
+    const tricksInput = document.getElementById('tricksAmount');
+    const roleSelect = document.getElementById('roleSelector');
+
+    if (talentInput) talentInput.addEventListener('input', updateTotals);
+    if (tricksInput) tricksInput.addEventListener('input', updateTotals);
+    if (roleSelect) roleSelect.addEventListener('change', populateRoleInfo); 
+
+    // Initialize everything
+    updateTotals();
 });
-
-// New function to handle proficiency selectors visibility
-function updateProficiencySelectors(attackType, rankValue) {
-    // Assume up to a reasonable max, e.g., 5; adjust if needed
-    const maxProf = 5;
-    for (let i = 1; i <= maxProf; i++) {
-        const profElement = document.getElementById(attackType + 'ProfSelector' + i);
-        if (profElement) {
-            profElement.hidden = i > rankValue;
-        }
-    }
-}

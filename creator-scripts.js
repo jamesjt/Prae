@@ -200,26 +200,11 @@ function generateSkills(category) {
         const select = clone.querySelector('select');
         select.id = skill.id;
         select.classList.add(category === 'attack' ? 'attackSkills' : `${category}Skills`, ...(skill.color.split(' ')));
-        select.innerHTML = '';
-        if (skill.name === 'Blast' || skill.name === 'Invoke') {
-            const opt = document.createElement('option');
-            opt.value = '0';
-            opt.textContent = '0: Unskilled';
-            select.appendChild(opt);
-        } else {
-            const labels = ['Unskilled', 'Basic', 'Trained', 'Adept', 'Expert', 'Master'];
-            labels.forEach((label, idx) => {
-                const opt = document.createElement('option');
-                opt.value = (idx + 1).toString();
-                opt.textContent = `${idx + 1}: ${label}`;
-                select.appendChild(opt);
-            });
-        }
         const mod = clone.querySelector('.skillMod');
         mod.id = `${skill.name.toLowerCase()}Mod`;
         const passive = clone.querySelector('.skillPassive');
         passive.id = category === 'attack' ? `${skill.name.toLowerCase()}Damage` : `${skill.name.toLowerCase()}Passive`;
-        passive.textContent = category === 'attack' ? '3/die' : '2';
+        passive.textContent = category === 'attack' ? '0' : '2';
         container.appendChild(clone);
     });
 }

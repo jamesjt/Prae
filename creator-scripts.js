@@ -87,6 +87,7 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
+        console.log('Abilities Data:', abilitiesData);
         updateTalentSelectors();
         updateTrickSelectors();
     })
@@ -180,9 +181,9 @@ const SKILLS_DATA = {
         { name: 'Command', id: 'commandSkillRank', color: 'faithColor faithSkill' }
     ],
     attack: [
-        { name: 'Strike', id: 'strikeSkillRank', color: 'bodyColor', container: 'strikeSkillsContainer' },
-        { name: 'Blast', id: 'blastSkillRank', color: 'mindColor', container: 'blastSkillsContainer' },
-        { name: 'Invoke', id: 'invokeSkillRank', color: 'spiritColor', container: 'invokeSkillsContainer' }
+        { name: 'Strike', id: 'strikeSkillRank', color: 'bodyColor', container: 'strikeSkillsContainer', passiveText: '3/die' },
+        { name: 'Blast', id: 'blastSkillRank', color: 'mindColor', container: 'blastSkillsContainer', passiveText: '3/die' },
+        { name: 'Invoke', id: 'invokeSkillRank', color: 'spiritColor', container: 'invokeSkillsContainer', passiveText: '3/die' }
     ]
 };
 
@@ -195,16 +196,16 @@ function generateSkills(category) {
         if (!container) return;
         
         const clone = template.cloneNode(true);
-        clone.querySelector('.skillListing').classList.add(...(skill.color.split(' ')));
+        clone.querySelector('.skillListing').classList.add(skill.color);
         clone.querySelector('.skillName').textContent = skill.name;
         const select = clone.querySelector('select');
         select.id = skill.id;
-        select.classList.add(category === 'attack' ? 'attackSkills' : `${category}Skills`, ...(skill.color.split(' ')));
+        select.classList.add(category === 'attack' ? 'attackSkills' : `${category}Skills`, skill.color);
         const mod = clone.querySelector('.skillMod');
         mod.id = `${skill.name.toLowerCase()}Mod`;
         const passive = clone.querySelector('.skillPassive');
-        passive.id = category === 'attack' ? `${skill.name.toLowerCase()}Damage` : `${skill.name.toLowerCase()}Passive`;
-        passive.textContent = category === 'attack' ? '0' : '2';
+        passive.id = `${skill.name.toLowerCase()}Passive`;
+        if (skill.passiveText) passive.textContent = skill.passiveText; // For attack skills dmg
         container.appendChild(clone);
     });
 }

@@ -331,7 +331,7 @@ document.addEventListener('change', e => {
 
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');
-    sel.innerHTML = '<option value="">Select Way</option>';
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
     waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
 }
 
@@ -350,7 +350,7 @@ function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(sel => {
         const cur = sel.value;
-        sel.innerHTML = '<option value="">—</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        sel.innerHTML = '<option value="talentEmpty">Select Talent</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
@@ -359,7 +359,7 @@ function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
     document.querySelectorAll('.trickSelector').forEach(sel => {
         const cur = sel.value;
-        sel.innerHTML = '<option value="">—</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        sel.innerHTML = '<option value="trickEmpty">Select Trick</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }

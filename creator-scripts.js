@@ -291,7 +291,7 @@ fetch(PROF_CSV_URL)
 function populateProfSelects(type, options) {
     const maxSelectors = 5; // Assume max rank is 5; adjust if needed
     for (let i = 1; i <= maxSelectors; i++) {
-        const select = document.getElementById(type + 'ProfSelect' + i);
+        const select = document.getElementById(type + 'ProfSelector' + i);
         if (select) {
             let html = '<option value=""></option>';
             options.forEach(opt => {

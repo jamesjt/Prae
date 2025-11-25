@@ -385,20 +385,33 @@ function updateWayOptions() {
     });
 }
 
-// Function to populate talent selectors (now dynamic)
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
-    const selects = document.querySelectorAll('.talentSelector');
-    selects.forEach((select) => {
-        let html = '<option value=""></option>';
+    document.querySelectorAll('.talentSelector').forEach(select => {
+        const wasSelected = select.value;
+        let html = '<option value="">—</option>';
+
         qualified.forEach(a => {
             html += `<option value="${a.name}">${a.name}</option>`;
         });
         select.innerHTML = html;
-        select.addEventListener('change', () => populateAbilityInfo(select.id, qualified, 'talent'));
+
+        // Clear description if previously selected talent is no longer available
+        const desc = document.getElementById(select.id + 'Description');
+        if (desc && (!select.value || !qualified.some(a => a.name === wasSelected))) {
+            desc.innerHTML = '';
+        }
+
+        // Re-attach handler with auto-clear
+        select.onchange = () => {
+            const descEl = document.getElementById(select.id + 'Description');
+            if (descEl) descEl.innerHTML = '';
+            if (select.value) {
+                populateAbilityInfo(select.id, qualified, 'talent');
+            }
+        };
     });
 }
-
 // Function to populate trick selectors (now dynamic)
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');

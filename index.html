@@ -41,10 +41,10 @@
             <article id="Traea" class="sectionBody">
                 <div id="charInfo">
                     <input id="charName" class="charText" type="text" placeholder="Character name">
-                    <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1">
+                    <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1" onkeyup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);" onmouseup="skillPoints(event); setAbilityAmount(event); setAttPoints(event);">
                     <input id="childhood" class="charText" type="text" placeholder="Childhood">
                     <input id="training" class="charText" type="text" placeholder="Adolescence">
-                    <select id="roleSelector">
+                    <select id="roleSelector" onchange="populateRoleInfo(event);">
                       <option value="">Way</option>
                     </select>
                     <img id="showCheckList" class="charInfoHover" onclick="showDesc('checkList');" src="imgs/check.png">
@@ -294,15 +294,15 @@
                       <div class="subAttribute mightSkill">
                         Might
                         <!-- Replace any <input type="number"> with this -->
-                        <input class="inputField mightSkill"  id="mightValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField mightSkill"  id="mightValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onchange="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" />
                       </div>
                       <div class="subAttribute subMiddle agilitySkill">
                         Agility
-                        <input class="inputField agilitySkill"  id="agilityValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField agilitySkill"  id="agilityValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onmouseup="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);" onchange="setSkillValues(event, ['acrobatics', 'sneak']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute brawnSkill">
                         Brawn
-                        <input class="inputField brawnSkill"  id="brawnValue" type="number" min="0" max="0" step="1" value="0"/>
+                        <input class="inputField brawnSkill"  id="brawnValue" type="number" min="0" max="0" step="1" value="0" onkeyup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onmouseup="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);" onchange="setSkillValues(event, ['endurance', 'poise']); setAttPoints(event);"/>
                       </div>
                     </div>
                     
@@ -315,7 +315,7 @@
                           Athletics
                         </div>
                         <div class="skillRank">
-                          <select id="athleticsSkillRank" class="nonAttackSkills mightSkill">
+                          <select id="athleticsSkillRank" onchange="setSkillValues(event, 'might'); skillPoints(event);" class="nonAttackSkills mightSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -338,7 +338,7 @@
                           Force
                         </div>
                         <div class="skillRank">
-                          <select id="forceSkillRank" class="nonAttackSkills mightSkill">
+                          <select id="forceSkillRank" onchange="setSkillValues(event, 'might'); skillPoints(event);" class="nonAttackSkills mightSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -361,7 +361,7 @@
                           Acrobatics
                         </div>
                         <div class="skillRank">
-                          <select id="acrobaticsSkillRank" class="nonAttackSkills agilitySkill">
+                          <select id="acrobaticsSkillRank" onchange="setSkillValues(event, 'agility'); skillPoints(event);" class="nonAttackSkills agilitySkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -384,7 +384,7 @@
                           Sneak
                         </div>
                         <div class="skillRank">
-                          <select id="sneakSkillRank" class="nonAttackSkills agilitySkill">
+                          <select id="sneakSkillRank" onchange="setSkillValues(event, 'agility'); skillPoints(event);" class="nonAttackSkills agilitySkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -407,7 +407,7 @@
                           Endurance
                         </div>
                         <div class="skillRank">
-                          <select id="enduranceSkillRank" class="nonAttackSkills brawnSkill">
+                          <select id="enduranceSkillRank" onchange="setSkillValues(event, 'brawn'); skillPoints(event);" class="nonAttackSkills brawnSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -430,7 +430,7 @@
                           Poise
                         </div>
                         <div class="skillRank">
-                          <select id="poiseSkillRank" class="nonAttackSkills brawnSkill">
+                          <select id="poiseSkillRank" onchange="setSkillValues(event, 'brawn'); skillPoints(event);" class="nonAttackSkills brawnSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -474,15 +474,16 @@
                     <div class="subAttributeWrapper">
                       <div class="subAttribute willSkill">
                         Will
-                        <input class="inputField willSkill"  id="willValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField willSkill"  id="willValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);" onmouseup="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"
+                        onchange="setSkillValues(event, ['lore', 'survival']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle witSkill">
                         Wit
-                        <input class="inputField witSkill"  id="witValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField witSkill"  id="witValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onmouseup="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);" onchange="setSkillValues(event, ['deception', 'insight']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute resolveSkill">
                         Resolve
-                        <input class="inputField resolveSkill"  id="resolveValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField resolveSkill"  id="resolveValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['athletics', 'force']); setAttPoints(event);" onmouseup="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);" onchange="setSkillValues(event, ['awareness', 'tinkering']); setAttPoints(event);"/>
                       </div>
                     </div>
                     
@@ -495,7 +496,7 @@
                           Lore
                         </div>
                         <div class="skillRank">
-                          <select id="loreSkillRank" class="nonAttackSkills willSkill">
+                          <select id="loreSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills willSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -518,7 +519,7 @@
                           Tinkering
                         </div>
                         <div class="skillRank">
-                          <select id="tinkeringSkillRank" class="nonAttackSkills willSkill">
+                          <select id="tinkeringSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills willSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -541,7 +542,7 @@
                           Deception
                         </div>
                         <div class="skillRank">
-                          <select id="deceptionSkillRank" class="nonAttackSkills witSkill">
+                          <select id="deceptionSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills witSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -564,7 +565,7 @@
                           Insight
                         </div>
                         <div class="skillRank">
-                          <select id="insightSkillRank" class="nonAttackSkills witSkill">
+                          <select id="insightSkillRank" onchange="setSkillValues(event, 'wit'); skillPoints(event);" class="nonAttackSkills witSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -587,7 +588,7 @@
                           Awareness
                         </div>
                         <div class="skillRank">
-                          <select id="awarenessSkillRank" class="nonAttackSkills resolveSkill">
+                          <select id="awarenessSkillRank" onchange="setSkillValues(event, 'resolve'); skillPoints(event);" class="nonAttackSkills resolveSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -610,7 +611,7 @@
                           Survival
                         </div>
                         <div class="skillRank">
-                          <select id="survivalSkillRank" class="nonAttackSkills resolveSkill">
+                          <select id="survivalSkillRank" onchange="setSkillValues(event, 'will'); skillPoints(event);" class="nonAttackSkills resolveSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -654,15 +655,15 @@
                     <div class="subAttributeWrapper">
                       <div class="subAttribute vigorSkill">
                         Vigor
-                        <input class="inputField vigorSkill"  id="vigorValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField vigorSkill"  id="vigorValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onmouseup="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);" onchange="setSkillValues(event, ['rouse', 'compel']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute subMiddle empathySkill">
                         Empathy
-                        <input class="inputField empathySkill"  id="empathyValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField empathySkill"  id="empathyValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onmouseup="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);" onchange="setSkillValues(event, ['charm', 'handling']); setAttPoints(event);"/>
                       </div>
                       <div class="subAttribute faithSkill">
                         Faith
-                        <input class="inputField faithSkill"  id="faithValue" type="number" min="0" max="4" step="1" value="0"/>
+                        <input class="inputField faithSkill"  id="faithValue" type="number" min="0" max="4" step="1" value="0" onkeyup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onmouseup="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);" onchange="setSkillValues(event, ['diplomacy', 'leadership']); setAttPoints(event);"/>
                       </div>
                     </div>
                     
@@ -675,7 +676,7 @@
                           Compel
                         </div>
                         <div class="skillRank">
-                          <select id="compelSkillRank" class="nonAttackSkills vigorSkill">
+                          <select id="compelSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills vigorSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -698,7 +699,7 @@
                           Rouse
                         </div>
                         <div class="skillRank">
-                          <select id="rouseSkillRank" class="nonAttackSkills vigorSkill">
+                          <select id="rouseSkillRank" onchange="setSkillValues(event, 'vigor'); skillPoints(event);" class="nonAttackSkills vigorSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -721,7 +722,7 @@
                           Assure
                         </div>
                         <div class="skillRank">
-                          <select id="assureSkillRank" class="nonAttackSkills empathySkill">
+                          <select id="assureSkillRank" onchange="setSkillValues(event, 'empathy' ); skillPoints(event);" class="nonAttackSkills empathySkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -744,7 +745,7 @@
                           Charm
                         </div>
                         <div class="skillRank">
-                          <select id="charmSkillRank" class="nonAttackSkills empathySkill">
+                          <select id="charmSkillRank" onchange="setSkillValues(event, 'empathy'); skillPoints(event);" class="nonAttackSkills empathySkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -769,7 +770,7 @@
                           Calm
                         </div>
                         <div class="skillRank">
-                          <select id="calmSkillRank" class="nonAttackSkills faithSkill">
+                          <select id="calmSkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills faithSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -792,7 +793,7 @@
                           Command
                         </div>
                         <div class="skillRank">
-                          <select id="commandSkillRank" class="nonAttackSkills faithSkill">
+                          <select id="commandSkillRank" onchange="setSkillValues(event, 'faith'); skillPoints(event);" class="nonAttackSkills faithSkill">
                             <option value="1">1: Unskilled</option>
                             <option value="2">2: Basic</option>
                             <option value="3">3: Trained</option>
@@ -835,7 +836,7 @@
                       Strike
                     </div>
                     <div class="skillRank">
-                      <select id="strikeSkillRank" class="attackSkills bodyColor">
+                      <select id="strikeSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills bodyColor">
                         <option value="0">1: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
@@ -876,7 +877,7 @@
                       Blast
                     </div>
                     <div class="skillRank">
-                      <select id="blastSkillRank" class="attackSkills mindColor">
+                      <select id="blastSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills mindColor">
                         <option value="0">0: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>
@@ -894,19 +895,19 @@
                   </div>
 
                   <div id="blastProfContainer" class="profContainer">
-                    <select id="blastProfSelector1" class="profSelector blastProfSelector">
+                    <select id="blastProfSelector1" class="profSelector blastProfSelector" onchange="proficiencyListManagement('blast');">
                       <option value="profUnassigned"></option>
                     </select>
-                    <select id="blastProfSelector2" class="profSelector blastProfSelector">
+                    <select id="blastProfSelector2" class="profSelector blastProfSelector" onchange="proficiencyListManagement('blast');">
                       <option value="profUnassigned"></option>
                     </select>
-                    <select id="blastProfSelector3" class="profSelector blastProfSelector">
+                    <select id="blastProfSelector3" class="profSelector blastProfSelector" onchange="proficiencyListManagement('blast');">
                       <option value="profUnassigned"></option>
                     </select>
-                    <select id="blastProfSelector4" class="profSelector blastProfSelector">
+                    <select id="blastProfSelector4" class="profSelector blastProfSelector" onchange="proficiencyListManagement('blast');">
                       <option value="profUnassigned"></option>
                     </select>
-                    <select id="blastProfSelector5" class="profSelector blastProfSelector">
+                    <select id="blastProfSelector5" class="profSelector blastProfSelector" onchange="proficiencyListManagement('blast');">
                       <option value="profUnassigned"></option>
                     </select> 
                   </div> <!-- End blastWrapper -->
@@ -916,7 +917,7 @@
                       Invoke
                     </div>
                     <div class="skillRank">
-                      <select id="invokeSkillRank" class="attackSkills spiritColor">
+                      <select id="invokeSkillRank" onchange="proficiencyAmount(event); skillPoints(event);" class="attackSkills spiritColor">
                         <option value="0">0: Unskilled</option>
                         <option value="1">2: Basic</option>
                         <option value="2">3: Trained</option>

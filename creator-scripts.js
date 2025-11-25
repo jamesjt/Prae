@@ -112,32 +112,47 @@ let abilitiesData = {}; // { skillLower: [{type: 'talent'|'trick', name, details
 
 // Fetch and process abilities (talents and tricks)
 fetch(ABILITIES_CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(r => { if (!r.ok) throw Error(r crucially.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
-        console.log('Parsed Abilities Rows:', rows);
-
-        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase()); // Skills from row 0, col 1+
+        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
 
         skills.forEach((skill, colIndex) => {
-            let currentType = '';
             let currentAbility = null;
-            rows.slice(1).forEach(row => {
-                const key = row[0].trim().toLowerCase();
-                const value = row[colIndex + 1] ? row[colIndex + 1].trim() : '';
-                if (key === 'talent' || key === 'trick') {
+
+            for (let r = 1; r < rows.length; r++) {
+                const keyCell = rows[r][0];
+                const valueCell = rows[r][colIndex + 1];
+
+                const key = keyCell ? keyCell.trim() : '';
+                const value = valueCell ? valueCell.trim() : '';
+
+                // Detect start of new ability: "Talent 1 Name", "Trick 2 Name", "Ritual 1 Name"
+                if (key.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
+                    // Save previous ability
                     if (currentAbility) {
                         saveAbility(skill, currentAbility);
                     }
-                    currentType = key;
-                    currentAbility = { type: currentType, name: value || '', details: {} };
-                } else if (currentAbility && key && value) {
-                    currentAbility.details[key] = value;
-                } else if (!key && !value && currentAbility) { // Empty row ends block
-                    saveAbility(skill, currentAbility);
-                    currentAbility = null;
+
+                    const typeMatch = key.match(/^(Talent|Trick|Ritual)/i);
+                    const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
+
+                    currentAbility = {
+                        type: type,
+                        name: value || `(Unnamed ${type})`,
+                        skill: skill,
+                        details: {}
+                    };
                 }
-            });
+                // Add detail lines (Keywords, Cost, Effect, etc.)
+                else if (currentAbility && key && key.includes(' ')) {
+                    // Extract the actual key name: "Trick 1 Keywords" → "Keywords"
+                    const detailKey = key.split(' ').slice(2).join(' ');
+                    currentAbility.details[detailKey] = value;
+                }
+            }
+
+            // Save the last ability
             if (currentAbility) {
                 saveAbility(skill, currentAbility);
             }
@@ -149,12 +164,10 @@ fetch(ABILITIES_CSV_URL)
         }
 
         console.log('Abilities Data:', abilitiesData);
-        updateTalentSelectors(); // Initial
+        updateTalentSelectors();
         updateTrickSelectors();
     })
-    .catch(err => {
-        console.error('Error loading Abilities CSV:', err);
-    });
+    .catch(err => console.error('Error loading Abilities CSV:', err));
 
 // Fetch and process ways
 fetch(WAYS_CSV_URL)

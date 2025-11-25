@@ -674,45 +674,61 @@ function tricksAmount() {
     updateTrickTables();
 }
 
-function updateTalentTables() {
-    const amountSelect = document.getElementById('talentAmount');
-    const extraCount = parseInt(amountSelect.value) || 1;
+function rebuildDynamicSelectors(config) {
+    const {
+        amountInputId,       // 'talentAmount' or 'tricksAmount'
+        containerSelector,   // '.talentWrapper' or '.tricksWrapper'
+        itemPrefix,          // 'talent' or 'tricks'
+        itemClass,           // 'talent' or 'ability-trick'
+        selectorClass,       // 'talentSelector' or 'tricksSelector'
+        descriptionSuffix,   // 'Description' for both
+        extraOffset = 0,     // tricks: +1 because value 1 → 2 tricks
+        maxSlots = 20,
+        populateFunction     // updateTalentSelectors or updateTrickSelectors
+    } = config;
 
-    const container = document.querySelector('.talentWrapper');
+    const amount = (parseInt(document.getElementById(amountInputId)?.value) || 1) + extraOffset;
+    const container = document.querySelector(containerSelector);
 
-    // 1. SAVE current selections before destroying anything
-    const savedSelections = {};
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById(`talent${i}`);
-        if (sel) savedSelections[i] = sel.value;
+    if (!container) return;
+
+    // 1. SAVE current selections
+    const saved = {};
+    for (let i = 1; i <= maxSlots; i++) {
+        const sel = document.getElementById(`${itemPrefix}${i}`);
+        if (sel) saved[i] = sel.value;
     }
 
-    // Remove only dynamic talent tables (keep wayTalent and amount row)
-    container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
+    // 2. Remove old dynamic items
+    // For talents: preserve #wayTalent (the Way's own talent)
+    if (itemPrefix === 'talent') {
+        container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
+    } else {
+        container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
+    }
 
-    // Rebuild the correct number of slots
-    for (let i = 1; i <= extraCount; i++) {
-        const table = document.createElement('div');
-        table.id = `talentTable${i}`;
-        table.className = 'talent';
+    // 3. Rebuild correct number of slots
+    for (let i = 1; i <= amount; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.id = `${itemPrefix}sTable${i}`;
+        wrapper.className = itemClass;
 
-        table.innerHTML = `
-            <div class="talentHeader">
-                <select id="talent${i}" class="talentSelector"></select>
-            </div>
-            <div id="talent${i}Description" class="talentInfo"></div>
+        wrapper.innerHTML = `
+            <select id="${itemPrefix}${i}" class="${selectorClass}"></select>
+            <div id="${itemPrefix}${i}${descriptionSuffix}"></div>
         `;
 
-        container.appendChild(table);
+        container.appendChild(wrapper);
     }
 
-    updateTalentSelectors();
+    // 4. Repopulate options
+    populateFunction();
 
-    // 2. RESTORE saved selections and update descriptions
-    for (let i = 1; i <= extraCount; i++) {
-        const select = document.getElementById(`talent${i}`);
-        if (select && savedSelections[i]) {
-            select.value = savedSelections[i];
+    // 5. Restore selections + trigger change (so descriptions update)
+    for (let i = 1; i <= amount; i++) {
+        const select = document.getElementById(`${itemPrefix}${i}`);
+        if (select && saved[i]) {
+            select.value = saved[i];
             select.dispatchEvent(new Event('change'));
         }
     }
@@ -720,49 +736,32 @@ function updateTalentTables() {
     calculateAbilities();
 }
 
-// FIXED: Tricks — now preserves your selections when changing amount
+// ———————————————————————— NEW CLEAN FUNCTIONS ————————————————————————
+
+function updateTalentTables() {
+    rebuildDynamicSelectors({
+        amountInputId:     'talentAmount',
+        containerSelector: '.talentWrapper',
+        itemPrefix:        'talent',
+        itemClass:         'talent',
+        selectorClass:     'talentSelector',
+        descriptionSuffix: 'Description',
+        extraOffset:       0,
+        populateFunction:  updateTalentSelectors
+    });
+}
+
 function updateTrickTables() {
-    const amountSelect = document.getElementById('tricksAmount');
-    const totalTricks = (parseInt(amountSelect.value) || 1) + 1;
-
-    const container = document.querySelector('.tricksWrapper');
-
-    // 1. SAVE current selections
-    const savedSelections = {};
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById(`tricks${i}`);
-        if (sel) savedSelections[i] = sel.value;
-    }
-
-    // Remove all existing trick tables
-    container.querySelectorAll('[id^="tricksTable"]').forEach(el => el.remove());
-
-    // Rebuild
-    for (let i = 1; i <= totalTricks; i++) {
-        const table = document.createElement('div');
-        table.id = `tricksTable${i}`;
-        table.className = 'ability-trick';
-
-        table.innerHTML = `
-            <select id="tricks${i}" class="tricksSelector"></select>
-            <div id="tricks${i}Description"></div>
-        `;
-
-        container.appendChild(table);
-    }
-
-    updateTrickSelectors();
-
-    // 2. RESTORE saved selections
-    for (let i = 1; i <= totalTricks; i++) {
-        const select = document.getElementById(`tricks${i}`);
-        if (select && savedSelections[i]) {
-            select.value = savedSelections[i];
-            select.dispatchEvent(new Event('change'));
-        }
-    }
-
-    calculateAbilities();
+    rebuildDynamicSelectors({
+        amountInputId:     'tricksAmount',
+        containerSelector: '.tricksWrapper',
+        itemPrefix:        'tricks',
+        itemClass:         'ability-trick',
+        selectorClass:     'tricksSelector',
+        descriptionSuffix: 'Description',
+        extraOffset:       1,                    // because 1 → 2 tricks
+        populateFunction:  updateTrickSelectors
+    });
 }
 
 function setAttPoints(event) {

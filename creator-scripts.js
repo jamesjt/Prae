@@ -220,7 +220,7 @@ function generateSkills(category) {
         mod.id = `${skill.name.toLowerCase()}Mod`;
         const passive = clone.querySelector('.skillPassive');
         passive.id = category === 'attack' ? `${skill.name.toLowerCase()}Damage` : `${skill.name.toLowerCase()}Passive`;
-        passive.textContent = category === 'attack' ? '3/die' : '3';
+        passive.textContent = category === 'attack' ? '1' : '3';
         container.appendChild(clone);
     });
 }
@@ -448,17 +448,27 @@ function updateAttributeGroup(group) {
 function updateSkillModAndPassive(skillId) {
     const sel = document.getElementById(skillId);
     if (!sel) return;
-    const rank = parseInt(sel.value) || 0;
+
+    // All normal skills start at rank 1, Blast/Invoke start at 0
+    const rank = parseInt(sel.value) || (skillId.includes('blast') || skillId.includes('invoke') ? 0 : 1);
+
     const modId = SKILL_MOD_MAP[skillId];
     const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
-    const name = skillId.replace('SkillRank', '');
-    const modEl = document.getElementById(name + 'Mod');
+
+    const baseName = skillId.replace('SkillRank', '').toLowerCase();
+
+    // Update Mod
+    const modEl = document.getElementById(baseName + 'Mod');
     if (modEl) modEl.textContent = modVal;
-    const passiveEl = document.getElementById(name + 'Passive');
+
+    // Update Passive (this is the important line)
+    const passiveEl = document.getElementById(baseName + 'Passive');
     if (passiveEl) passiveEl.textContent = rank + modVal + 2;
-    if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
-        const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
-        if (dmgEl) dmgEl.textContent = modVal;
+
+    // Damage for Strike/Blast/Invoke stays 3/die
+    if (['strike', 'blast', 'invoke'].includes(baseName)) {
+        const dmgEl = document.getElementById(baseName + 'Damage');
+        if (dmgEl) dmgEl.textContent = '3/die';
     }
 }
 
@@ -509,4 +519,20 @@ window.addEventListener('load', () => {
     });
     updateTalentTables();  // Initial build for talents
     updateTrickTables();   // Initial build for tricks
+    // Re-attach listeners every time skills are generated (safe even if called multiple times)
+    document.querySelectorAll('select[id$="SkillRank"]').forEach(select => {
+        select.removeEventListener('change', handleSkillChange); // prevent duplicates
+        select.addEventListener('change', handleSkillChange);
+    });
+
+    function handleSkillChange(e) {
+        const skillId = e.target.id;
+        updateSkillModAndPassive(skillId);
+        calculateSkillPoints();
+        // Update proficiency selectors for attack skills
+        if (skillId.includes('strike') || skillId.includes('blast') || skillId.includes('invoke')) {
+            const type = skillId.includes('strike') ? 'strike' : skillId.includes('blast') ? 'blast' : 'invoke';
+            updateProficiencySelectors(type, parseInt(e.target.value) || 0);
+        }
+    }
 });

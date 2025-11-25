@@ -87,7 +87,6 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
-        console.log('Abilities Data:', abilitiesData);
         updateTalentSelectors();
         updateTrickSelectors();
     })
@@ -184,14 +183,14 @@ function rebuildDynamicSelectors(config) {
         if (sel) saved[i] = sel.value;
     }
 
-    // Remove ALL dynamic slots (clean slate every time)
+    // Remove ALL dynamic slots
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
 
-    // Build exactly the number of slots we need
+    // Build exactly the number needed
     for (let i = 1; i <= totalSlots; i++) {
         const wrapper = document.createElement('div');
         wrapper.id = `${itemPrefix}sTable${i}`;
@@ -203,7 +202,6 @@ function rebuildDynamicSelectors(config) {
         container.appendChild(wrapper);
     }
 
-    // Repopulate options
     populateFunction();
 
     // Restore saved values
@@ -243,26 +241,39 @@ function updateTrickTables() {
     });
 }
 
-// ———————————————————————— ONE EVENT LISTENER FOR EVERYTHING (FIXED!) ————————————————————————
+// ———————————————————————— ONE EVENT LISTENER (CLEAN & FIXED) ————————————————————————
 
 document.addEventListener('change', e => {
     const t = e.target;
 
-    // Talent Amount — fixed increment/decrement
-    else if (t.matches('#talentAmount')) {
+    // Talent Amount
+    if (t.matches('#talentAmount')) {
         const value = parseInt(t.value) || 1;
         document.getElementById('totalTalents').textContent = 1 + value;
         updateTalentTables();
         calculateAbilities();
+        return;
     }
 
-    // Trick Amount — fixed increment/decrement
-    else if (t.matches('#tricksAmount')) {
+    // Trick Amount
+    if (t.matches('#tricksAmount')) {
         const value = parseInt(t.value) || 1;
         document.getElementById('totalTricks').textContent = 1 + value;
         updateTrickTables();
         calculateAbilities();
+        return;
     }
+
+    // Talent/Trick selection
+    if (t.matches('.talentSelector')) {
+        populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
+        calculateAbilities();
+    }
+    else if (t.matches('.tricksSelector')) {
+        populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
+        calculateAbilities();
+    }
+
     // Skill Ranks
     else if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
@@ -296,28 +307,12 @@ document.addEventListener('change', e => {
         updateSkillsForMod(t.id);
     }
 
-    // Talent Amount — ONLY rebuild talents
-    else if (t.matches('#talentAmount')) {
-        const tExtra = parseInt(t.value) || 1;
-        document.getElementById('totalTalents').textContent = 1 + tExtra;
-        updateTalentTables();     // Only talents
-        calculateAbilities();
-    }
-
-    // Trick Amount — ONLY rebuild tricks
-    else if (t.matches('#tricksAmount')) {
-        const trExtra = parseInt(t.value) || 1;
-        document.getElementById('totalTricks').textContent = 1 + trExtra;
-        updateTrickTables();      // Only tricks
-        calculateAbilities();
-    }
-
     // Way Selector
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
     }
 
-    // Gear Selectors
+    // Gear
     else if (t.matches('.gearSelector')) {
         const i = t.id.replace('gearSelect', '');
         const selectedOption = t.options[t.selectedIndex];
@@ -328,7 +323,7 @@ document.addEventListener('change', e => {
     }
 });
 
-// ———————————————————————— CORE FUNCTIONS ————————————————————————
+// ———————————————————————— CORE FUNCTIONS (unchanged) ————————————————————————
 
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');
@@ -562,5 +557,4 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTotals();
 });

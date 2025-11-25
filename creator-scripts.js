@@ -385,46 +385,78 @@ function updateWayOptions() {
     });
 }
 
-// TALENTS
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(select => {
-        const wasSelected = select.value;
+        const currentValue = select.value;  // Save what was selected
+
+        // Rebuild options
         let html = '<option value="">—</option>';
-        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
         select.innerHTML = html;
 
-        const desc = document.getElementById(select.id + 'Description');
-        if (desc && (!select.value || !qualified.some(a => a.name === wasSelected))) {
-            desc.innerHTML = '';
+        // Re-select if still valid
+        if (currentValue && qualified.some(a => a.name === currentValue)) {
+            select.value = currentValue;
+        } else {
+            select.value = '';  // Clear if no longer valid
         }
 
+        // Always clear + repopulate description on change
+        const desc = document.getElementById(select.id + 'Description');
+        if (desc) {
+            desc.innerHTML = '';  // Clear old
+            if (select.value) {
+                const ability = qualified.find(a => a.name === select.value);
+                if (ability) populateAbilityInfo(select.id, [ability], 'talent');
+            }
+        }
+
+        // Re-attach handler
         select.onchange = () => {
             const descEl = document.getElementById(select.id + 'Description');
             if (descEl) descEl.innerHTML = '';
-            if (select.value) populateAbilityInfo(select.id, qualified, 'talent');
+            if (select.value) {
+                populateAbilityInfo(select.id, qualified, 'talent');
+            }
         };
     });
 }
 
-// TRICKS — EXACT SAME LOGIC
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
     document.querySelectorAll('.tricksSelector').forEach(select => {
-        const wasSelected = select.value;
+        const currentValue = select.value;
+
         let html = '<option value="">—</option>';
-        qualified.forEach(a => html += `<option value="${a.name}">${a.name}</option>`);
+        qualified.forEach(a => {
+            html += `<option value="${a.name}">${a.name}</option>`;
+        });
         select.innerHTML = html;
 
+        if (currentValue && qualified.some(a => a.name === currentValue)) {
+            select.value = currentValue;
+        } else {
+            select.value = '';
+        }
+
         const desc = document.getElementById(select.id + 'Description');
-        if (desc && (!select.value || !qualified.some(a => a.name === wasSelected))) {
+        if (desc) {
             desc.innerHTML = '';
+            if (select.value) {
+                const ability = qualified.find(a => a.name === select.value);
+                if (ability) populateAbilityInfo(select.id, [ability], 'trick');
+            }
         }
 
         select.onchange = () => {
             const descEl = document.getElementById(select.id + 'Description');
             if (descEl) descEl.innerHTML = '';
-            if (select.value) populateAbilityInfo(select.id, qualified, 'trick');
+            if (select.value) {
+                populateAbilityInfo(select.id, qualified, 'trick');
+            }
         };
     });
 }

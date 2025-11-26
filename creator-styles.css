@@ -537,9 +537,15 @@ dark leather: #5E4634
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
 .gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #6F6A63;color:whitesmoke;}
-.gearDetails{border-radius: 20px; border:2px solid black;color:whitesmoke;}
+.gearDetails{border-radius: 20px; border:2px solid black;color:whitesmoke;display: flex;justify-content: center;align-items: center; width:15px;}
 .gearAmtInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;}
 .gearAmtInputField:hover{background-color: white;color:black;}
+.gearLoad{display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    font-size: 14px;
+}
 
 #ritualList {
   background-color:#9BAABF;

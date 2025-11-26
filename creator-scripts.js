@@ -57,6 +57,34 @@ const ATTRIBUTE_GROUPS = {
 
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
 
+// Add near top constants
+const MAX_READY_SLOTS = 12;  // Change this to adjust ready slots globally
+
+// Hardcoded packs (from your list; replace/merge with CSV parse if needed)
+const packData = [
+    { name: 'Backpack', loadLimit: 3, stowedSlots: 4, readySlots: 1, location: 'Back', cost: '10c', isPack: true, baseLoad: 0 },
+    { name: 'Rucksack', loadLimit: 5, stowedSlots: 7, readySlots: 2, location: 'Back', cost: '20c', isPack: true, baseLoad: 0 },
+    { name: 'Padded Pack', loadLimit: 2, stowedSlots: 6, readySlots: 1, location: 'Back', cost: '15c', isPack: true, baseLoad: 0 },
+    { name: 'Satchel', loadLimit: 1, stowedSlots: 3, readySlots: 1, location: 'Waist', cost: '5c', isPack: true, baseLoad: 0 },
+    { name: 'Kit', loadLimit: 0.5, stowedSlots: 5, readySlots: 1, location: 'Waist', cost: '9c', isPack: true, baseLoad: 0 },
+    { name: 'Pouch', loadLimit: 2, stowedSlots: 2, readySlots: 1, location: 'Waist', cost: '1c', isPack: true, baseLoad: 0 },
+    { name: 'Coin Pouch', loadLimit: 1, stowedSlots: 1, readySlots: 0, location: null, cost: '1c', isPack: true, baseLoad: 0 }  // Special handling
+];
+
+// Assume gearData is non-packs (from fetch or hardcoded; example below)
+let gearData = [  // Replace with actual data
+    { name: 'Sword', load: 2, isPack: false },
+    { name: 'Shield', load: 1, isPack: false },
+    // Add more from CSV
+];
+
+const allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
+const nonPackOptions = gearData;  // For stowed
+
+let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
+let usedLocations = { Back: null, Waist: null };
+let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
+
 // ———————————————————————— DATA LOADING ————————————————————————
 
 fetch(ABILITIES_CSV_URL)
@@ -565,10 +593,11 @@ function updateGearLoad(i) {
     }
 }
 
-function generateGearEntries(num = 12) {
+// Updated generateGearEntries
+function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
-    for (let i = 1; i <= num; i++) {
+    for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
         entry.innerHTML = `
@@ -576,34 +605,166 @@ function generateGearEntries(num = 12) {
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
             <div id="gear${i}Details" class="gearDetails">i</div>
+            <div id="stowed-container-${i}" class="stowed-container"></div>  <!-- For stowed slots -->
         `;
         container.appendChild(entry);
-        // Populate selector and add events (move from init)
+
         const sel = document.getElementById(`gear${i}Select`);
-        sel.innerHTML += gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`).join('');
-        sel.addEventListener('change', () => updateGearLoad(i));
-        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => updateGearLoad(i));
+        sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
+        sel.addEventListener('change', () => handleReadySelectChange(i));
+        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
+            readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);
+            this.value = readyState[i-1].amt;
+            updateReadyLoad(i);
+            calculateLoad();
+        });
+    }
+    // Coin pouch events (fixed)
+    ['tok', 'copper', 'silver', 'gold'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            coinState[id] = Math.max(0, parseInt(this.value) || 0);
+            this.value = coinState[id];
+            updateCoinLoad();
+        });
+    });
+    updateCoinLoad();
+    calculateLoad();
+}
+
+// Handle ready select change
+function handleReadySelectChange(i) {
+    const sel = document.getElementById(`gear${i}Select`);
+    const newGear = sel.value;
+    const prevGear = readyState[i-1].gear;
+    const prevPack = allOptions.find(g => g.name === prevGear);
+    const newPack = allOptions.find(g => g.name === newGear);
+
+    // Handle location if changing pack
+    if (prevPack && prevPack.isPack) {
+        usedLocations[prevPack.location] = null;
+    }
+    if (newPack && newPack.isPack) {
+        if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
+            alert(`Location ${newPack.location} already in use in slot ${usedLocations[newPack.location]}.`);
+            sel.value = prevGear;  // Reset
+            return;
+        }
+        usedLocations[newPack.location] = i;
+    }
+
+    // Update state
+    readyState[i-1].gear = newGear;
+    if (newPack && newPack.isPack) {
+        const newSlots = newPack.stowedSlots;
+        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots);  // Prune if fewer
+        while (readyState[i-1].stowed.length < newSlots) {
+            readyState[i-1].stowed.push({ gear: '', amt: 1 });
+        }
+    } else {
+        readyState[i-1].stowed = [];
+    }
+
+    renderStowed(i);
+    updateReadyLoad(i);
+    calculateLoad();
+}
+// Render stowed for a ready slot
+function renderStowed(i) {
+    const container = document.getElementById(`stowed-container-${i}`);
+    container.innerHTML = '';
+    readyState[i-1].stowed.forEach((s, j) => {
+        const entry = document.createElement('div');
+        entry.className = 'gear-entry stowed-gear';
+        entry.innerHTML = `
+            <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
+            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
+            <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
+            <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
+        `;
+        container.appendChild(entry);
+
+        const sel = entry.querySelector('select');
+        sel.innerHTML += nonPackOptions.map(g => `<option value="${g.name}" data-load="${g.load}" ${s.gear === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
+        sel.addEventListener('change', () => {
+            readyState[i-1].stowed[j].gear = sel.value;
+            updateStowedLoad(i, j+1);
+            updateReadyLoad(i);
+            calculateLoad();
+        });
+
+        const amt = entry.querySelector('input');
+        amt.addEventListener('input', () => {
+            readyState[i-1].stowed[j].amt = Math.max(1, parseInt(amt.value) || 1);
+            amt.value = readyState[i-1].stowed[j].amt;
+            updateStowedLoad(i, j+1);
+            updateReadyLoad(i);
+            calculateLoad();
+        });
+
+        updateStowedLoad(i, j+1);
+    });
+}
+// Update single stowed load
+function updateStowedLoad(readyI, stowedJ) {
+    const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
+    if (!sel) return;
+    const opt = sel.options[sel.selectedIndex];
+    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
+    const qty = readyState[readyI-1].stowed[stowedJ-1].amt;
+    const total = baseLoad * qty;
+    const loadDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-load`);
+    if (loadDiv) {
+        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
+        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+    }
+}
+
+// Update ready load (for pack: sum stowed + base; for non-pack: base * amt)
+function updateReadyLoad(i) {
+    const state = readyState[i-1];
+    const item = allOptions.find(g => g.name === state.gear);
+    let total = 0;
+    if (item) {
+        const baseLoad = item.baseLoad || item.load || 0;
+        total += baseLoad * state.amt;
+        if (item.isPack) {
+            state.stowed.forEach(s => {
+                const sItem = nonPackOptions.find(g => g.name === s.gear);
+                if (sItem) total += (sItem.load || 0) * s.amt;
+            });
+        }
+    }
+    const loadDiv = document.getElementById(`gear${i}Load`);
+    if (loadDiv) {
+        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
+        if (item?.isPack) loadDiv.style.color = total > item.loadLimit ? 'red' : '';
+    }
+}
+
+// Update coin load (total coins / 50; red if >1)
+function updateCoinLoad() {
+    const totalCoins = coinState.tok + coinState.copper + coinState.silver + coinState.gold;
+    const load = totalCoins / 50;
+    const loadDiv = document.getElementById('coinLoad');
+    if (loadDiv) {
+        loadDiv.textContent = load.toFixed(2).replace(/\.?0+$/, '');
+        loadDiv.style.color = load > 1 ? 'red' : '';
     }
     calculateLoad();
 }
 
-// Call in window.load: generateGearEntries();
-
+// Updated calculateLoad (loop over state, no hard numbers beyond max)
 function calculateLoad() {
     let totalLoad = 0;
-    for (let i = 1; i <= 12; i++) {
-        const select = document.getElementById('gear' + i + 'Select');
-        if (select) {
-            const selectedOption = select.options[select.selectedIndex];
-            const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
-            const amtInput = document.getElementById('gear' + i + 'Amt');
-            const qty = Math.max(1, parseInt(amtInput?.value) || 1);
-            totalLoad += baseLoad * qty;
-        }
-    }
+    readyState.forEach((state, idx) => {
+        const i = idx + 1;
+        const loadText = document.getElementById(`gear${i}Load`)?.textContent || '0';
+        totalLoad += parseFloat(loadText) || 0;
+    });
+    const coinLoadText = document.getElementById('coinLoad')?.textContent || '0';
+    totalLoad += parseFloat(coinLoadText) || 0;
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-    // Uncomment and add <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div> in HTML
-    // document.getElementById('totalLoadValue').textContent = formattedTotal;
+    document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
 
 

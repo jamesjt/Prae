@@ -564,7 +564,27 @@ function generateGearEntries() {
         `; // Removed stowed-container from here
         container.appendChild(entry);
         const sel = document.getElementById(`gear${i}Select`);
-        sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
+        sel.innerHTML += '<option value="">Select Gear</option>';
+        // Group by category with optgroup
+        const grouped = {};
+        allOptions.forEach(g => {
+            if (!grouped[g.category]) grouped[g.category] = [];
+            grouped[g.category].push(g);
+        });
+        // Sort categories alphabetically
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `--${cat}--`;
+            // Sort items in category alphabetically
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.baseLoad || g.load || 0;
+                optgroup.appendChild(opt);
+            });
+            sel.appendChild(optgroup);
+        });
         sel.addEventListener('change', () => handleReadySelectChange(i));
         document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
             readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);

@@ -27,9 +27,12 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
 
 // Add near top constants
-const MAX_READY_SLOTS = 5; // Change this to adjust ready slots globally
-let packData = []; // Will be populated from CSV
+const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
+let packData = [];  // Will be populated from CSV
+
+
 // ———————————————————————— DATA LOADING ————————————————————————
+
 fetch(ABILITIES_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -73,6 +76,7 @@ fetch(ABILITIES_CSV_URL)
         updateTrickSelectors();
     })
     .catch(err => console.error('Error loading Abilities CSV:', err));
+
 fetch(WAYS_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -114,7 +118,7 @@ fetch(WAYS_CSV_URL)
         updateWayOptions();
     })
     .catch(err => console.error('Error loading Ways CSV:', err));
-// Fetch and parse PROF_CSV_URL (extended to parse gear and packs)
+
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -130,20 +134,26 @@ fetch(PROF_CSV_URL)
         }
         const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
-        // Find column indices
+
         const gearIdx = headers.indexOf('Gear');
-        const loadIdx = headers.indexOf('Load'); // Assuming next to Gear
+        const loadIdx = headers.indexOf('Load');
         const packsIdx = headers.indexOf('Packs');
         const loadLimitIdx = headers.indexOf('Pack Load Limit');
         const stowedSlotsIdx = headers.indexOf('Pack Stowed Slots');
         const locationIdx = headers.indexOf('Pack Location');
-        const readySlotsIdx = headers.indexOf('Pack Ready Slots'); // If exists, else default 1
-        const costIdx = headers.indexOf('Pack Cost'); // If exists
-        gearData = []; // Non-packs
-        packData = []; // Packs
+        const readySlotsIdx = headers.indexOf('Pack Ready Slots');
+        const costIdx = headers.indexOf('Pack Cost');
+
+        // Generalizable categories (add more like { col: 'Armor', loadCol: 'Armor Load', flag: 'isArmor', class: 'gearArmor' })
+        const categories = [
+            { col: 'Weapons', loadCol: 'Weapon Load', flag: 'isWeapon', class: 'gearWeapon' }
+        ];
+
+        gearData = [];
+        packData = [];
+
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            // Parse gear (non-packs)
             if (gearIdx >= 0 && row[gearIdx] && row[gearIdx].trim()) {
                 gearData.push({
                     name: row[gearIdx].trim(),
@@ -151,7 +161,6 @@ fetch(PROF_CSV_URL)
                     isPack: false
                 });
             }
-            // Parse packs
             if (packsIdx >= 0 && row[packsIdx] && row[packsIdx].trim()) {
                 packData.push({
                     name: row[packsIdx].trim(),
@@ -164,14 +173,28 @@ fetch(PROF_CSV_URL)
                     baseLoad: 0
                 });
             }
+            // Parse categories (weapons, armor, etc.)
+            categories.forEach(cat => {
+                const catIdx = headers.indexOf(cat.col);
+                const catLoadIdx = headers.indexOf(cat.loadCol);
+                if (catIdx >= 0 && row[catIdx] && row[catIdx].trim()) {
+                    gearData.push({
+                        name: row[catIdx].trim(),
+                        load: parseFloat(row[catLoadIdx]) || 0,
+                        [cat.flag]: true,
+                        isPack: false
+                    });
+                }
+            });
         }
-        allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')]; // Exclude coin pouch from ready selectors
-        nonPackOptions = gearData; // For stowed
+
+        const allOptions = [...gearData, ...packData];
+        const nonPackOptions = gearData.filter(g => !g.isPack);
         generateGearEntries();
-        calculateLoad(); // Initial total
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 
+// Remove any hardcoded gearData assignment outside the fetch (e.g., no gearData = [Sword, Shield] block)
 let allOptions = [];
 let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
@@ -594,6 +617,18 @@ function handleReadySelectChange(i) {
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
+    // Update category classes
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
+    const categories = [
+        { col: 'Weapons', loadCol: 'Weapon Load', flag: 'isWeapon', class: 'gearWeapon' }
+    ]; // Add more for armor later
+    categories.forEach(cat => gearEntry.classList.remove(cat.class));
+    const item = allOptions.find(g => g.name === newGear);
+    if (item) {
+        categories.forEach(cat => {
+            if (item[cat.flag]) gearEntry.classList.add(cat.class);
+        });
+    }
 }
 // Render stowed for a ready slot
 function renderStowed(i) {

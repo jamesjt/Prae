@@ -612,46 +612,49 @@ function handleReadySelectChange(i) {
     const item = allOptions.find(g => g.name === newGearName);
 
     // Update ready state
-    readyState[i-1].gear = newGearName;
+    readyState[i - 1].gear = newGearName;
 
-    // Handle pack logic (unchanged)
-    const prevGearName = readyState[i-1].gear;
+    // Handle pack location cleanup
+    const prevGearName = readyState[i - 1].gear; // old value before change
     const prevPack = allOptions.find(g => g.name === prevGearName);
-    const newPack = item?.isPack ? item : null;
-
-    if (prevPack?.isPack) && (usedLocations[prevPack.location] = null);
-    if (newPack) {
-        if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
-            alert(`Location ${newPack.location} already in use!`);
-            sel.value = prevGearName;
-            return;
-        }
-        usedLocations[newPack.location] = i;
+    if (prevPack?.isPack) {
+        usedLocations[prevPack.location] = null;
     }
 
-    // Pack stowed slots
-    if (newPack) {
-        const slots = newPack.stowedslots || 0;
-        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, slots);
-        while (readyState[i-1].stowed.length < slots) {
-            readyState[i-1].stowed.push({ gear: '', amt: 1 });
+    // Handle new pack
+    if (item?.isPack) {
+        if (usedLocations[item.location] && usedLocations[item.location] !== i) {
+            alert(`Location ${item.location} already in use!`);
+            sel.value = prevGearName;
+            readyState[i - 1].gear = prevGearName;
+            return;
+        }
+        usedLocations[item.location] = i;
+    }
+
+    // Update stowed slots if it's a pack
+    if (item?.isPack) {
+        const slots = item.stowedslots || 0;
+        readyState[i - 1].stowed = readyState[i - 1].stowed.slice(0, slots);
+        while (readyState[i - 1].stowed.length < slots) {
+            readyState[i - 1].stowed.push({ gear: '', amt: 1 });
         }
     } else {
-        readyState[i-1].stowed = [];
+        readyState[i - 1].stowed = [];
     }
 
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
 
-    // ——— UPDATE CATEGORY CLASS ———
+    // Update category class on gearEntry
     const entry = sel.closest('.gearEntry');
     entry.className = 'gearEntry'; // reset
     if (item?.category) {
         entry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
     }
 
-    // ——— UPDATE DETAILS ICON ———
+    // Update details icon
     const detailsDiv = document.getElementById(`gear${i}Details`);
     if (item?.details?.trim()) {
         detailsDiv.textContent = 'i';

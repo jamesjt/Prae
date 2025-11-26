@@ -136,7 +136,7 @@ fetch(PROF_CSV_URL)
         const headers = rows[0].map(h => h.trim());
 
         // Known suffixes to ignore for main categories
-        const suffixes = ['Load', 'Descriptions', 'Containers', 'LoadLimit', 'StowedSlots', 'ReadyUsed', 'Location', 'Cost', 'Bonus'];
+        const suffixes = ['Load', 'Descriptions', 'Containers', 'LoadLimit', 'StowedSlots', 'ReadyUsed', 'Location', 'Cost', 'Bonus', 'Details'];
 
         // Find main categories: headers starting with 'Gear ' and not ending with a suffix
         const mainCategories = headers.filter(h => h.startsWith('Gear ') && !suffixes.some(s => h.endsWith(s)));
@@ -626,7 +626,7 @@ function handleReadySelectChange(i) {
     // Update state
     readyState[i-1].gear = newGear;
     if (newPack && newPack.isPack) {
-        const newSlots = newPack.stowedSlots;
+        const newSlots = newPack.stowedslots;
         readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots); // Prune if fewer
         while (readyState[i-1].stowed.length < newSlots) {
             readyState[i-1].stowed.push({ gear: '', amt: 1 });

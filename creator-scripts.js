@@ -556,12 +556,14 @@ function generateGearEntries() {
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
+        let detailsHtml = '';
+        // Conditional: Add details icon only if item has details (will be updated on select change)
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails"></div>
-        `; // Removed stowed-container from here
+            ${detailsHtml}
+        `;
         container.appendChild(entry);
         const sel = document.getElementById(`gear${i}Select`);
         sel.innerHTML += '<option value="">Select Gear</option>';
@@ -647,8 +649,17 @@ function handleReadySelectChange(i) {
     if (item && item.category) {
         gearEntry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
     }
+    // Update details icon visibility
+    const detailsDiv = document.getElementById(`gear${i}Details`);
+    if (item && item.details) {
+        detailsDiv.innerHTML = 'i';
+        detailsDiv.dataset.details = item.details; // Store for hover
+    } else {
+        detailsDiv.innerHTML = '';
+        detailsDiv.dataset.details = '';
+    }
 }
-// Render stowed for a ready slot
+JavaScript// Render stowed for a ready slot
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`); // Find the parent gearEntry
@@ -667,11 +678,13 @@ function renderStowed(i) {
     readyState[i-1].stowed.forEach((s, j) => {
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
+        let detailsHtml = '';
+        // Conditional: Add details icon only if item has details (will be updated on select change)
         entry.innerHTML = `
             <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
             <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${j+1}-details" class="gearDetails"></div>
+            ${detailsHtml}
         `;
         container.appendChild(entry);
         const sel = entry.querySelector('select');
@@ -711,6 +724,25 @@ function renderStowed(i) {
             calculateLoad();
         });
         updateStowedLoad(i, j+1);
+    });
+    // Hover logic for gear details (event delegation)
+    document.addEventListener('mouseover', e => {
+        if (e.target.matches('.gearDetails') && e.target.dataset.details) {
+            const tooltip = createTooltip(e.target.dataset.details);
+            document.body.appendChild(tooltip);
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+            tooltip.style.display = 'block';
+            e.target._tooltip = tooltip; // Store for mouseout
+        }
+    });
+
+    document.addEventListener('mouseout', e => {
+        if (e.target.matches('.gearDetails') && e.target._tooltip) {
+            e.target._tooltip.remove();
+            e.target._tooltip = null;
+        }
     });
 }
 // Update single stowed load
@@ -771,6 +803,20 @@ function calculateLoad() {
     totalLoad += parseFloat(coinLoadText) || 0;
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
+}
+
+// Reusable function to create a tooltip div
+function createTooltip(details) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = details;
+    tooltip.style.position = 'absolute';
+    tooltip.style.background = '#fff';
+    tooltip.style.border = '1px solid #ccc';
+    tooltip.style.padding = '10px';
+    tooltip.style.zIndex = '1000';
+    tooltip.style.display = 'none'; // Hidden by default
+    return tooltip;
 }
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {

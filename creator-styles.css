@@ -938,6 +938,17 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 
 .attvalue{width:30px;}
 
+.tooltip {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    max-width: 300px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    white-space: pre-wrap; /* Preserve formatting if needed */
+}
+
 .amountRow {
     display: flex;
     align-items: center;

@@ -565,6 +565,30 @@ function updateGearLoad(i) {
     }
 }
 
+function generateGearEntries(num = 12) {
+    const container = document.getElementById('gearEntries');
+    container.innerHTML = '';
+    for (let i = 1; i <= num; i++) {
+        const entry = document.createElement('div');
+        entry.className = 'gearEntry';
+        entry.innerHTML = `
+            <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
+            <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
+            <div id="gear${i}Load" class="gearLoad"></div>
+            <div id="gear${i}Details" class="gearDetails">i</div>
+        `;
+        container.appendChild(entry);
+        // Populate selector and add events (move from init)
+        const sel = document.getElementById(`gear${i}Select`);
+        sel.innerHTML += gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`).join('');
+        sel.addEventListener('change', () => updateGearLoad(i));
+        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => updateGearLoad(i));
+    }
+    calculateLoad();
+}
+
+// Call in window.load: generateGearEntries();
+
 function calculateLoad() {
     let totalLoad = 0;
     for (let i = 1; i <= 12; i++) {
@@ -578,10 +602,10 @@ function calculateLoad() {
         }
     }
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-    console.log('Total Load:', formattedTotal);
     // Uncomment and add <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div> in HTML
     // document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
+
 
 // ———————————————————————— INIT ————————————————————————
 
@@ -597,5 +621,6 @@ window.addEventListener('load', () => {
     });
     updateTalentTables();  // Initial build for talents
     updateTrickTables();   // Initial build for tricks
+    generateGearEntries();
     calculateLoad(); // Initial total
 });

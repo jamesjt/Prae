@@ -934,103 +934,39 @@
                 </div> <!-- End Column 2 -->
                 <div id="column3">
                   <div class="gearListContainer">
-                    <div class="gearEntryHeader">
-                      <div class="gearEntryHead">Gear
-                      </div>
-                      <div class="gearAmtHead">Amt</div>
-                      <div class="gearLoadHead">Load
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gear1Select" class="gearSelector">Gear Slots
-                      </select>
-                      <input type="number" id="gear1Amt" class="gearAmtInputField" min="1" value="1"/>
-                      <div id="gear1Load" class="gearLoad">
-                      </div>
-                      <div id="gear1Details"class="gearDetails">i</div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect2" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad2" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect3" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad3" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect4" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad4" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect5" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad5" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect6" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad6" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect7" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad7" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect8" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad8" class="gearLoad">
-                      </div>
-                    </div>
-                    <div class="gearEntry">
-                      <select id="gearSelect9" class="gearSelector">Gear Slots
-                      </select>
-                      <div id="gearLoad9" class="gearLoad">
-                      </div>
-                    </div>
-                    <div id="totalLoadDisplay" style="font-weight: bold; color: green; margin-top: 10px;">
-                      Total Load: <span id="totalLoadValue">0</span>
-                    </div>
+                    <div class="gearEntryHeader"> <!-- Header as-is --> </div>
+                    <div id="gearEntries"></div> <!-- JS will populate this -->
+                    <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div>
                   </div>
-                  <!--
-                  <div id='ritualList'>
-                    <div id="ritual1" class="ritualListing">
-                      <select id="ritual1Select" class="ritualSelector">
-                        <option value="0"></option>
-                      </select>
-                      <div id="ritual1SelectShortCost" class="filledField ritualCost">Cost</div>
-                      <div id="ritual1SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
-                      <div id="ritual1SelectShortDuration" class="filledField ritualDuration">Duration</div>
-                      <img id="showritual1Details" class="showRitualDetails" onclick="showDesc('ritual1Details');" src="imgs/details2.png">
-                      <div id="ritual1Details" class="draggable ritualDetails">
-                        <div id="hideritual1Details" class="closeRitual" onclick="hideDesc('ritual1Details');">X</div>
-                        <div class="ritualBody">
-                          <div class="mentalExploit ritualDescLine" id="ritual1SelectName"></div>
-                          <div id="ritual1SelectKeywords" class="ritualDescLine"></div>
-                          <div id="ritual1SelectCost" class="ritualDescLine"></div>
-                          <div id="ritual1SelectCastTime" class="ritualDescLine"></div>
-                          <div id="ritual1SelectDuration" class="ritualDescLine"></div>
-                          <div id="ritual1SelectEffect" class="ritualDescLine"></div>
-                          <div id="ritual1SelectEnhancements" class="ritualDescLine"></div>
-                          <div id="ritual1SelectAugments" class="ritualDescLine"></div>
-                          <div id="ritual1SelectResist" class="ritualDescLine"></div>
-                          <div id="ritual1SelectNotes" class="ritualNotes ritualDescLine"></div>
-                        </div>
+                <!--
+                <div id='ritualList'>
+                  <div id="ritual1" class="ritualListing">
+                    <select id="ritual1Select" class="ritualSelector">
+                      <option value="0"></option>
+                    </select>
+                    <div id="ritual1SelectShortCost" class="filledField ritualCost">Cost</div>
+                    <div id="ritual1SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
+                    <div id="ritual1SelectShortDuration" class="filledField ritualDuration">Duration</div>
+                    <img id="showritual1Details" class="showRitualDetails" onclick="showDesc('ritual1Details');" src="imgs/details2.png">
+                    <div id="ritual1Details" class="draggable ritualDetails">
+                      <div id="hideritual1Details" class="closeRitual" onclick="hideDesc('ritual1Details');">X</div>
+                      <div class="ritualBody">
+                        <div class="mentalExploit ritualDescLine" id="ritual1SelectName"></div>
+                        <div id="ritual1SelectKeywords" class="ritualDescLine"></div>
+                        <div id="ritual1SelectCost" class="ritualDescLine"></div>
+                        <div id="ritual1SelectCastTime" class="ritualDescLine"></div>
+                        <div id="ritual1SelectDuration" class="ritualDescLine"></div>
+                        <div id="ritual1SelectEffect" class="ritualDescLine"></div>
+                        <div id="ritual1SelectEnhancements" class="ritualDescLine"></div>
+                        <div id="ritual1SelectAugments" class="ritualDescLine"></div>
+                        <div id="ritual1SelectResist" class="ritualDescLine"></div>
+                        <div id="ritual1SelectNotes" class="ritualNotes ritualDescLine"></div>
                       </div>
-                    </div>  
+                    </div>
+                  </div>  
+                </div>
 
-                  </div>
-
-                  End of column 3  --> 
+                End of column 3  --> 
                 </div> 
 
 
@@ -1043,24 +979,21 @@
                             <label class="amountLabel">Talents</label>
                             <input type="number" id="talentAmount" min="1" max="10" value="1" step="1">
                         </div>
-
                         <div id="wayTalent" class="talentAbility">
                             <div id="wayTalentName" class="wayTalent">Select Way</div>
                             <div id="wayTalentDesc" class="talentInfo"></div>
                         </div>
-                        <!-- Extra talents injected here by JS -->
+                        <div id="talentTables"></div> <!-- JS populates extra talents -->
                     </div>
-
                     <div class="trickWrapper">
-                        <!-- Trick Amount with Live Total -->
                         <div class="amountRow">
                             <label class="amountLabel">Tricks</label>
                             <input type="number" id="tricksAmount" min="1" max="10" value="1" step="1">
                         </div>
-
-                        <!-- All trick tables injected here by JS -->
+                        <div id="trickTables"></div> <!-- JS populates -->
                     </div>
                 </div>
+                <!-- End abilityWrapper -->
                 <!-- End abilityWrapper -->
       </article>
     <script src="script.js"></script>

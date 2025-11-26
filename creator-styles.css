@@ -548,6 +548,7 @@ dark leather: #5E4634
 }
 .gearEntryHead{width: 45px;width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
+.gearLoad.overloaded { color: red !important; }
 
 #ritualList {
   background-color:#9BAABF;

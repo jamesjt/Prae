@@ -61,12 +61,6 @@ let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = 
 const MAX_READY_SLOTS = 12;  // Change this to adjust ready slots globally
 let packData = [];  // Will be populated from CSV
 
-// Assume gearData is non-packs (from fetch or hardcoded; example below)
-gearData = [  // Reassign without 'let' (fix for duplicate declaration); replace with parsed CSV data
-    { name: 'Sword', load: 2, isPack: false },
-    { name: 'Shield', load: 1, isPack: false },
-    // Add more from CSV (parse in the PROF_CSV_URL fetch block, e.g., filter rows where 'Packs' column is empty/false)
-];
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
@@ -181,11 +175,17 @@ fetch(PROF_CSV_URL)
             }
         }
 
+        // Define allOptions and nonPackOptions here, after data is populated
+        allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
+        nonPackOptions = gearData;  // For stowed
+
         // Now that data is loaded, generate entries
         generateGearEntries();
         calculateLoad(); // Initial total
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
+
+// Remove any hardcoded gearData assignment outside the fetch (e.g., no gearData = [Sword, Shield] block)
 
 let allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
 let nonPackOptions = gearData;  // For stowed

@@ -685,7 +685,7 @@ function renderStowed(i) {
         entry.className = 'gearEntry stowedGear';
         entry.innerHTML = `
             <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
-            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
+            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" class="gearAmtInputField" value="${s.amt}"/>
             <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
             <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
         `;

@@ -138,12 +138,11 @@ fetch(PROF_CSV_URL)
 
         if (strikeCol !== -1) profData.strike = rows.slice(1).map(r => r[strikeCol]).filter(v => v);
         if (blastCol !== -1) profData.blast = rows.slice(1).map(r => r[blastCol]).filter(v => v);
-        if (invokeCol !== -1) profData.invoke = rows.slice(1).map(r => r[involveCol]).filter(v => v);
+        if (invokeCol !== -1) profData.invoke = rows.slice(1).map(r => r[invokeCol]).filter(v => v);
         if (gearCol !== -1 && loadCol !== -1) {
             gearData = rows.slice(1).map(r => ({ gear: r[gearCol].trim(), load: parseInt(r[loadCol].trim()) || 0 })).filter(g => g.gear);
         }
 
-        // Populate prof selectors (unchanged)
         ['strike', 'blast', 'invoke'].forEach(type => {
             for (let i = 1; i <= 5; i++) {
                 const sel = document.getElementById(type + 'ProfSelector' + i);
@@ -153,13 +152,11 @@ fetch(PROF_CSV_URL)
             }
         });
 
-        // UPDATED: Populate gear selectors with new IDs (gear1Select, gear2Select, etc.)
         for (let i = 1; i <= 12; i++) {
             const sel = document.getElementById('gear' + i + 'Select');
             if (sel) {
                 sel.innerHTML = '<option value="">Select Gear</option>' + 
                     gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear} (Load: ${g.load})</option>`).join('');
-                // Trigger initial calculation
                 sel.dispatchEvent(new Event('change'));
             }
         }
@@ -321,7 +318,7 @@ document.addEventListener('change', e => {
         populateRoleInfo(e);
     }
 
-    // Gear
+    // Gear Selector Change
     else if (t.matches('.gearSelector')) {
         const match = t.id.match(/gear(\d+)Select/);
         if (!match) return;
@@ -330,11 +327,11 @@ document.addEventListener('change', e => {
         calculateLoad();
     }
 
-    // NEW: Amount Input Change
-    else if (t.matches('[class*="AmtInputField"]')) {
-        const classMatch = t.className.match(/gear(\d+)AmtInputField/);
-        if (!classMatch) return;
-        const i = classMatch[1];
+    // Amount Input Change
+    else if (t.matches('.gearAmtInputField')) {
+        const match = t.id.match(/gear(\d+)Amt/);
+        if (!match) return;
+        const i = match[1];
         updateGearLoad(i);
         calculateLoad();
     }
@@ -550,24 +547,12 @@ function updateProficiencySelectors(type, rank) {
     }
 }
 
-function calculateLoad() {
-    let totalLoad = 0;
-    for (let i = 1; i <= 12; i++) {
-        const select = document.getElementById('gearSelect' + i);
-        if (select) {
-            const load = parseInt(select.options[select.selectedIndex]?.getAttribute('data-load')) || 0;
-            totalLoad += load;
-        }
-    }
-    console.log('Total Load:', totalLoad);
-}
-
 function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');
     if (!select) return;
     const selectedOption = select.options[select.selectedIndex];
     const baseLoad = parseInt(selectedOption.getAttribute('data-load')) || 0;
-    const amtInput = document.querySelector(`.${'gear' + i + 'AmtInputField'}`);
+    const amtInput = document.getElementById('gear' + i + 'Amt');
     const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
     if (amtInput) amtInput.value = qty; // Enforce clamp
     const totalLoad = baseLoad * qty;
@@ -578,6 +563,7 @@ function updateGearLoad(i) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
+
 function calculateLoad() {
     let totalLoad = 0;
     for (let i = 1; i <= 12; i++) {
@@ -585,15 +571,15 @@ function calculateLoad() {
         if (select) {
             const selectedOption = select.options[select.selectedIndex];
             const baseLoad = parseInt(selectedOption.getAttribute('data-load')) || 0;
-            const amtInput = document.querySelector(`.gear${i}AmtInputField`);
+            const amtInput = document.getElementById('gear' + i + 'Amt');
             const qty = Math.max(1, parseInt(amtInput?.value) || 1);
             totalLoad += baseLoad * qty;
         }
     }
     console.log('Total Load:', totalLoad);
-    // Uncomment and add <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div> in HTML
-    // document.getElementById('totalLoadValue').textContent = totalLoad;
+    document.getElementById('totalLoadValue').textContent = totalLoad;
 }
+
 // ———————————————————————— INIT ————————————————————————
 
 window.addEventListener('load', () => {
@@ -609,5 +595,4 @@ window.addEventListener('load', () => {
     updateTalentTables();  // Initial build for talents
     updateTrickTables();   // Initial build for tricks
     calculateLoad(); // Initial total
-});
 });

@@ -606,60 +606,65 @@ function generateGearEntries() {
     updateCoinLoad();
     calculateLoad();
 }
-// Handle ready select change
 function handleReadySelectChange(i) {
     const sel = document.getElementById(`gear${i}Select`);
-    const newGear = sel.value;
-    const prevGear = readyState[i-1].gear;
-    const prevPack = allOptions.find(g => g.name === prevGear);
-    const newPack = allOptions.find(g => g.name === newGear);
-    // Handle location if changing pack
-    if (prevPack && prevPack.isPack) {
-        usedLocations[prevPack.location] = null;
-    }
-    if (newPack && newPack.isPack) {
+    const newGearName = sel.value;
+    const item = allOptions.find(g => g.name === newGearName);
+
+    // Update ready state
+    readyState[i-1].gear = newGearName;
+
+    // Handle pack logic (unchanged)
+    const prevGearName = readyState[i-1].gear;
+    const prevPack = allOptions.find(g => g.name === prevGearName);
+    const newPack = item?.isPack ? item : null;
+
+    if (prevPack?.isPack) && (usedLocations[prevPack.location] = null);
+    if (newPack) {
         if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
-            alert(`Location ${newPack.location} already in use in slot ${usedLocations[newPack.location]}.`);
-            sel.value = prevGear; // Reset
+            alert(`Location ${newPack.location} already in use!`);
+            sel.value = prevGearName;
             return;
         }
         usedLocations[newPack.location] = i;
     }
-    // Update state
-    readyState[i-1].gear = newGear;
-    if (newPack && newPack.isPack) {
-        const newSlots = newPack.stowedslots;
-        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots); // Prune if fewer
-        while (readyState[i-1].stowed.length < newSlots) {
+
+    // Pack stowed slots
+    if (newPack) {
+        const slots = newPack.stowedslots || 0;
+        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, slots);
+        while (readyState[i-1].stowed.length < slots) {
             readyState[i-1].stowed.push({ gear: '', amt: 1 });
         }
     } else {
         readyState[i-1].stowed = [];
     }
+
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
-    // Update category classes
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
-    // Remove all gear* classes except gearEntry
-    Array.from(gearEntry.classList).forEach(cl => {
-        if (cl.startsWith('gear') && cl !== 'gearEntry') gearEntry.classList.remove(cl);
-    });
-    const item = allOptions.find(g => g.name === newGear);
-    if (item && item.category) {
-        gearEntry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
+
+    // ——— UPDATE CATEGORY CLASS ———
+    const entry = sel.closest('.gearEntry');
+    entry.className = 'gearEntry'; // reset
+    if (item?.category) {
+        entry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
     }
-    // Update details icon visibility
+
+    // ——— UPDATE DETAILS ICON ———
     const detailsDiv = document.getElementById(`gear${i}Details`);
-    if (item && item.details) {
-        detailsDiv.innerHTML = 'i';
-        detailsDiv.dataset.details = item.details; // Store for hover
+    if (item?.details?.trim()) {
+        detailsDiv.textContent = 'i';
+        detailsDiv.dataset.details = item.details.trim();
+        detailsDiv.style.cursor = 'help';
+        detailsDiv.title = 'Hover for details';
     } else {
-        detailsDiv.innerHTML = '';
+        detailsDiv.textContent = '';
         detailsDiv.dataset.details = '';
+        detailsDiv.style.cursor = 'default';
+        detailsDiv.title = '';
     }
 }
-JavaScript// Render stowed for a ready slot
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`); // Find the parent gearEntry
@@ -724,25 +729,6 @@ function renderStowed(i) {
             calculateLoad();
         });
         updateStowedLoad(i, j+1);
-    });
-    // Hover logic for gear details (event delegation)
-    document.addEventListener('mouseover', e => {
-        if (e.target.matches('.gearDetails') && e.target.dataset.details) {
-            const tooltip = createTooltip(e.target.dataset.details);
-            document.body.appendChild(tooltip);
-            const rect = e.target.getBoundingClientRect();
-            tooltip.style.left = `${rect.left + window.scrollX}px`;
-            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-            tooltip.style.display = 'block';
-            e.target._tooltip = tooltip; // Store for mouseout
-        }
-    });
-
-    document.addEventListener('mouseout', e => {
-        if (e.target.matches('.gearDetails') && e.target._tooltip) {
-            e.target._tooltip.remove();
-            e.target._tooltip = null;
-        }
     });
 }
 // Update single stowed load
@@ -818,6 +804,26 @@ function createTooltip(details) {
     tooltip.style.display = 'none'; // Hidden by default
     return tooltip;
 }
+
+// Hover logic for gear details (event delegation)
+    document.addEventListener('mouseover', e => {
+        if (e.target.matches('.gearDetails') && e.target.dataset.details) {
+            const tooltip = createTooltip(e.target.dataset.details);
+            document.body.appendChild(tooltip);
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+            tooltip.style.display = 'block';
+            e.target._tooltip = tooltip; // Store for mouseout
+        }
+    });
+
+    document.addEventListener('mouseout', e => {
+        if (e.target.matches('.gearDetails') && e.target._tooltip) {
+            e.target._tooltip.remove();
+            e.target._tooltip = null;
+        }
+    });
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
     calculateSkillPoints();

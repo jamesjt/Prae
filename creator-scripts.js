@@ -193,11 +193,6 @@ fetch(PROF_CSV_URL)
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 
-const allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
-const nonPackOptions = gearData;  // For stowed
-let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
-let usedLocations = { Back: null, Waist: null };
-let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 
 function rebuildDynamicSelectors(config) {

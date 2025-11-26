@@ -560,7 +560,7 @@ function generateGearEntries() {
             <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails">i</div>
+            <div id="gear${i}Details" class="gearDetails"></div>
         `; // Removed stowed-container from here
         container.appendChild(entry);
         const sel = document.getElementById(`gear${i}Select`);
@@ -671,11 +671,31 @@ function renderStowed(i) {
             <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
             <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
+            <div id="stowed-${i}-${j+1}-details" class="gearDetails"></div>
         `;
         container.appendChild(entry);
         const sel = entry.querySelector('select');
-        sel.innerHTML += nonPackOptions.map(g => `<option value="${g.name}" data-load="${g.load}" ${s.gear === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
+        sel.innerHTML += '<option value="">Select Gear</option>';
+        // Group by category with optgroup
+        const grouped = {};
+        allOptions.forEach(g => {
+            if (!grouped[g.category]) grouped[g.category] = [];
+            grouped[g.category].push(g);
+        });
+        // Sort categories alphabetically
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `--${cat}--`;
+            // Sort items in category alphabetically
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.baseLoad || g.load || 0;
+                optgroup.appendChild(opt);
+            });
+            sel.appendChild(optgroup);
+        });
         sel.addEventListener('change', () => {
             readyState[i-1].stowed[j].gear = sel.value;
             updateStowedLoad(i, j+1);

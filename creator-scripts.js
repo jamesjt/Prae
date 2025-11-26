@@ -135,61 +135,61 @@ fetch(PROF_CSV_URL)
         const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
 
-        const gearIdx = headers.indexOf('Gear');
-        const loadIdx = headers.indexOf('Load');
-        const packsIdx = headers.indexOf('Packs');
-        const loadLimitIdx = headers.indexOf('Pack Load Limit');
-        const stowedSlotsIdx = headers.indexOf('Pack Stowed Slots');
-        const locationIdx = headers.indexOf('Pack Location');
-        const readySlotsIdx = headers.indexOf('Pack Ready Slots');
-        const costIdx = headers.indexOf('Pack Cost');
+        // Known suffixes to ignore for main categories
+        const suffixes = ['Load', 'Descriptions', 'Containers', 'LoadLimit', 'StowedSlots', 'ReadyUsed', 'Location', 'Cost', 'Bonus'];
 
-        // Generalizable categories (add more like { col: 'Armor', loadCol: 'Armor Load', flag: 'isArmor', class: 'gearArmor' })
-        const categories = [
-            { col: 'Weapons', loadCol: 'Weapon Load', flag: 'isWeapon', class: 'gearWeapon' }
-        ];
+        // Find main categories: headers starting with 'Gear ' and not ending with a suffix
+        const mainCategories = headers.filter(h => h.startsWith('Gear ') && !suffixes.some(s => h.endsWith(s)));
+
+        // For each main category, derive camelPrefix and find related columns
+        const categoryConfigs = mainCategories.map(main => {
+            const categoryName = main.replace('Gear ', '').trim();
+            const camelPrefix = 'Gear' + categoryName.replace(/\s+/g, '');
+            const related = headers.filter(h => h.startsWith(camelPrefix)).map(h => ({
+                suffix: h.replace(camelPrefix, '').trim(),
+                idx: headers.indexOf(h)
+            }));
+            return {
+                mainIdx: headers.indexOf(main),
+                category: categoryName,
+                related,
+                flag: `is${categoryName.replace(/\s+/g, '')}`,
+                class: `gear${categoryName.replace(/\s+/g, '')}`
+            };
+        });
 
         gearData = [];
-        packData = [];
 
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            if (gearIdx >= 0 && row[gearIdx] && row[gearIdx].trim()) {
-                gearData.push({
-                    name: row[gearIdx].trim(),
-                    load: parseFloat(row[loadIdx]) || 0,
-                    isPack: false
-                });
-            }
-            if (packsIdx >= 0 && row[packsIdx] && row[packsIdx].trim()) {
-                packData.push({
-                    name: row[packsIdx].trim(),
-                    loadLimit: parseFloat(row[loadLimitIdx]) || 0,
-                    stowedSlots: parseInt(row[stowedSlotsIdx]) || 0,
-                    location: row[locationIdx] ? row[locationIdx].trim() : null,
-                    readySlots: parseInt(row[readySlotsIdx]) || 1,
-                    cost: row[costIdx] ? row[costIdx].trim() : '',
-                    isPack: true,
-                    baseLoad: 0
-                });
-            }
-            // Parse categories (weapons, armor, etc.)
-            categories.forEach(cat => {
-                const catIdx = headers.indexOf(cat.col);
-                const catLoadIdx = headers.indexOf(cat.loadCol);
-                if (catIdx >= 0 && row[catIdx] && row[catIdx].trim()) {
-                    gearData.push({
-                        name: row[catIdx].trim(),
-                        load: parseFloat(row[catLoadIdx]) || 0,
-                        [cat.flag]: true,
-                        isPack: false
+            categoryConfigs.forEach(config => {
+                const name = row[config.mainIdx]?.trim();
+                if (name) {
+                    const item = {
+                        name,
+                        category: config.category,
+                        [config.flag]: true,
+                        isPack: config.category === 'Packs' // Special case for packs if needed
+                    };
+                    // Add related props
+                    config.related.forEach(rel => {
+                        let val = row[rel.idx]?.trim();
+                        if (rel.suffix === 'Load' || rel.suffix === 'LoadLimit' || rel.suffix === 'StowedSlots' || rel.suffix === 'ReadyUsed') {
+                            val = parseFloat(val) || 0;
+                        } else if (rel.suffix === 'Bonus') {
+                            val = parseInt(val) || 0;
+                        }
+                        if (val !== undefined && val !== '') {
+                            item[rel.suffix.toLowerCase()] = val;
+                        }
                     });
+                    gearData.push(item);
                 }
             });
         }
 
-        const allOptions = [...gearData, ...packData];
-        const nonPackOptions = gearData.filter(g => !g.isPack);
+        allOptions = gearData;
+        nonPackOptions = gearData.filter(g => !g.isPack);
         generateGearEntries();
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
@@ -617,18 +617,6 @@ function handleReadySelectChange(i) {
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
-    // Update category classes
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
-    const categories = [
-        { col: 'Weapons', loadCol: 'Weapon Load', flag: 'isWeapon', class: 'gearWeapon' }
-    ]; // Add more for armor later
-    categories.forEach(cat => gearEntry.classList.remove(cat.class));
-    const item = allOptions.find(g => g.name === newGear);
-    if (item) {
-        categories.forEach(cat => {
-            if (item[cat.flag]) gearEntry.classList.add(cat.class);
-        });
-    }
 }
 // Render stowed for a ready slot
 function renderStowed(i) {

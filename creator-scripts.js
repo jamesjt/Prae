@@ -558,7 +558,7 @@ function updateGearLoad(i) {
     const totalLoad = baseLoad * qty;
     const loadDiv = document.getElementById('gear' + i + 'Load');
     if (loadDiv) {
-        loadDiv.textContent = totalLoad > 0 ? totalLoad.toString() : '';
+        loadDiv.textContent = totalLoad > 0 ? totalLoad.toFixed(2) : '';
         // Color red if qty >1 AND baseLoad >1
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
@@ -576,9 +576,9 @@ function calculateLoad() {
             totalLoad += baseLoad * qty;
         }
     }
-    console.log('Total Load:', totalLoad);
+    console.log('Total Load:', totalLoad.toFixed(2));
     // Uncomment and add <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div> in HTML
-    // document.getElementById('totalLoadValue').textContent = totalLoad;
+    // document.getElementById('totalLoadValue').textContent = totalLoad.toFixed(2);
 }
 
 // ———————————————————————— INIT ————————————————————————

@@ -27,12 +27,9 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
 
 // Add near top constants
-const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
-let packData = [];  // Will be populated from CSV
-
-
+const MAX_READY_SLOTS = 5; // Change this to adjust ready slots globally
+let packData = []; // Will be populated from CSV
 // ———————————————————————— DATA LOADING ————————————————————————
-
 fetch(ABILITIES_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -76,7 +73,6 @@ fetch(ABILITIES_CSV_URL)
         updateTrickSelectors();
     })
     .catch(err => console.error('Error loading Abilities CSV:', err));
-
 fetch(WAYS_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -118,7 +114,7 @@ fetch(WAYS_CSV_URL)
         updateWayOptions();
     })
     .catch(err => console.error('Error loading Ways CSV:', err));
-
+// Fetch and parse PROF_CSV_URL (extended to parse gear and packs)
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
@@ -134,21 +130,20 @@ fetch(PROF_CSV_URL)
         }
         const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
-
+        // Find column indices
         const gearIdx = headers.indexOf('Gear');
-        const loadIdx = headers.indexOf('Load');
+        const loadIdx = headers.indexOf('Load'); // Assuming next to Gear
         const packsIdx = headers.indexOf('Packs');
         const loadLimitIdx = headers.indexOf('Pack Load Limit');
         const stowedSlotsIdx = headers.indexOf('Pack Stowed Slots');
         const locationIdx = headers.indexOf('Pack Location');
-        const readySlotsIdx = headers.indexOf('Pack Ready Slots');
-        const costIdx = headers.indexOf('Pack Cost');
-
-        gearData = [];
-        packData = [];
-
+        const readySlotsIdx = headers.indexOf('Pack Ready Slots'); // If exists, else default 1
+        const costIdx = headers.indexOf('Pack Cost'); // If exists
+        gearData = []; // Non-packs
+        packData = []; // Packs
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
+            // Parse gear (non-packs)
             if (gearIdx >= 0 && row[gearIdx] && row[gearIdx].trim()) {
                 gearData.push({
                     name: row[gearIdx].trim(),
@@ -156,6 +151,7 @@ fetch(PROF_CSV_URL)
                     isPack: false
                 });
             }
+            // Parse packs
             if (packsIdx >= 0 && row[packsIdx] && row[packsIdx].trim()) {
                 packData.push({
                     name: row[packsIdx].trim(),
@@ -169,16 +165,15 @@ fetch(PROF_CSV_URL)
                 });
             }
         }
-
-        // Define allOptions and nonPackOptions here if needed (assuming from original)
-        const allOptions = [...gearData, ...packData];
-        const nonPackOptions = gearData.filter(g => !g.isPack);
+        allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')]; // Exclude coin pouch from ready selectors
+        nonPackOptions = gearData; // For stowed
+        generateGearEntries();
+        calculateLoad(); // Initial total
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 
-// Remove any hardcoded gearData assignment outside the fetch (e.g., no gearData = [Sword, Shield] block)
-let allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')]; // Exclude coin pouch from ready selectors
-let nonPackOptions = gearData; // For stowed
+let allOptions = [];
+let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
 let usedLocations = { Back: null, Waist: null };
 let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };

@@ -72,10 +72,10 @@ const packData = [
 ];
 
 // Assume gearData is non-packs (from fetch or hardcoded; example below)
-let gearData = [  // Replace with actual data
+gearData = [  // Reassign without 'let' (fix for duplicate declaration); replace with parsed CSV data
     { name: 'Sword', load: 2, isPack: false },
     { name: 'Shield', load: 1, isPack: false },
-    // Add more from CSV
+    // Add more from CSV (parse in the PROF_CSV_URL fetch block, e.g., filter rows where 'Packs' column is empty/false)
 ];
 
 const allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
@@ -718,7 +718,6 @@ function updateStowedLoad(readyI, stowedJ) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-
 // Update ready load (for pack: sum stowed + base; for non-pack: base * amt)
 function updateReadyLoad(i) {
     const state = readyState[i-1];
@@ -766,7 +765,6 @@ function calculateLoad() {
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
-
 
 // ———————————————————————— INIT ————————————————————————
 

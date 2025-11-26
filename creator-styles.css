@@ -549,6 +549,7 @@ dark leather: #5E4634
 .gearEntryHead{width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
+.stowedGear{margin-left:10px;background-color:rgba(89, 72, 54, 1);}
 #coinInputs{display:flex;}
 #coinInputs input{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
 #coinInputs input:hover{background-color: white;color:black;}

@@ -551,7 +551,7 @@ dark leather: #5E4634
 .gearLoad.overloaded { color: red !important; }
 #coinInputs{display:flex;}
 #coinInputs input{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
-#coinInputs input:hover;{background-color: white;color:black;}
+#coinInputs input:hover{background-color: white;color:black;}
 
 #ritualList {
   background-color:#9BAABF;

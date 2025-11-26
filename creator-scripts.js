@@ -194,9 +194,6 @@ let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1
 let usedLocations = { Back: null, Waist: null };
 let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
 
-// Add domCache
-let domCache = {};
-
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 
 function rebuildDynamicSelectors(config) {
@@ -205,7 +202,7 @@ function rebuildDynamicSelectors(config) {
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
 
-    const inputEl = domCache[amountInputId] || document.getElementById(amountInputId);
+    const inputEl = document.getElementById(amountInputId);
     if (!inputEl) return;
 
     const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Clamp to 0+
@@ -374,17 +371,17 @@ document.addEventListener('change', e => {
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
 
 function populateRoleSelector() {
-    const sel = domCache.roleSelector || document.getElementById('roleSelector');
+    const sel = document.getElementById('roleSelector');
     sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
     waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
 }
 
 function updateWayOptions() {
-    const sel = domCache.roleSelector || document.getElementById('roleSelector');
+    const sel = document.getElementById('roleSelector');
     waysData.forEach(way => {
         let qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => (domCache[id] || document.getElementById(id))?.value > 1)
-            : (domCache[way.skillId] || document.getElementById(way.skillId))?.value > 1;
+            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
+            : document.getElementById(way.skillId)?.value > 1;
         const opt = sel.querySelector(`option[value="${way.name}"]`);
         if (opt) opt.disabled = !qualified;
     });
@@ -411,7 +408,7 @@ function updateTrickSelectors() {
 function getQualifiedAbilities(type) {
     const result = [];
     Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
-        const sel = domCache[id] || document.getElementById(id);
+        const sel = document.getElementById(id);
         if (sel && parseInt(sel.value) >= 2 && abilitiesData[name.toLowerCase()]) {
             result.push(...abilitiesData[name.toLowerCase()].filter(a => a.type === type));
         }
@@ -420,7 +417,7 @@ function getQualifiedAbilities(type) {
 }
 
 function populateAbilityInfo(selectId, abilities, type) {
-    const value = (domCache[selectId] || document.getElementById(selectId))?.value;
+    const value = document.getElementById(selectId)?.value;
     const ability = abilities.find(a => a.name === value);
     const desc = document.getElementById(selectId + 'Description');
     if (!desc || !ability) { desc.innerHTML = ''; return; }
@@ -445,8 +442,7 @@ function populateRoleInfo(e) {
     const way = waysData.find(w => w.name === name);
     if (!way) return;
 
-    const wayTalentName = document.getElementById('wayTalentName');
-    wayTalentName.textContent = way.name;
+    document.getElementById('wayTalentName').textContent = way.name;
 
     const desc = document.getElementById('wayTalentDesc');
     desc.innerHTML = '';
@@ -462,7 +458,7 @@ function populateRoleInfo(e) {
     const attackSkill = way.props[Object.keys(way.props).find(k => k.includes('attack skill'))] || way.reqSkill;
     const skillId = SKILL_ID_MAP[attackSkill];
     if (skillId) {
-        const sel = domCache[skillId] || document.getElementById(skillId);
+        const sel = document.getElementById(skillId);
         if (sel && parseInt(sel.value) < 2) {
             sel.value = '2';
             sel.dispatchEvent(new Event('change'));
@@ -472,7 +468,7 @@ function populateRoleInfo(e) {
     const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
     if (primary) {
         const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
-        const pri = domCache[map[primary]] || document.getElementById(map[primary]);
+        const pri = document.getElementById(map[primary]);
         if (pri) {
             pri.value = '1';
             pri.dispatchEvent(new Event('change'));
@@ -485,39 +481,35 @@ function populateRoleInfo(e) {
 }
 
 function calculateSkillPoints() {
-    const level = parseInt((domCache.charLvl || document.getElementById('charLvl')).value) || 1;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
     const total = level * 3 + 9;
     let spent = 0;
     Object.values(SKILL_ID_MAP).forEach(id => {
-        const sel = domCache[id] || document.getElementById(id);
+        const sel = document.getElementById(id);
         if (sel) spent += parseInt(sel.value) || 0;
     });
-    const skillPoints = document.getElementById('skillPoints');
-    skillPoints.textContent = total - spent;
+    document.getElementById('skillPoints').textContent = total - spent;
 }
 
 function calculateAbilities() {
-    const level = parseInt((domCache.charLvl || document.getElementById('charLvl')).value) || 1;
-    const tExtra = parseInt((domCache.talentAmount || document.getElementById('talentAmount')).value) || 1;
-    const trExtra = parseInt((domCache.tricksAmount || document.getElementById('tricksAmount')).value) || 1;
-    const abilityNumber = document.getElementById('abilityNumber');
-    abilityNumber.textContent = tExtra + trExtra + 2;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
+    const trExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
+    document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
     const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
-    const remainingAbilities = document.getElementById('remainingAbilities');
-    remainingAbilities.textContent = remaining < 0 ? 0 : remaining;
+    document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
 }
 
 function calculateAttributeValues() {
-    const level = parseInt((domCache.charLvl || document.getElementById('charLvl')).value) || 1;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
     const sec = 2 + (level >= 6 ? 1 : 0);
     const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
 
     ['body', 'mind', 'spirit'].forEach(attr => {
-        const priVal = (domCache[attr + 'Priority'] || document.getElementById(attr + 'Priority')).value;
+        const priVal = document.getElementById(attr + 'Priority').value;
         let val = priVal === '1' ? pri : priVal === '2' ? sec : ter;
-        const valueEl = domCache[attr + 'Value'] || document.getElementById(attr + 'Value');
-        valueEl.textContent = val;
+        document.getElementById(attr + 'Value').textContent = val;
     });
 
     updateSkillsForMod('bodyValue');
@@ -528,16 +520,16 @@ function calculateAttributeValues() {
 function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
 
 function updateAttributeGroup(group) {
-    const level = parseInt((domCache.charLvl || document.getElementById('charLvl')).value) || 1;
-    const pri = (domCache[group.priorityId] || document.getElementById(group.priorityId)).value || '3';
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = document.getElementById(group.priorityId).value || '3';
     let points = 1 + Math.floor((level - 1) / 3);
     if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
     if (pri === '2') points = 2 + Math.floor(level / 3);
 
-    const max = parseInt((domCache[group.primaryValueId] || document.getElementById(group.primaryValueId)).textContent) || 0;
+    const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
     let sum = 0;
     group.subIds.forEach(id => {
-        const inp = domCache[id] || document.getElementById(id);
+        const inp = document.getElementById(id);
         if (inp) {
             inp.max = max;
             let v = Math.min(max, Math.max(0, parseInt(inp.value) || 0));
@@ -553,11 +545,11 @@ function updateAttributeGroup(group) {
 }
 
 function updateSkillModAndPassive(skillId) {
-    const sel = domCache[skillId] || document.getElementById(skillId);
+    const sel = document.getElementById(skillId);
     if (!sel) return;
     const rank = parseInt(sel.value) || 0;
     const modId = SKILL_MOD_MAP[skillId];
-    const modVal = parseInt((domCache[modId] || document.getElementById(modId))?.value || (domCache[modId] || document.getElementById(modId))?.textContent || 0);
+    const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
     const name = skillId.replace('SkillRank', '');
     const modEl = document.getElementById(name + 'Mod');
     if (modEl) modEl.textContent = modVal;
@@ -587,15 +579,15 @@ function updateProficiencySelectors(type, rank) {
 }
 
 function updateGearLoad(i) {
-    const select = domCache[`gear${i}Select`] || document.getElementById('gear' + i + 'Select');
+    const select = document.getElementById('gear' + i + 'Select');
     if (!select) return;
     const selectedOption = select.options[select.selectedIndex];
     const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
-    const amtInput = domCache[`gear${i}Amt`] || document.getElementById('gear' + i + 'Amt');
+    const amtInput = document.getElementById('gear' + i + 'Amt');
     const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
     if (amtInput) amtInput.value = qty; // Enforce clamp
     const totalLoad = baseLoad * qty;
-    const loadDiv = domCache[`gear${i}Load`] || document.getElementById('gear' + i + 'Load');
+    const loadDiv = document.getElementById('gear' + i + 'Load');
     if (loadDiv) {
         const formattedLoad = totalLoad.toFixed(2).replace(/\.?0+$/, '');
         loadDiv.textContent = totalLoad > 0 ? formattedLoad : '';
@@ -605,7 +597,7 @@ function updateGearLoad(i) {
 }
 
 function generateGearEntries() {
-    const container = domCache.gearEntries || document.getElementById('gearEntries');
+    const container = document.getElementById('gearEntries');
     container.innerHTML = '';
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
@@ -619,37 +611,29 @@ function generateGearEntries() {
         container.appendChild(entry);
 
         const sel = document.getElementById(`gear${i}Select`);
-        domCache[`gear${i}Select`] = sel;
         sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
         sel.addEventListener('change', () => handleReadySelectChange(i));
-        const amt = document.getElementById(`gear${i}Amt`);
-        domCache[`gear${i}Amt`] = amt;
-        amt?.addEventListener('input', () => {
+        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
             readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);
             this.value = readyState[i-1].amt;
             updateReadyLoad(i);
             calculateLoad();
         });
-        domCache[`gear${i}Load`] = document.getElementById(`gear${i}Load`);
-        domCache[`gear${i}Details`] = document.getElementById(`gear${i}Details`);
     }
     // Coin pouch events (fixed)
     ['tok', 'copper', 'silver', 'gold'].forEach(id => {
-        const input = document.getElementById(id);
-        domCache[id] = input;
-        input?.addEventListener('input', () => {
+        document.getElementById(id)?.addEventListener('input', () => {
             coinState[id] = Math.max(0, parseInt(this.value) || 0);
             this.value = coinState[id];
             updateCoinLoad();
         });
     });
-    domCache.coinLoad = document.getElementById('coinLoad');
     updateCoinLoad();
     calculateLoad();
 }
 // Handle ready select change
 function handleReadySelectChange(i) {
-    const sel = domCache[`gear${i}Select`] || document.getElementById(`gear${i}Select`);
+    const sel = document.getElementById(`gear${i}Select`);
     const newGear = sel.value;
     const prevGear = readyState[i-1].gear;
     const prevPack = allOptions.find(g => g.name === prevGear);
@@ -764,7 +748,7 @@ function updateReadyLoad(i) {
             });
         }
     }
-    const loadDiv = domCache[`gear${i}Load`] || document.getElementById(`gear${i}Load`);
+    const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
         if (item?.isPack) loadDiv.style.color = total > item.loadLimit ? 'red' : '';
@@ -775,7 +759,7 @@ function updateReadyLoad(i) {
 function updateCoinLoad() {
     const totalCoins = coinState.tok + coinState.copper + coinState.silver + coinState.gold;
     const load = totalCoins / 50;
-    const loadDiv = domCache.coinLoad || document.getElementById('coinLoad');
+    const loadDiv = document.getElementById('coinLoad');
     if (loadDiv) {
         loadDiv.textContent = load.toFixed(2).replace(/\.?0+$/, '');
         loadDiv.style.color = load > 1 ? 'red' : '';
@@ -788,54 +772,23 @@ function calculateLoad() {
     let totalLoad = 0;
     readyState.forEach((state, idx) => {
         const i = idx + 1;
-        const loadText = (domCache[`gear${i}Load`] || document.getElementById(`gear${i}Load`))?.textContent || '0';
+        const loadText = document.getElementById(`gear${i}Load`)?.textContent || '0';
         totalLoad += parseFloat(loadText) || 0;
     });
-    const coinLoadText = (domCache.coinLoad || document.getElementById('coinLoad'))?.textContent || '0';
+    const coinLoadText = document.getElementById('coinLoad')?.textContent || '0';
     totalLoad += parseFloat(coinLoadText) || 0;
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-    const totalLoadValue = domCache.totalLoadValue || document.getElementById('totalLoadValue');
-    totalLoadValue.textContent = formattedTotal;
+    document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
-    // Populate domCache
-    Object.values(SKILL_ID_MAP).forEach(id => domCache[id] = document.getElementById(id));
-    Object.keys(SKILL_MOD_MAP).forEach(id => {
-        const name = id.replace('SkillRank', '');
-        domCache[name + 'Mod'] = document.getElementById(name + 'Mod');
-        domCache[name + 'Passive'] = document.getElementById(name + 'Passive');
-        if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
-            domCache[name + 'Damage'] = document.getElementById(name + 'Damage');
-        }
-    });
-    ['body', 'mind', 'spirit'].forEach(attr => {
-        domCache[attr + 'Value'] = document.getElementById(attr + 'Value');
-        domCache[attr + 'Priority'] = document.getElementById(attr + 'Priority');
-    });
-    ATTRIBUTE_GROUPS.physical.subIds.forEach(id => domCache[id] = document.getElementById(id));
-    ATTRIBUTE_GROUPS.mental.subIds.forEach(id => domCache[id] = document.getElementById(id));
-    ATTRIBUTE_GROUPS.spirit.subIds.forEach(id => domCache[id] = document.getElementById(id));
-    ['physical', 'mental', 'spirit'].forEach(group => {
-        domCache[group + 'AttributePoints'] = document.getElementById(group + 'AttributePoints');
-    });
-    domCache.charLvl = document.getElementById('charLvl');
-    domCache.roleSelector = document.getElementById('roleSelector');
-    domCache.talentAmount = document.getElementById('talentAmount');
-    domCache.tricksAmount = document.getElementById('tricksAmount');
-    domCache.abilityNumber = document.getElementById('abilityNumber');
-    domCache.remainingAbilities = document.getElementById('remainingAbilities');
-    domCache.skillPoints = document.getElementById('skillPoints');
-    domCache.gearEntries = document.getElementById('gearEntries');
-    domCache.totalLoadValue = document.getElementById('totalLoadValue');
-
     calculateSkillPoints();
     calculateAbilities();
     calculateAttributeValues();
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
     ['strike', 'blast', 'invoke'].forEach(t => {
-        const sel = domCache[t + 'SkillRank'] || document.getElementById(t + 'SkillRank');
+        const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
     updateTalentTables();  // Initial build for talents

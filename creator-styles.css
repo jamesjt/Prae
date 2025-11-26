@@ -533,12 +533,14 @@ leather? rgba(89, 72, 54, 1)
 dark leather: #5E4634
 */
 
-.gearAmount{background-color:#6F6A63;}
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:white;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
 .gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #6F6A63;color:whitesmoke;}
-.gearDetails{border-radius: 20px; border:2px solid black;}
+.gearDetails{border-radius: 20px; border:2px solid black;color:whitesmoke;}
+.subAttInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;}
+.subAttinputField:hover{background-color: white;color:black;}
+
 #ritualList {
   background-color:#9BAABF;
   height: 144px;
@@ -637,11 +639,11 @@ dark leather: #5E4634
 .trickAbility div:nth-of-type(2n+1){color:black;background-color: rgba(217,217,217,1);padding:0px 5px;font-size: 14px;}
 .trickAbility div:nth-of-type(2n){color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
 
-.inputField{    width: 30px;
+.subAttInputField{    width: 30px;
     border: none;
     margin-left: 20px;
     color: whitesmoke;}
-.inputField:hover{
+.subAttinputField:hover{
     background-color: white;
     color:black;
 }

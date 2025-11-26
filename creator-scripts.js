@@ -10,27 +10,72 @@ function parseWaysCSV(csvText) {
     let i = 0;
     while (i < csvText.length) {
         const char = csvText[i];
-        if (insideQuote) {
-            if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
-            else if (char === '"') { insideQuote = false; i++; continue; }
-            else { currentValue += char; i++; continue; }
-        } else {
-            if (char === '"') { insideQuote = true; i++; continue; }
-            else if (char === ',') { currentRow.push(currentValue.trim()); currentValue = ''; i++; continue; }
-            else if (char === '\r' || char === '\n') {
-                currentRow.push(currentValue.trim());
-                if (currentRow.some(v => v !== '')) rows.push(currentRow);
-                currentRow = []; currentValue = ''; i++;
-                if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
-                continue;
-            } else { currentValue += char; i++; continue; }
+        const nextChar = csvText[i + 1];
+        ({ currentValue, insideQuote, i } = processChar(char, nextChar, currentValue, insideQuote, i));
+        if (char === ',' && !insideQuote) {
+            currentRow = addValueToRow(currentRow, currentValue);
+            currentValue = '';
+            i++;
+            continue;
         }
+        if ((char === '\r' || char === '\n') && !insideQuote) {
+            currentRow = addValueToRow(currentRow, currentValue);
+            rows = addRowIfValid(rows, currentRow);
+            currentRow = [];
+            currentValue = '';
+            i = skipNewline(char, nextChar, i);
+            continue;
+        }
+        i++;
     }
     if (currentValue !== '' || currentRow.length > 0) {
-        currentRow.push(currentValue.trim());
-        if (currentRow.some(v => v !== '')) rows.push(currentRow);
+        currentRow = addValueToRow(currentRow, currentValue);
+        rows = addRowIfValid(rows, currentRow);
     }
     return rows;
+}
+
+function processChar(char, nextChar, currentValue, insideQuote, i) {
+    if (insideQuote) {
+        if (char === '"' && nextChar === '"') {
+            currentValue += '"';
+            i += 2;
+            return { currentValue, insideQuote, i };
+        }
+        if (char === '"') {
+            insideQuote = false;
+            i++;
+            return { currentValue, insideQuote, i };
+        }
+        currentValue += char;
+        i++;
+        return { currentValue, insideQuote, i };
+    } else {
+        if (char === '"') {
+            insideQuote = true;
+            i++;
+            return { currentValue, insideQuote, i };
+        }
+        currentValue += char;
+        i++;
+        return { currentValue, insideQuote, i };
+    }
+}
+
+function addValueToRow(row, value) {
+    row.push(value.trim());
+    return row;
+}
+
+function addRowIfValid(rows, row) {
+    if (row.some(v => v !== '')) rows.push(row);
+    return rows;
+}
+
+function skipNewline(char, nextChar, i) {
+    i++;
+    if (char === '\r' && nextChar === '\n') i++;
+    return i;
 }
 
 const SKILL_ID_MAP = {
@@ -600,27 +645,39 @@ function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
-        const entry = document.createElement('div');
-        entry.className = 'gearEntry';
-        entry.innerHTML = `
-            <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
-            <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
-            <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails">i</div>
-        `;  // Removed stowed-container from here
+        const entry = createGearEntry(i);
         container.appendChild(entry);
-
-        const sel = document.getElementById(`gear${i}Select`);
-        sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
-        sel.addEventListener('change', () => handleReadySelectChange(i));
-        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
-            readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);
-            this.value = readyState[i-1].amt;
-            updateReadyLoad(i);
-            calculateLoad();
-        });
+        bindGearEvents(i);
     }
-    // Coin pouch events (fixed)
+    bindCoinEvents();
+    updateCoinLoad();
+    calculateLoad();
+}
+function createGearEntry(i) {
+    const entry = document.createElement('div');
+    entry.className = 'gearEntry';
+    entry.innerHTML = `
+        <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
+        <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
+        <div id="gear${i}Load" class="gearLoad"></div>
+        <div id="gear${i}Details" class="gearDetails">i</div>
+    `;
+    return entry;
+}
+
+function bindGearEvents(i) {
+    const sel = document.getElementById(`gear${i}Select`);
+    sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
+    sel.addEventListener('change', () => handleReadySelectChange(i));
+    document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
+        readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);
+        this.value = readyState[i-1].amt;
+        updateReadyLoad(i);
+        calculateLoad();
+    });
+}
+
+function bindCoinEvents() {
     ['tok', 'copper', 'silver', 'gold'].forEach(id => {
         document.getElementById(id)?.addEventListener('input', () => {
             coinState[id] = Math.max(0, parseInt(this.value) || 0);
@@ -628,10 +685,7 @@ function generateGearEntries() {
             updateCoinLoad();
         });
     });
-    updateCoinLoad();
-    calculateLoad();
 }
-// Handle ready select change
 function handleReadySelectChange(i) {
     const sel = document.getElementById(`gear${i}Select`);
     const newGear = sel.value;
@@ -639,87 +693,112 @@ function handleReadySelectChange(i) {
     const prevPack = allOptions.find(g => g.name === prevGear);
     const newPack = allOptions.find(g => g.name === newGear);
 
-    // Handle location if changing pack
+    handlePrevPackLocation(prevPack, i);
+    if (newPack && newPack.isPack) {
+        if (!validateNewPackLocation(newPack, i)) {
+            sel.value = prevGear;
+            return;
+        }
+        updateUsedLocation(newPack, i);
+    }
+
+    updateReadyState(i, newGear, newPack);
+    renderStowed(i);
+    updateReadyLoad(i);
+    calculateLoad();
+}
+
+function handlePrevPackLocation(prevPack, i) {
     if (prevPack && prevPack.isPack) {
         usedLocations[prevPack.location] = null;
     }
-    if (newPack && newPack.isPack) {
-        if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
-            alert(`Location ${newPack.location} already in use in slot ${usedLocations[newPack.location]}.`);
-            sel.value = prevGear;  // Reset
-            return;
-        }
-        usedLocations[newPack.location] = i;
-    }
+}
 
-    // Update state
+function validateNewPackLocation(newPack, i) {
+    if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
+        alert(`Location ${newPack.location} already in use in slot ${usedLocations[newPack.location]}.`);
+        return false;
+    }
+    return true;
+}
+
+function updateUsedLocation(newPack, i) {
+    usedLocations[newPack.location] = i;
+}
+
+function updateReadyState(i, newGear, newPack) {
     readyState[i-1].gear = newGear;
     if (newPack && newPack.isPack) {
         const newSlots = newPack.stowedSlots;
-        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots);  // Prune if fewer
+        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots);
         while (readyState[i-1].stowed.length < newSlots) {
             readyState[i-1].stowed.push({ gear: '', amt: 1 });
         }
     } else {
         readyState[i-1].stowed = [];
     }
-
-    renderStowed(i);
-    updateReadyLoad(i);
-    calculateLoad();
 }
-// Render stowed for a ready slot
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);  // Find the parent gearEntry
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
 
     if (readyState[i-1].stowed.length === 0) {
-        if (container) container.remove();  // Remove if no stowed
+        if (container) container.remove();
         return;
     }
 
-    // Create container if it doesn't exist
     if (!container) {
-        container = document.createElement('div');
-        container.id = `stowed-container-${i}`;
-        container.className = 'stowed-container';
-        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);  // Insert after gearEntry
+        container = createStowedContainer(i);
+        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);
     }
 
     container.innerHTML = '';
     readyState[i-1].stowed.forEach((s, j) => {
-        const entry = document.createElement('div');
-        entry.className = 'gearEntry gearStowed';
-        entry.innerHTML = `
-            <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
-            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
-            <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
-        `;
+        const entry = createStowedEntry(i, j, s);
         container.appendChild(entry);
-
-        const sel = entry.querySelector('select');
-        sel.innerHTML += nonPackOptions.map(g => `<option value="${g.name}" data-load="${g.load}" ${s.gear === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
-        sel.addEventListener('change', () => {
-            readyState[i-1].stowed[j].gear = sel.value;
-            updateStowedLoad(i, j+1);
-            updateReadyLoad(i);
-            calculateLoad();
-        });
-
-        const amt = entry.querySelector('input');
-        amt.addEventListener('input', () => {
-            readyState[i-1].stowed[j].amt = Math.max(1, parseInt(amt.value) || 1);
-            amt.value = readyState[i-1].stowed[j].amt;
-            updateStowedLoad(i, j+1);
-            updateReadyLoad(i);
-            calculateLoad();
-        });
-
+        bindStowedEvents(i, j);
         updateStowedLoad(i, j+1);
     });
 }
-// Update single stowed load
+
+function createStowedContainer(i) {
+    const container = document.createElement('div');
+    container.id = `stowed-container-${i}`;
+    container.className = 'stowed-container';
+    return container;
+}
+
+function createStowedEntry(i, j, s) {
+    const entry = document.createElement('div');
+    entry.className = 'gearEntry gearStowed';
+    entry.innerHTML = `
+        <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
+        <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
+        <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
+        <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
+    `;
+    return entry;
+}
+
+function bindStowedEvents(i, j) {
+    const sel = document.getElementById(`stowed-${i}-${j+1}-select`);
+    sel.innerHTML += nonPackOptions.map(g => `<option value="${g.name}" data-load="${g.load}" ${readyState[i-1].stowed[j].gear === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
+    sel.addEventListener('change', () => {
+        readyState[i-1].stowed[j].gear = sel.value;
+        updateStowedLoad(i, j+1);
+        updateReadyLoad(i);
+        calculateLoad();
+    });
+
+    const amt = document.getElementById(`stowed-${i}-${j+1}-amt`);
+    amt.addEventListener('input', () => {
+        readyState[i-1].stowed[j].amt = Math.max(1, parseInt(amt.value) || 1);
+        amt.value = readyState[i-1].stowed[j].amt;
+        updateStowedLoad(i, j+1);
+        updateReadyLoad(i);
+        calculateLoad();
+    });
+}// Changed: updateStowedLoad (minor, but integrated with new structure)
 function updateStowedLoad(readyI, stowedJ) {
     const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
     if (!sel) return;
@@ -733,7 +812,8 @@ function updateStowedLoad(readyI, stowedJ) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-// Update ready load (for pack: sum stowed + base; for non-pack: base * amt)
+
+// Changed: updateReadyLoad (minor, but integrated)
 function updateReadyLoad(i) {
     const state = readyState[i-1];
     const item = allOptions.find(g => g.name === state.gear);

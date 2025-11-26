@@ -68,13 +68,6 @@ gearData = [  // Reassign without 'let' (fix for duplicate declaration); replace
     // Add more from CSV (parse in the PROF_CSV_URL fetch block, e.g., filter rows where 'Packs' column is empty/false)
 ];
 
-const allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
-const nonPackOptions = gearData;  // For stowed
-
-let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
-let usedLocations = { Back: null, Waist: null };
-let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
-
 // ———————————————————————— DATA LOADING ————————————————————————
 
 fetch(ABILITIES_CSV_URL)
@@ -166,7 +159,7 @@ fetch(PROF_CSV_URL)
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
             // Parse gear (non-packs)
-            if (row[gearIdx] && row[gearIdx].trim()) {
+            if (gearIdx >= 0 && row[gearIdx] && row[gearIdx].trim()) {
                 gearData.push({
                     name: row[gearIdx].trim(),
                     load: parseFloat(row[loadIdx]) || 0,
@@ -174,7 +167,7 @@ fetch(PROF_CSV_URL)
                 });
             }
             // Parse packs
-            if (row[packsIdx] && row[packsIdx].trim()) {
+            if (packsIdx >= 0 && row[packsIdx] && row[packsIdx].trim()) {
                 packData.push({
                     name: row[packsIdx].trim(),
                     loadLimit: parseFloat(row[loadLimitIdx]) || 0,
@@ -188,10 +181,18 @@ fetch(PROF_CSV_URL)
             }
         }
 
-        // Now that data is loaded, regenerate entries if needed (or call in load)
-        if (document.readyState === 'complete') generateGearEntries();  // If fetch after load
+        // Now that data is loaded, generate entries
+        generateGearEntries();
+        calculateLoad(); // Initial total
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
+
+let allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
+let nonPackOptions = gearData;  // For stowed
+
+let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
+let usedLocations = { Back: null, Waist: null };
+let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
 
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 
@@ -767,7 +768,6 @@ function calculateLoad() {
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
-
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
     calculateSkillPoints();
@@ -781,6 +781,5 @@ window.addEventListener('load', () => {
     });
     updateTalentTables();  // Initial build for talents
     updateTrickTables();   // Initial build for tricks
-    generateGearEntries();
-    calculateLoad(); // Initial total
+    calculateLoad(); // Initial total (will be 0 until data loads)
 });

@@ -8,57 +8,6 @@ function getIndentLevel(text) {
     return match ? match[0].length : 0;
 }
 
-// Parse CSV
-function parseCSV(csvText) {
-    try {
-        const rows = [];
-        let currentRow = [];
-        let currentValue = '';
-        let insideQuote = false;
-        let i = 0;
-        while (i < csvText.length) {
-            const char = csvText[i];
-            if (insideQuote) {
-                if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
-                else if (char === '"') { insideQuote = false; i++; continue; }
-                else { currentValue += char; i++; continue; }
-            } else {
-                if (char === '"') { insideQuote = true; i++; continue; }
-                else if (char === ',') { currentRow.push(currentValue); currentValue = ''; i++; continue; }
-                else if (char === '\r' || char === '\n') {
-                    currentRow.push(currentValue);
-                    if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
-                    currentRow = []; currentValue = ''; i++;
-                    if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
-                    continue;
-                } else { currentValue += char; i++; continue; }
-            }
-        }
-        if (currentValue !== '' || currentRow.length > 0) {
-            currentRow.push(currentValue);
-            if (currentRow.some(v => v.trim() !== '')) rows.push(currentRow);
-        }
-
-        const headers = (rows[0] || []).map(h => h.trim());
-        let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
-        if (sectionsIndex === -1) sectionsIndex = 1;
-        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
-        if (detailsIndex === -1) detailsIndex = 2;
-
-        const dataRows = rows.slice(1).map(values => {
-            while (values.length <= Math.max(sectionsIndex, detailsIndex)) values.push('');
-            return {
-                Sections: values[sectionsIndex]?.trim() || '',
-                Details: values[detailsIndex] || 'WIP'
-            };
-        }).filter(r => r.Sections);
-
-        return { rows: dataRows };
-    } catch (error) {
-        throw error;
-    }
-}
-
 // Organize data
 function organizeData(rows) {
     try {
@@ -203,8 +152,32 @@ document.querySelectorAll('.nav-list a').forEach(link => {
 fetch(CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
-        const parsed = parseCSV(text);
-        allData = organizeData(parsed.rows);
+        const parsed = Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            delimitersToGuess: [',']
+        });
+        if (parsed.errors.length > 0) {
+            console.error('PapaParse errors:', parsed.errors);
+            throw new Error('Error parsing CSV');
+        }
+        const rows = parsed.data;
+        const headers = (rows[0] || []).map(h => h.trim());
+        let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
+        if (sectionsIndex === -1) sectionsIndex = 1;
+        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
+        if (detailsIndex === -1) detailsIndex = 2;
+
+        const dataRows = rows.slice(1).map(values => {
+            while (values.length <= Math.max(sectionsIndex, detailsIndex)) values.push('');
+            return {
+                Sections: values[sectionsIndex]?.trim() || '',
+                Details: values[detailsIndex] || 'WIP'
+            };
+        }).filter(r => r.Sections);
+
+        allData = organizeData(dataRows);
         renderSidebar(allData);
         renderSections(allData);
     })

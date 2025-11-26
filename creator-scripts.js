@@ -637,6 +637,16 @@ function handleReadySelectChange(i) {
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
+    // Update category classes
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
+    // Remove all gear* classes except gearEntry
+    Array.from(gearEntry.classList).forEach(cl => {
+        if (cl.startsWith('gear') && cl !== 'gearEntry') gearEntry.classList.remove(cl);
+    });
+    const item = allOptions.find(g => g.name === newGear);
+    if (item && item.category) {
+        gearEntry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
+    }
 }
 // Render stowed for a ready slot
 function renderStowed(i) {

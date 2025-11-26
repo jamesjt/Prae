@@ -2,37 +2,6 @@ const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4
 const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
-function parseWaysCSV(csvText) {
-    const rows = [];
-    let currentRow = [];
-    let currentValue = '';
-    let insideQuote = false;
-    let i = 0;
-    while (i < csvText.length) {
-        const char = csvText[i];
-        if (insideQuote) {
-            if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') { currentValue += '"'; i += 2; continue; }
-            else if (char === '"') { insideQuote = false; i++; continue; }
-            else { currentValue += char; i++; continue; }
-        } else {
-            if (char === '"') { insideQuote = true; i++; continue; }
-            else if (char === ',') { currentRow.push(currentValue.trim()); currentValue = ''; i++; continue; }
-            else if (char === '\r' || char === '\n') {
-                currentRow.push(currentValue.trim());
-                if (currentRow.some(v => v !== '')) rows.push(currentRow);
-                currentRow = []; currentValue = ''; i++;
-                if (char === '\r' && i < csvText.length && csvText[i] === '\n') i++;
-                continue;
-            } else { currentValue += char; i++; continue; }
-        }
-    }
-    if (currentValue !== '' || currentRow.length > 0) {
-        currentRow.push(currentValue.trim());
-        if (currentRow.some(v => v !== '')) rows.push(currentRow);
-    }
-    return rows;
-}
-
 const SKILL_ID_MAP = {
     'Athletics': 'athleticsSkillRank', 'Force': 'forceSkillRank', 'Acrobatics': 'acrobaticsSkillRank', 'Sneak': 'sneakSkillRank',
     'Endurance': 'enduranceSkillRank', 'Poise': 'poiseSkillRank', 'Lore': 'loreSkillRank', 'Tinkering': 'tinkeringSkillRank',
@@ -67,7 +36,17 @@ let packData = [];  // Will be populated from CSV
 fetch(ABILITIES_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
-        const rows = parseWaysCSV(text);
+        const parsed = Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            delimitersToGuess: [',']
+        });
+        if (parsed.errors.length > 0) {
+            console.error('PapaParse errors:', parsed.errors);
+            throw new Error('Error parsing Abilities CSV');
+        }
+        const rows = parsed.data;
         const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
         skills.forEach((skill, colIndex) => {
             let currentAbility = null;
@@ -101,7 +80,17 @@ fetch(ABILITIES_CSV_URL)
 fetch(WAYS_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
-        const rows = parseWaysCSV(text);
+        const parsed = Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            delimitersToGuess: [',']
+        });
+        if (parsed.errors.length > 0) {
+            console.error('PapaParse errors:', parsed.errors);
+            throw new Error('Error parsing Ways CSV');
+        }
+        const rows = parsed.data;
         let includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
         if (includeRowIdx === -1) return console.error('Missing "Include" row');
         const includeRow = rows[includeRowIdx];
@@ -130,29 +119,36 @@ fetch(WAYS_CSV_URL)
     })
     .catch(err => console.error('Error loading Ways CSV:', err));
 
-// Fetch and parse PROF_CSV_URL (extended to parse gear and packs)
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
-        const rows = parseWaysCSV(text);
+        const parsed = Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            delimitersToGuess: [',']
+        });
+        if (parsed.errors.length > 0) {
+            console.error('PapaParse errors:', parsed.errors);
+            throw new Error('Error parsing PROF CSV');
+        }
+        const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
 
-        // Find column indices
         const gearIdx = headers.indexOf('Gear');
-        const loadIdx = headers.indexOf('Load');  // Assuming next to Gear
+        const loadIdx = headers.indexOf('Load');
         const packsIdx = headers.indexOf('Packs');
         const loadLimitIdx = headers.indexOf('Pack Load Limit');
         const stowedSlotsIdx = headers.indexOf('Pack Stowed Slots');
         const locationIdx = headers.indexOf('Pack Location');
-        const readySlotsIdx = headers.indexOf('Pack Ready Slots');  // If exists, else default 1
-        const costIdx = headers.indexOf('Pack Cost');  // If exists
+        const readySlotsIdx = headers.indexOf('Pack Ready Slots');
+        const costIdx = headers.indexOf('Pack Cost');
 
-        gearData = [];  // Non-packs
-        packData = [];  // Packs
+        gearData = [];
+        packData = [];
 
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            // Parse gear (non-packs)
             if (gearIdx >= 0 && row[gearIdx] && row[gearIdx].trim()) {
                 gearData.push({
                     name: row[gearIdx].trim(),
@@ -160,7 +156,6 @@ fetch(PROF_CSV_URL)
                     isPack: false
                 });
             }
-            // Parse packs
             if (packsIdx >= 0 && row[packsIdx] && row[packsIdx].trim()) {
                 packData.push({
                     name: row[packsIdx].trim(),
@@ -175,56 +170,43 @@ fetch(PROF_CSV_URL)
             }
         }
 
-        // Define allOptions and nonPackOptions here, after data is populated
-        allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
-        nonPackOptions = gearData;  // For stowed
-
-        // Now that data is loaded, generate entries
-        generateGearEntries();
-        calculateLoad(); // Initial total
+        // Define allOptions and nonPackOptions here if needed (assuming from original)
+        const allOptions = [...gearData, ...packData];
+        const nonPackOptions = gearData.filter(g => !g.isPack);
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 
 // Remove any hardcoded gearData assignment outside the fetch (e.g., no gearData = [Sword, Shield] block)
-
-let allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
-let nonPackOptions = gearData;  // For stowed
-
+let allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')]; // Exclude coin pouch from ready selectors
+let nonPackOptions = gearData; // For stowed
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
 let usedLocations = { Back: null, Waist: null };
 let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
-
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
-
 function rebuildDynamicSelectors(config) {
     const {
         amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
-
     const inputEl = document.getElementById(amountInputId);
     if (!inputEl) return;
-
-    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);  // Clamp to 0+
-    inputEl.value = currentAmount;  // Update input to reflect clamped value
+    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0); // Clamp to 0+
+    inputEl.value = currentAmount; // Update input to reflect clamped value
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
-
     // Save current selections
     const saved = {};
     for (let i = 1; i <= 20; i++) {
         const sel = document.getElementById(`${itemPrefix}${i}`);
         if (sel) saved[i] = sel.value;
     }
-
     // Remove ALL dynamic slots
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
-
     // Build exactly the number of slots we need
     for (let i = 1; i <= totalSlots; i++) {
         const wrapper = document.createElement('div');
@@ -236,9 +218,7 @@ function rebuildDynamicSelectors(config) {
         `;
         container.appendChild(wrapper);
     }
-
     populateFunction();
-
     // Restore saved values
     for (let i = 1; i <= totalSlots; i++) {
         const select = document.getElementById(`${itemPrefix}${i}`);
@@ -247,10 +227,8 @@ function rebuildDynamicSelectors(config) {
             populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
         }
     }
-
     calculateAbilities();
 }
-
 function updateTalentTables() {
     rebuildDynamicSelectors({
         amountInputId: 'talentAmount',
@@ -262,7 +240,6 @@ function updateTalentTables() {
         abilityType: 'talent'
     });
 }
-
 function updateTrickTables() {
     rebuildDynamicSelectors({
         amountInputId: 'tricksAmount',
@@ -275,32 +252,27 @@ function updateTrickTables() {
         abilityType: 'trick'
     });
 }
-
 // ———————————————————————— ONE EVENT LISTENER (CLEAN & FIXED) ————————————————————————
-
 document.addEventListener('change', e => {
     const t = e.target;
-
     // TALENT AMOUNT — FIXED
     if (t.matches('#talentAmount')) {
         const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value;  // Clamp input
+        t.value = value; // Clamp input
         document.getElementById('totalTalents').textContent = 1 + value;
         updateTalentTables();
         calculateAbilities();
         return;
     }
-
     // TRICK AMOUNT — FIXED
     if (t.matches('#tricksAmount')) {
         const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value;  // Clamp input
+        t.value = value; // Clamp input
         document.getElementById('totalTricks').textContent = 1 + value;
         updateTrickTables();
         calculateAbilities();
         return;
     }
-
     // Talent/Trick selection
     if (t.matches('.talentSelector')) {
         populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
@@ -310,22 +282,18 @@ document.addEventListener('change', e => {
         populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
         calculateAbilities();
     }
-
     // Skill Ranks
     else if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
         updateWayOptions();
         calculateSkillPoints();
-
         if (t.id === 'strikeSkillRank' || t.id === 'blastSkillRank' || t.id === 'invokeSkillRank') {
             const type = t.id.replace('SkillRank', '').toLowerCase();
             updateProficiencySelectors(type, parseInt(t.value) || 0);
         }
-
         updateTalentSelectors();
         updateTrickSelectors();
     }
-
     // Priorities & Level
     else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
         calculateAttributeValues();
@@ -334,7 +302,6 @@ document.addEventListener('change', e => {
         calculateSkillPoints();
         calculateAbilities();
     }
-
     // Sub-attributes
     else if (t.matches('input[id$="Value"][type="number"]')) {
         const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
@@ -343,12 +310,10 @@ document.addEventListener('change', e => {
         updateAttributeGroup(group);
         updateSkillsForMod(t.id);
     }
-
     // Way Selector
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
     }
-
     // Gear Selector Change
     else if (t.matches('.gearSelector')) {
         const match = t.id.match(/gear(\d+)Select/);
@@ -357,7 +322,6 @@ document.addEventListener('change', e => {
         updateGearLoad(i);
         calculateLoad();
     }
-
     // Amount Input Change
     else if (t.matches('.gearAmtInputField')) {
         const match = t.id.match(/gear(\d+)Amt/);
@@ -367,15 +331,12 @@ document.addEventListener('change', e => {
         calculateLoad();
     }
 });
-
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
-
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');
     sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
     waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
 }
-
 function updateWayOptions() {
     const sel = document.getElementById('roleSelector');
     waysData.forEach(way => {
@@ -386,7 +347,6 @@ function updateWayOptions() {
         if (opt) opt.disabled = !qualified;
     });
 }
-
 function updateTalentSelectors() {
     const qualified = getQualifiedAbilities('talent');
     document.querySelectorAll('.talentSelector').forEach(sel => {
@@ -395,7 +355,6 @@ function updateTalentSelectors() {
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
-
 function updateTrickSelectors() {
     const qualified = getQualifiedAbilities('trick');
     document.querySelectorAll('.trickSelector').forEach(sel => {
@@ -404,7 +363,6 @@ function updateTrickSelectors() {
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
-
 function getQualifiedAbilities(type) {
     const result = [];
     Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
@@ -415,13 +373,11 @@ function getQualifiedAbilities(type) {
     });
     return result;
 }
-
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId)?.value;
     const ability = abilities.find(a => a.name === value);
     const desc = document.getElementById(selectId + 'Description');
     if (!desc || !ability) { desc.innerHTML = ''; return; }
-
     desc.innerHTML = '';
     const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
@@ -435,15 +391,12 @@ function populateAbilityInfo(selectId, abilities, type) {
         desc.appendChild(div);
     });
 }
-
 function populateRoleInfo(e) {
     const name = e.target.value;
     if (!name) return;
     const way = waysData.find(w => w.name === name);
     if (!way) return;
-
     document.getElementById('wayTalentName').textContent = way.name;
-
     const desc = document.getElementById('wayTalentDesc');
     desc.innerHTML = '';
     ['passive', 'focus', 'critical effect'].forEach(key => {
@@ -454,7 +407,6 @@ function populateRoleInfo(e) {
             desc.appendChild(div);
         }
     });
-
     const attackSkill = way.props[Object.keys(way.props).find(k => k.includes('attack skill'))] || way.reqSkill;
     const skillId = SKILL_ID_MAP[attackSkill];
     if (skillId) {
@@ -464,7 +416,6 @@ function populateRoleInfo(e) {
             sel.dispatchEvent(new Event('change'));
         }
     }
-
     const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
     if (primary) {
         const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
@@ -474,12 +425,10 @@ function populateRoleInfo(e) {
             pri.dispatchEvent(new Event('change'));
         }
     }
-
     calculateAttributeValues();
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
 }
-
 function calculateSkillPoints() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const total = level * 3 + 9;
@@ -490,7 +439,6 @@ function calculateSkillPoints() {
     });
     document.getElementById('skillPoints').textContent = total - spent;
 }
-
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
@@ -499,33 +447,27 @@ function calculateAbilities() {
     const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
     document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
 }
-
 function calculateAttributeValues() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
     const sec = 2 + (level >= 6 ? 1 : 0);
     const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
-
     ['body', 'mind', 'spirit'].forEach(attr => {
         const priVal = document.getElementById(attr + 'Priority').value;
         let val = priVal === '1' ? pri : priVal === '2' ? sec : ter;
         document.getElementById(attr + 'Value').textContent = val;
     });
-
     updateSkillsForMod('bodyValue');
     updateSkillsForMod('mindValue');
     updateSkillsForMod('spiritValue');
 }
-
 function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
-
 function updateAttributeGroup(group) {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = document.getElementById(group.priorityId).value || '3';
     let points = 1 + Math.floor((level - 1) / 3);
     if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
     if (pri === '2') points = 2 + Math.floor(level / 3);
-
     const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
     let sum = 0;
     group.subIds.forEach(id => {
@@ -543,7 +485,6 @@ function updateAttributeGroup(group) {
     el.classList.toggle('hidden', rem === 0);
     group.subIds.forEach(id => updateSkillsForMod(id));
 }
-
 function updateSkillModAndPassive(skillId) {
     const sel = document.getElementById(skillId);
     if (!sel) return;
@@ -560,24 +501,20 @@ function updateSkillModAndPassive(skillId) {
         if (dmgEl) dmgEl.textContent = modVal;
     }
 }
-
 function updateSkillsForMod(subId) {
     Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {
         if (modId === subId) updateSkillModAndPassive(skillId);
     });
 }
-
 function updateAllSkillModsAndPassives() {
     Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
 }
-
 function updateProficiencySelectors(type, rank) {
     for (let i = 1; i <= 5; i++) {
         const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
 }
-
 function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');
     if (!select) return;
@@ -595,7 +532,6 @@ function updateGearLoad(i) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
@@ -607,9 +543,8 @@ function generateGearEntries() {
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
             <div id="gear${i}Details" class="gearDetails">i</div>
-        `;  // Removed stowed-container from here
+        `; // Removed stowed-container from here
         container.appendChild(entry);
-
         const sel = document.getElementById(`gear${i}Select`);
         sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
         sel.addEventListener('change', () => handleReadySelectChange(i));
@@ -638,7 +573,6 @@ function handleReadySelectChange(i) {
     const prevGear = readyState[i-1].gear;
     const prevPack = allOptions.find(g => g.name === prevGear);
     const newPack = allOptions.find(g => g.name === newGear);
-
     // Handle location if changing pack
     if (prevPack && prevPack.isPack) {
         usedLocations[prevPack.location] = null;
@@ -646,24 +580,22 @@ function handleReadySelectChange(i) {
     if (newPack && newPack.isPack) {
         if (usedLocations[newPack.location] && usedLocations[newPack.location] !== i) {
             alert(`Location ${newPack.location} already in use in slot ${usedLocations[newPack.location]}.`);
-            sel.value = prevGear;  // Reset
+            sel.value = prevGear; // Reset
             return;
         }
         usedLocations[newPack.location] = i;
     }
-
     // Update state
     readyState[i-1].gear = newGear;
     if (newPack && newPack.isPack) {
         const newSlots = newPack.stowedSlots;
-        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots);  // Prune if fewer
+        readyState[i-1].stowed = readyState[i-1].stowed.slice(0, newSlots); // Prune if fewer
         while (readyState[i-1].stowed.length < newSlots) {
             readyState[i-1].stowed.push({ gear: '', amt: 1 });
         }
     } else {
         readyState[i-1].stowed = [];
     }
-
     renderStowed(i);
     updateReadyLoad(i);
     calculateLoad();
@@ -671,21 +603,18 @@ function handleReadySelectChange(i) {
 // Render stowed for a ready slot
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);  // Find the parent gearEntry
-
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`); // Find the parent gearEntry
     if (readyState[i-1].stowed.length === 0) {
-        if (container) container.remove();  // Remove if no stowed
+        if (container) container.remove(); // Remove if no stowed
         return;
     }
-
     // Create container if it doesn't exist
     if (!container) {
         container = document.createElement('div');
         container.id = `stowed-container-${i}`;
         container.className = 'stowed-container';
-        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);  // Insert after gearEntry
+        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling); // Insert after gearEntry
     }
-
     container.innerHTML = '';
     readyState[i-1].stowed.forEach((s, j) => {
         const entry = document.createElement('div');
@@ -697,7 +626,6 @@ function renderStowed(i) {
             <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
         `;
         container.appendChild(entry);
-
         const sel = entry.querySelector('select');
         sel.innerHTML += nonPackOptions.map(g => `<option value="${g.name}" data-load="${g.load}" ${s.gear === g.name ? 'selected' : ''}>${g.name}</option>`).join('');
         sel.addEventListener('change', () => {
@@ -706,7 +634,6 @@ function renderStowed(i) {
             updateReadyLoad(i);
             calculateLoad();
         });
-
         const amt = entry.querySelector('input');
         amt.addEventListener('input', () => {
             readyState[i-1].stowed[j].amt = Math.max(1, parseInt(amt.value) || 1);
@@ -715,7 +642,6 @@ function renderStowed(i) {
             updateReadyLoad(i);
             calculateLoad();
         });
-
         updateStowedLoad(i, j+1);
     });
 }
@@ -754,7 +680,6 @@ function updateReadyLoad(i) {
         if (item?.isPack) loadDiv.style.color = total > item.loadLimit ? 'red' : '';
     }
 }
-
 // Update coin load (total coins / 50; red if >1)
 function updateCoinLoad() {
     const totalCoins = coinState.tok + coinState.copper + coinState.silver + coinState.gold;
@@ -766,7 +691,6 @@ function updateCoinLoad() {
     }
     calculateLoad();
 }
-
 // Updated calculateLoad (loop over state, no hard numbers beyond max)
 function calculateLoad() {
     let totalLoad = 0;
@@ -791,7 +715,7 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTalentTables();  // Initial build for talents
-    updateTrickTables();   // Initial build for tricks
+    updateTalentTables(); // Initial build for talents
+    updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
 });

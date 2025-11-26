@@ -608,9 +608,14 @@ function generateGearEntries() {
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
             <div id="gear${i}Details" class="gearDetails">i</div>
-            <div id="stowed-container-${i}" class="stowed-container"></div>  <!-- For stowed slots -->
-        `;
+        `;  // Removed stowed-container from here
         container.appendChild(entry);
+
+        // Create and append stowed-container after the gearEntry (below the parent)
+        const stowedContainer = document.createElement('div');
+        stowedContainer.id = `stowed-container-${i}`;
+        stowedContainer.className = 'stowed-container';
+        container.appendChild(stowedContainer);
 
         const sel = document.getElementById(`gear${i}Select`);
         sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');

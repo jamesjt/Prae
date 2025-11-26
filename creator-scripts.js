@@ -3,7 +3,7 @@ const PROF_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4
 const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
 function parseWaysCSV(csvText) {
-    let rows = [];  // Changed to let
+    const rows = [];
     let currentRow = [];
     let currentValue = '';
     let insideQuote = false;
@@ -77,6 +77,7 @@ function skipNewline(char, nextChar, i) {
     if (char === '\r' && nextChar === '\n') i++;
     return i;
 }
+
 const SKILL_ID_MAP = {
     'Athletics': 'athleticsSkillRank', 'Force': 'forceSkillRank', 'Acrobatics': 'acrobaticsSkillRank', 'Sneak': 'sneakSkillRank',
     'Endurance': 'enduranceSkillRank', 'Poise': 'poiseSkillRank', 'Lore': 'loreSkillRank', 'Tinkering': 'tinkeringSkillRank',

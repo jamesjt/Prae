@@ -59,17 +59,7 @@ let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = 
 
 // Add near top constants
 const MAX_READY_SLOTS = 12;  // Change this to adjust ready slots globally
-
-// Hardcoded packs (from your list; replace/merge with CSV parse if needed)
-const packData = [
-    { name: 'Backpack', loadLimit: 3, stowedSlots: 4, readySlots: 1, location: 'Back', cost: '10c', isPack: true, baseLoad: 0 },
-    { name: 'Rucksack', loadLimit: 5, stowedSlots: 7, readySlots: 2, location: 'Back', cost: '20c', isPack: true, baseLoad: 0 },
-    { name: 'Padded Pack', loadLimit: 2, stowedSlots: 6, readySlots: 1, location: 'Back', cost: '15c', isPack: true, baseLoad: 0 },
-    { name: 'Satchel', loadLimit: 1, stowedSlots: 3, readySlots: 1, location: 'Waist', cost: '5c', isPack: true, baseLoad: 0 },
-    { name: 'Kit', loadLimit: 0.5, stowedSlots: 5, readySlots: 1, location: 'Waist', cost: '9c', isPack: true, baseLoad: 0 },
-    { name: 'Pouch', loadLimit: 2, stowedSlots: 2, readySlots: 1, location: 'Waist', cost: '1c', isPack: true, baseLoad: 0 },
-    { name: 'Coin Pouch', loadLimit: 1, stowedSlots: 1, readySlots: 0, location: null, cost: '1c', isPack: true, baseLoad: 0 }  // Special handling
-];
+let packData = [];  // Will be populated from CSV
 
 // Assume gearData is non-packs (from fetch or hardcoded; example below)
 gearData = [  // Reassign without 'let' (fix for duplicate declaration); replace with parsed CSV data
@@ -153,44 +143,61 @@ fetch(WAYS_CSV_URL)
     })
     .catch(err => console.error('Error loading Ways CSV:', err));
 
+// Fetch and parse PROF_CSV_URL (extended to parse gear and packs)
 fetch(PROF_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const rows = parseWaysCSV(text);
-        const headers = rows[0].map(h => h.trim().toLowerCase());
-        const strikeCol = headers.findIndex(h => h.includes('strike'));
-        const blastCol = headers.findIndex(h => h.includes('blast'));
-        const invokeCol = headers.findIndex(h => h.includes('invoke'));
-        const gearCol = headers.findIndex(h => h.includes('gear'));
-        const loadCol = headers.findIndex(h => h.includes('load'));
+        const headers = rows[0].map(h => h.trim());
 
-        if (strikeCol !== -1) profData.strike = rows.slice(1).map(r => r[strikeCol]).filter(v => v);
-        if (blastCol !== -1) profData.blast = rows.slice(1).map(r => r[blastCol]).filter(v => v);
-        if (invokeCol !== -1) profData.invoke = rows.slice(1).map(r => r[invokeCol]).filter(v => v);
-        if (gearCol !== -1 && loadCol !== -1) {
-            gearData = rows.slice(1).map(r => ({ gear: r[gearCol].trim(), load: parseFloat(r[loadCol].trim()) || 0 })).filter(g => g.gear);
+        // Find column indices
+        const gearIdx = headers.indexOf('Gear');
+        const loadIdx = headers.indexOf('Load');  // Assuming next to Gear
+        const packsIdx = headers.indexOf('Packs');
+        const loadLimitIdx = headers.indexOf('Pack Load Limit');
+        const stowedSlotsIdx = headers.indexOf('Pack Stowed Slots');
+        const locationIdx = headers.indexOf('Pack Location');
+        const readySlotsIdx = headers.indexOf('Pack Ready Slots');  // If exists, else default 1
+        const costIdx = headers.indexOf('Pack Cost');  // If exists
+
+        gearData = [];  // Non-packs
+        packData = [];  // Packs
+
+        for (let r = 1; r < rows.length; r++) {
+            const row = rows[r];
+            // Parse gear (non-packs)
+            if (row[gearIdx] && row[gearIdx].trim()) {
+                gearData.push({
+                    name: row[gearIdx].trim(),
+                    load: parseFloat(row[loadIdx]) || 0,
+                    isPack: false
+                });
+            }
+            // Parse packs
+            if (row[packsIdx] && row[packsIdx].trim()) {
+                packData.push({
+                    name: row[packsIdx].trim(),
+                    loadLimit: parseFloat(row[loadLimitIdx]) || 0,
+                    stowedSlots: parseInt(row[stowedSlotsIdx]) || 0,
+                    location: row[locationIdx] ? row[locationIdx].trim() : null,
+                    readySlots: parseInt(row[readySlotsIdx]) || 1,
+                    cost: row[costIdx] ? row[costIdx].trim() : '',
+                    isPack: true,
+                    baseLoad: 0
+                });
+            }
         }
 
-        ['strike', 'blast', 'invoke'].forEach(type => {
-            for (let i = 1; i <= 5; i++) {
-                const sel = document.getElementById(type + 'ProfSelector' + i);
-                if (sel) {
-                    sel.innerHTML = '<option value=""></option>' + profData[type].map(o => `<option>${o}</option>`).join('');
-                }
-            }
-        });
-
-        for (let i = 1; i <= 12; i++) {
-            const sel = document.getElementById('gear' + i + 'Select');
-            if (sel) {
-                sel.innerHTML = '<option value="">Select Gear</option>' + 
-                    gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`).join('');
-                sel.dispatchEvent(new Event('change'));
-            }
-        }
+        // Now that data is loaded, regenerate entries if needed (or call in load)
+        if (document.readyState === 'complete') generateGearEntries();  // If fetch after load
     })
-    .catch(err => console.error('Error loading Prof/Gear CSV:', err));
+    .catch(err => console.error('Error loading PROF CSV:', err));
 
+const allOptions = [...gearData, ...packData.filter(p => p.name !== 'Coin Pouch')];  // Exclude coin pouch from ready selectors
+const nonPackOptions = gearData;  // For stowed
+let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
+let usedLocations = { Back: null, Waist: null };
+let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 
 function rebuildDynamicSelectors(config) {
@@ -767,7 +774,6 @@ function calculateLoad() {
 }
 
 // ———————————————————————— INIT ————————————————————————
-
 window.addEventListener('load', () => {
     calculateSkillPoints();
     calculateAbilities();

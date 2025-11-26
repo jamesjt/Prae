@@ -140,7 +140,7 @@ fetch(PROF_CSV_URL)
         if (blastCol !== -1) profData.blast = rows.slice(1).map(r => r[blastCol]).filter(v => v);
         if (invokeCol !== -1) profData.invoke = rows.slice(1).map(r => r[invokeCol]).filter(v => v);
         if (gearCol !== -1 && loadCol !== -1) {
-            gearData = rows.slice(1).map(r => ({ gear: r[gearCol].trim(), load: parseInt(r[loadCol].trim()) || 0 })).filter(g => g.gear);
+            gearData = rows.slice(1).map(r => ({ gear: r[gearCol].trim(), load: parseFloat(r[loadCol].trim()) || 0 })).filter(g => g.gear);
         }
 
         ['strike', 'blast', 'invoke'].forEach(type => {
@@ -156,7 +156,7 @@ fetch(PROF_CSV_URL)
             const sel = document.getElementById('gear' + i + 'Select');
             if (sel) {
                 sel.innerHTML = '<option value="">Select Gear</option>' + 
-                    gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear} (Load: ${g.load})</option>`).join('');
+                    gearData.map(g => `<option value="${g.gear}" data-load="${g.load}">${g.gear}</option>`).join('');
                 sel.dispatchEvent(new Event('change'));
             }
         }
@@ -551,7 +551,7 @@ function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');
     if (!select) return;
     const selectedOption = select.options[select.selectedIndex];
-    const baseLoad = parseInt(selectedOption.getAttribute('data-load')) || 0;
+    const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
     const amtInput = document.getElementById('gear' + i + 'Amt');
     const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
     if (amtInput) amtInput.value = qty; // Enforce clamp
@@ -570,14 +570,15 @@ function calculateLoad() {
         const select = document.getElementById('gear' + i + 'Select');
         if (select) {
             const selectedOption = select.options[select.selectedIndex];
-            const baseLoad = parseInt(selectedOption.getAttribute('data-load')) || 0;
+            const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
             const amtInput = document.getElementById('gear' + i + 'Amt');
             const qty = Math.max(1, parseInt(amtInput?.value) || 1);
             totalLoad += baseLoad * qty;
         }
     }
     console.log('Total Load:', totalLoad);
-    document.getElementById('totalLoadValue').textContent = totalLoad;
+    // Uncomment and add <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div> in HTML
+    // document.getElementById('totalLoadValue').textContent = totalLoad;
 }
 
 // ———————————————————————— INIT ————————————————————————

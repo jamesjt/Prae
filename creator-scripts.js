@@ -596,7 +596,6 @@ function updateGearLoad(i) {
     }
 }
 
-// Updated generateGearEntries
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
@@ -610,12 +609,6 @@ function generateGearEntries() {
             <div id="gear${i}Details" class="gearDetails">i</div>
         `;  // Removed stowed-container from here
         container.appendChild(entry);
-
-        // Create and append stowed-container after the gearEntry (below the parent)
-        const stowedContainer = document.createElement('div');
-        stowedContainer.id = `stowed-container-${i}`;
-        stowedContainer.className = 'stowed-container';
-        container.appendChild(stowedContainer);
 
         const sel = document.getElementById(`gear${i}Select`);
         sel.innerHTML += allOptions.map(g => `<option value="${g.name}" data-load="${g.baseLoad || g.load || 0}">${g.name}</option>`).join('');
@@ -677,14 +670,29 @@ function handleReadySelectChange(i) {
 }
 // Render stowed for a ready slot
 function renderStowed(i) {
-    const container = document.getElementById(`stowed-container-${i}`);
+    let container = document.getElementById(`stowed-container-${i}`);
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);  // Find the parent gearEntry
+
+    if (readyState[i-1].stowed.length === 0) {
+        if (container) container.remove();  // Remove if no stowed
+        return;
+    }
+
+    // Create container if it doesn't exist
+    if (!container) {
+        container = document.createElement('div');
+        container.id = `stowed-container-${i}`;
+        container.className = 'stowed-container';
+        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);  // Insert after gearEntry
+    }
+
     container.innerHTML = '';
     readyState[i-1].stowed.forEach((s, j) => {
         const entry = document.createElement('div');
-        entry.className = 'gearEntry stowedGear';
+        entry.className = 'gear-entry stowed-gear';
         entry.innerHTML = `
             <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
-            <input type="number" id="stowed-${i}-${j+1}-amt" class="gearAmtInputField" min="1" value="${s.amt}"/>
+            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
             <div id="stowed-${i}-${j+1}-details" class="gearDetails">i</div>
         `;

@@ -58,7 +58,7 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
 
 // Add near top constants
-const MAX_READY_SLOTS = 12;  // Change this to adjust ready slots globally
+const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
 let packData = [];  // Will be populated from CSV
 
 

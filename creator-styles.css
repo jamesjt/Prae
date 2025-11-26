@@ -550,7 +550,7 @@ dark leather: #5E4634
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
 .stowed-container{padding-left:10px;background-color:rgba(89, 72, 54, 1);}
-.stowed-container input{background-color:rgba(89, 72, 54, 1);}
+.stowed-container input{background-color:rgba(89, 72, 54, 1);border:none;width:30px;}
 .stowed-container select{background-color:rgba(89, 72, 54, 1);border:1px solid #6F6A63;}
 .stowedGear{}
 #coinInputs{display:flex;}

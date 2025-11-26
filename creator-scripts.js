@@ -689,7 +689,7 @@ function renderStowed(i) {
     container.innerHTML = '';
     readyState[i-1].stowed.forEach((s, j) => {
         const entry = document.createElement('div');
-        entry.className = 'gear-entry stowed-gear';
+        entry.className = 'gearEntry gearStowed';
         entry.innerHTML = `
             <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
             <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>

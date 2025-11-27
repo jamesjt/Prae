@@ -772,7 +772,6 @@ function updateStowedDetails(readyI, stowedJ) {
     const item = allOptions.find(g => g.name === gearName);
     const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
 
-    const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
     if (item && item.details && item.details.trim()) {
         detailsDiv.classList.add('hasDetails');
         detailsDiv.dataset.details = item.details.trim();

@@ -553,31 +553,33 @@ function updateGearLoad(i) {
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
+
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
-        let detailsHtml = '';
-        // Conditional: Add details icon only if item has details (will be updated on select change)
+
         entry.innerHTML = `
-            <select id="gear${i}Select" class="gearSelector"><option value="">Select Gear</option></select>
+            <select id="gear${i}Select" class="gearSelector">
+                <option value="">– Ready Slot ${i} –</option>
+            </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            ${detailsHtml}
+            <div id="gear${i}Details" class="gearDetails"></div>  <!-- NOW EXISTS -->
         `;
+
         container.appendChild(entry);
+
+        // Populate selector with grouped gear
         const sel = document.getElementById(`gear${i}Select`);
-        sel.innerHTML += '<option value="">Select Gear</option>';
-        // Group by category with optgroup
         const grouped = {};
         allOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
-        // Sort categories alphabetically
+
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `--${cat}--`;
-            // Sort items in category alphabetically
+            optgroup.label = `-- ${cat} --`;
             grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g.name;
@@ -587,22 +589,33 @@ function generateGearEntries() {
             });
             sel.appendChild(optgroup);
         });
+
+        // Event listeners
         sel.addEventListener('change', () => handleReadySelectChange(i));
-        document.getElementById(`gear${i}Amt`)?.addEventListener('input', () => {
-            readyState[i-1].amt = Math.max(1, parseInt(this.value) || 1);
-            this.value = readyState[i-1].amt;
+
+        const amtInput = document.getElementById(`gear${i}Amt`);
+        amtInput.addEventListener('input', function () {
+            const val = Math.max(1, parseInt(this.value) || 1);
+            this.value = val;
+            readyState[i - 1].amt = val;
             updateReadyLoad(i);
             calculateLoad();
         });
     }
-    // Coin pouch events (fixed)
+
+    // Coin pouch listeners
     ['tok', 'copper', 'silver', 'gold'].forEach(id => {
-        document.getElementById(id)?.addEventListener('input', () => {
-            coinState[id] = Math.max(0, parseInt(this.value) || 0);
-            this.value = coinState[id];
-            updateCoinLoad();
-        });
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function () {
+                coinState[id] = Math.max(0, parseInt(this.value) || 0);
+                this.value = coinState[id];
+                updateCoinLoad();
+                calculateLoad();
+            });
+        }
     });
+
     updateCoinLoad();
     calculateLoad();
 }
@@ -811,7 +824,7 @@ function createTooltip(details) {
 // ———————————————————————— GEAR DETAILS TOOLTIP (HOVER) ————————————————————————
 document.addEventListener('mouseover', e => {
     if (e.target.matches('.gearDetails') && e.target.dataset.details?.trim()) {
-        // Create or reuse the single tooltip element
+        // Create the tooltip only once
         let tooltip = document.getElementById('gear-tooltip');
         if (!tooltip) {
             tooltip = document.createElement('div');

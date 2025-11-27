@@ -149,48 +149,39 @@ fetch(PROF_CSV_URL)
                 suffix: h.replace(camelPrefix, '').trim(),
                 idx: headers.indexOf(h)
             }));
-            return {
-                mainIdx: headers.indexOf(main),
-                category: categoryName,
-                related,
-                flag: `is${categoryName.replace(/\s+/g, '')}`,
-                class: `gear${categoryName.replace(/\s+/g, '')}`
-            };
+            return { categoryName, mainIdx: headers.indexOf(main), related };
         });
 
-        gearData = [];
-
-        for (let r = 1; r < rows.length; r++) {
-            const row = rows[r];
+        // Process rows for gear
+        for (let rowIndex = 1; rowIndex < rows.length; rowIndex++) {
             categoryConfigs.forEach(config => {
-                const name = row[config.mainIdx]?.trim();
+                const { mainIdx, related, categoryName } = config;
+                const name = rows[rowIndex][mainIdx]?.trim() || '';
                 if (name) {
-                    const item = {
-                        name,
-                        category: config.category,
-                        [config.flag]: true,
-                        isPack: config.category === 'Packs' // Special case for packs if needed
-                    };
-                    // Add related props
-                    config.related.forEach(rel => {
-                        let val = row[rel.idx]?.trim();
-                        if (rel.suffix === 'Load' || rel.suffix === 'LoadLimit' || rel.suffix === 'StowedSlots' || rel.suffix === 'ReadyUsed') {
-                            val = parseFloat(val) || 0;
-                        } else if (rel.suffix === 'Bonus') {
-                            val = parseInt(val) || 0;
-                        }
-                        if (val !== undefined && val !== '') {
-                            item[rel.suffix.toLowerCase()] = val;
-                        }
+                    const gear = { name, category: categoryName.split(' ')[0] };
+                    related.forEach(r => {
+                        gear[r.suffix.toLowerCase()] = rows[rowIndex][r.idx]?.trim() || '';
                     });
-                    gearData.push(item);
+                    // Set isPack flag based on containers (case-insensitive)
+                    gear.isPack = (gear.containers || '').toLowerCase().includes('pack');
+                    // Normalize numbers
+                    gear.load = parseFloat(gear.load) || 0;
+                    gear.loadlimit = parseFloat(gear.loadlimit) || 0;
+                    gear.stowedslots = parseInt(gear.stowedslots) || 0;
+                    gearData.push(gear);
                 }
             });
         }
 
-        allOptions = gearData;
+        // Separate packs and non-packs
+        packData = gearData.filter(g => g.isPack);
         nonPackOptions = gearData.filter(g => !g.isPack);
-        generateGearEntries();
+        allOptions = gearData;
+
+        console.log('Gear Data:', gearData);
+        initGearEntries();
+        initCoinListeners();
+        calculateLoad();
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 

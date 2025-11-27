@@ -332,14 +332,6 @@ document.addEventListener('change', e => {
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
     }
-    // Gear Selector Change
-    else if (t.matches('.gearSelector')) {
-        const match = t.id.match(/gear(\d+)Select/);
-        if (!match) return;
-        const i = match[1];
-        updateGearLoad(i);
-        calculateLoad();
-    }
     // Amount Input Change
     else if (t.matches('.gearAmtInputField')) {
         const match = t.id.match(/gear(\d+)Amt/);

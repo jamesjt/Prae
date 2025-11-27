@@ -199,7 +199,6 @@ let allOptions = [];
 let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
 let usedLocations = { Back: null, Waist: null };
-let coinState = { tok: 0, copper: 0, silver: 0, gold: 0 };
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config) {
     const {
@@ -600,20 +599,6 @@ sel.addEventListener('change', () => {
         });
     }
 
-    // Coin pouch listeners
-    ['tok', 'copper', 'silver', 'gold'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', function () {
-                coinState[id] = Math.max(0, parseInt(this.value) || 0);
-                this.value = coinState[id];
-                updateCoinLoad();
-                calculateLoad();
-            });
-        }
-    });
-
-    updateCoinLoad();
     calculateLoad();
 }
 function handleReadySelectChange(i) {
@@ -828,17 +813,6 @@ function updateReadyLoad(i) {
         if (item?.isPack) loadDiv.style.color = total > item.loadLimit ? 'red' : '';
     }
 }
-// Update coin load (total coins / 50; red if >1)
-function updateCoinLoad() {
-    const totalCoins = coinState.tok + coinState.copper + coinState.silver + coinState.gold;
-    const load = totalCoins / 50;
-    const loadDiv = document.getElementById('coinLoad');
-    if (loadDiv) {
-        loadDiv.textContent = load.toFixed(2).replace(/\.?0+$/, '');
-        loadDiv.style.color = load > 1 ? 'red' : '';
-    }
-    calculateLoad();
-}
 // Updated calculateLoad (loop over state, no hard numbers beyond max)
 function calculateLoad() {
     let totalLoad = 0;
@@ -847,8 +821,6 @@ function calculateLoad() {
         const loadText = document.getElementById(`gear${i}Load`)?.textContent || '0';
         totalLoad += parseFloat(loadText) || 0;
     });
-    const coinLoadText = document.getElementById('coinLoad')?.textContent || '0';
-    totalLoad += parseFloat(coinLoadText) || 0;
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }

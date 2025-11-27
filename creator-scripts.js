@@ -564,7 +564,7 @@ function generateGearEntries() {
             </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails"></div>  <!-- NOW EXISTS -->
+            <div id="gear${i}Details" class="gearDetails hasDetails"></div>  <!-- NOW EXISTS -->
         `;
 
         container.appendChild(entry);
@@ -670,15 +670,14 @@ function handleReadySelectChange(i) {
     // Update details icon
     const detailsDiv = document.getElementById(`gear${i}Details`);
     if (item?.details?.trim()) {
-        detailsDiv.textContent = 'i';
+        detailsDiv.classList.add('hasDetails');
         detailsDiv.dataset.details = item.details.trim();
-        detailsDiv.style.cursor = 'help';
         detailsDiv.title = 'Hover for details';
     } else {
-        detailsDiv.textContent = '';
-        detailsDiv.dataset.details = '';
-        detailsDiv.style.cursor = 'default';
+        detailsDiv.classList.remove('hasDetails');
+        delete detailsDiv.dataset.details;
         detailsDiv.title = '';
+        detailsDiv.textContent = ''; // optional: clears old 'i' if present
     }
 }
 function renderStowed(i) {
@@ -711,7 +710,7 @@ function renderStowed(i) {
             </select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails"></div>
+            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails hasDetails"></div>
         `;
 
         container.appendChild(entry);
@@ -737,7 +736,7 @@ function renderStowed(i) {
             sel.appendChild(optgroup);
         });
 
-        // Restore saved selection
+        // Restore savegear$d selection
         if (s.gear) {
             sel.value = s.gear;
             updateStowedDetails(i, stowedIndex); // Show "i" if it has details
@@ -773,16 +772,16 @@ function updateStowedDetails(readyI, stowedJ) {
     const item = allOptions.find(g => g.name === gearName);
     const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
 
+    const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
     if (item && item.details && item.details.trim()) {
-        detailsDiv.textContent = 'i';
+        detailsDiv.classList.add('hasDetails');
         detailsDiv.dataset.details = item.details.trim();
-        detailsDiv.style.cursor = 'help';
         detailsDiv.title = 'Hover for details';
     } else {
-        detailsDiv.textContent = '';
+        detailsDiv.classList.remove('hasDetails');
         delete detailsDiv.dataset.details;
-        detailsDiv.style.cursor = 'default';
         detailsDiv.title = '';
+        detailsDiv.textContent = '';
     }
 }
 // Update single stowed load

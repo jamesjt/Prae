@@ -964,6 +964,54 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     display: none;
 }
 
+/* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
+.hasDetails {
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    background: #333;
+    color: #ffcc00;
+    border: 2px solid #ffcc00;
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+/* Hide completely when empty */
+.hasDetails:empty {
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* Hover glow */
+.hasDetails:hover {
+    background: #ffcc00;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.9);
+}
+
+/* Optional: auto-show 'i' even if element is empty */
+.hasDetails::before {
+    content: 'i';
+    font-style: italic;
+}
+.hasDetails:empty::before {
+    content: none;
+}
 .amountRow {
     display: flex;
     align-items: center;

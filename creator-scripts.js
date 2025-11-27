@@ -647,61 +647,51 @@ function handleReadySelectChange(i) {
     const newGearName = sel.value;
     const item = allOptions.find(g => g.name === newGearName);
 
-    // Update ready state
-    readyState[i - 1].gear = newGearName;
+    // === 1. Remove old details icon (if any) ===
+    const oldDetails = document.getElementById(`gear${i}Details`);
+    if (oldDetails) oldDetails.remove();
 
-    // Pack location cleanup
-    const prevGearName = readyState[i - 1].gear; // old value
-    const prevPack = allOptions.find(g => g.name === prevGearName);
-    if (prevPack?.isPack) {
-        usedLocations[prevPack.location] = null;
+    // === 2. Add details icon only if item has details ===
+    if (item?.details?.trim()) {
+        const detailsDiv = document.createElement('div');
+        detailsDiv.id = `gear${i}Details`;
+        detailsDiv.className = 'hasDetails';
+        detailsDiv.textContent = 'i';
+        detailsDiv.dataset.details = item.details.trim();
+        sel.closest('.gearEntry').appendChild(detailsDiv);
     }
 
-    // New pack handling
-    if (item?.isPack) {
-        if (usedLocations[item.location] && usedLocations[item.location] !== i) {
-            alert(`Location ${item.location} already in use!`);
-            sel.value = prevGearName;
-            readyState[i - 1].gear = prevGearName;
-            return;
-        }
-        usedLocations[item.location] = i;
+    // === 3. Handle pack logic (this was broken) ===
+    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.isPack;
+    const isPack = item?.isPack;
+
+    // If switching FROM a pack → clear stowed
+    if (wasPack && !isPack) {
+        readyState[i-1].stowed = [];
+        renderStowed(i); // This removes the container
     }
 
-    // Stowed slots for packs
-    if (item?.isPack) {
+    // If switching TO a pack → initialize stowed slots
+    if (isPack && !wasPack) {
         const slots = item.stowedslots || 0;
-        readyState[i - 1].stowed = readyState[i - 1].stowed.slice(0, slots);
-        while (readyState[i - 1].stowed.length < slots) {
-            readyState[i - 1].stowed.push({ gear: '', amt: 1 });
-        }
-    } else {
-        readyState[i - 1].stowed = [];
+        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
+        renderStowed(i); // ← THIS IS THE MISSING CALL!
     }
 
-    renderStowed(i);
+    // If staying on same pack but changing item (shouldn't happen, but safe)
+    if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
+        const slots = item.stowedslots || 0;
+        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
+        renderStowed(i);
+    }
+
+    // Update state
+    readyState[i-1].gear = newGearName;
+    readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
+
+    // Update load
     updateReadyLoad(i);
     calculateLoad();
-
-    // Update category class
-    const entry = sel.closest('.gearEntry');
-    entry.className = 'gearEntry';
-    if (item?.category) {
-        entry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
-    }
-
-    // Update details icon
-    const detailsDiv = document.getElementById(`gear${i}Details`);
-    if (item?.details?.trim()) {
-        detailsDiv.classList.add('hasDetails');
-        detailsDiv.dataset.details = item.details.trim();
-        detailsDiv.title = 'Hover for details';
-    } else {
-        detailsDiv.classList.remove('hasDetails');
-        delete detailsDiv.dataset.details;
-        detailsDiv.title = '';
-        detailsDiv.textContent = ''; // optional: clears old 'i' if present
-    }
 }
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);

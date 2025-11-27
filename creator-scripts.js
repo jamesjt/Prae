@@ -558,25 +558,27 @@ function generateGearEntries() {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
 
+        // We'll build the details HTML only if needed later
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
                 <option value="">– Ready Slot ${i} –</option>
             </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails hasDetails">i</div>  <!-- NOW EXISTS -->
+            ${detailsHtml}
         `;
 
         container.appendChild(entry);
 
-        // Populate selector with grouped gear
+        // Populate selector
         const sel = document.getElementById(`gear${i}Select`);
         const grouped = {};
         allOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
-
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
             optgroup.label = `-- ${cat} --`;
@@ -590,9 +592,30 @@ function generateGearEntries() {
             sel.appendChild(optgroup);
         });
 
-        // Event listeners
-        sel.addEventListener('change', () => handleReadySelectChange(i));
+        // On change: update load + conditionally add details icon
+        sel.addEventListener('change', () => {
+            const selectedName = sel.value;
+            const item = allOptions.find(g => g.name === selectedName);
 
+            // Remove existing details div if present
+            const existingDetails = document.getElementById(`gear${i}Details`);
+            if (existingDetails) existingDetails.remove();
+
+            // Add details icon only if item has details
+            if (item?.details?.trim()) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = `gear${i}Details`;
+                detailsDiv.className = 'hasDetails';
+                detailsDiv.textContent = 'i';
+                detailsDiv.dataset.details = item.details.trim();
+                entry.appendChild(detailsDiv);
+            }
+
+            updateReadyLoad(i);
+            calculateLoad();
+        });
+
+        // Amount input
         const amtInput = document.getElementById(`gear${i}Amt`);
         amtInput.addEventListener('input', function () {
             const val = Math.max(1, parseInt(this.value) || 1);
@@ -684,13 +707,11 @@ function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
 
-    // Remove container if no stowed slots
     if (readyState[i-1].stowed.length === 0) {
         if (container) container.remove();
         return;
     }
 
-    // Create container if missing
     if (!container) {
         container = document.createElement('div');
         container.id = `stowed-container-${i}`;
@@ -704,20 +725,21 @@ function renderStowed(i) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
 
+        // Start with no details div
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
                 <option value="">Select Gear</option>
             </select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails hasDetails">i</div>
+            ${detailsHtml}
         `;
 
         container.appendChild(entry);
 
         const sel = entry.querySelector('select');
-
-        // Populate with grouped gear (same as ready slots)
         const grouped = {};
         nonPackOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
@@ -725,7 +747,7 @@ function renderStowed(i) {
         });
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `-- ${cat} --`;
+            optgroup.label poking = `-- ${cat} --`;
             grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g.name;
@@ -736,16 +758,40 @@ function renderStowed(i) {
             sel.appendChild(optgroup);
         });
 
-        // Restore savegear$d selection
+        // Restore saved selection
         if (s.gear) {
             sel.value = s.gear;
-            updateStowedDetails(i, stowedIndex); // Show "i" if it has details
+            const item = nonPackOptions.find(g => g.name === s.gear);
+            if (item?.details?.trim()) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+                detailsDiv.className = 'hasDetails';
+                detailsDiv.textContent = 'i';
+                detailsDiv.dataset.details = item.details.trim();
+                entry.appendChild(detailsDiv);
+            }
         }
 
-        // Listeners
+        // On change
         sel.addEventListener('change', () => {
-            readyState[i-1].stowed[j].gear = sel.value;
-            updateStowedDetails(i, stowedIndex);
+            const selectedName = sel.value;
+            const item = nonPackOptions.find(g => g.name === selectedName);
+
+            // Remove old details if exists
+            const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
+            if (oldDetails) oldDetails.remove();
+
+            // Add new one only if has details
+            if (item?.details?.trim()) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+                detailsDiv.className = 'hasDetails';
+                detailsDiv.textContent = 'i';
+                detailsDiv.dataset.details = item.details.trim();
+                entry.appendChild(detailsDiv);
+            }
+
+            readyState[i-1].stowed[j].gear = selectedName;
             updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
             calculateLoad();

@@ -683,44 +683,50 @@ function handleReadySelectChange(i) {
 }
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`); // Find the parent gearEntry
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
+
+    // Remove container if no stowed slots
     if (readyState[i-1].stowed.length === 0) {
-        if (container) container.remove(); // Remove if no stowed
+        if (container) container.remove();
         return;
     }
-    // Create container if it doesn't exist
+
+    // Create container if missing
     if (!container) {
         container = document.createElement('div');
         container.id = `stowed-container-${i}`;
         container.className = 'stowed-container';
-        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling); // Insert after gearEntry
+        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);
     }
     container.innerHTML = '';
+
     readyState[i-1].stowed.forEach((s, j) => {
+        const stowedIndex = j + 1;
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
-        let detailsHtml = '';
-        // Conditional: Add details icon only if item has details (will be updated on select change)
+
         entry.innerHTML = `
-            <select id="stowed-${i}-${j+1}-select" class="gearSelector"><option value="">Select Gear</option></select>
-            <input type="number" id="stowed-${i}-${j+1}-amt" min="1" value="${s.amt}"/>
-            <div id="stowed-${i}-${j+1}-load" class="gearLoad"></div>
-            ${detailsHtml}
+            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
+                <option value="">Select Gear</option>
+            </select>
+            <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
+            <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
+            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails"></div>
         `;
+
         container.appendChild(entry);
+
         const sel = entry.querySelector('select');
-        sel.innerHTML += '<option value="">Select Gear</option>';
-        // Group by category with optgroup
+
+        // Populate with grouped gear (same as ready slots)
         const grouped = {};
-        allOptions.forEach(g => {
+        nonPackOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
-        // Sort categories alphabetically
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `--${cat}--`;
-            // Sort items in category alphabetically
+            optgroup.label = `-- ${cat} --`;
             grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g.name;
@@ -730,22 +736,54 @@ function renderStowed(i) {
             });
             sel.appendChild(optgroup);
         });
+
+        // Restore saved selection
+        if (s.gear) {
+            sel.value = s.gear;
+            updateStowedDetails(i, stowedIndex); // Show "i" if it has details
+        }
+
+        // Listeners
         sel.addEventListener('change', () => {
             readyState[i-1].stowed[j].gear = sel.value;
-            updateStowedLoad(i, j+1);
+            updateStowedDetails(i, stowedIndex);
+            updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
             calculateLoad();
         });
-        const amt = entry.querySelector('input');
-        amt.addEventListener('input', () => {
-            readyState[i-1].stowed[j].amt = Math.max(1, parseInt(amt.value) || 1);
-            amt.value = readyState[i-1].stowed[j].amt;
-            updateStowedLoad(i, j+1);
+
+        const amtInput = entry.querySelector('input');
+        amtInput.addEventListener('input', () => {
+            const val = Math.max(1, parseInt(amtInput.value) || 1);
+            amtInput.value = val;
+            readyState[i-1].stowed[j].amt = val;
+            updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
             calculateLoad();
         });
-        updateStowedLoad(i, j+1);
+
+        updateStowedLoad(i, stowedIndex);
     });
+}
+function updateStowedDetails(readyI, stowedJ) {
+    const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
+    if (!sel) return;
+
+    const gearName = sel.value;
+    const item = allOptions.find(g => g.name === gearName);
+    const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
+
+    if (item && item.details && item.details.trim()) {
+        detailsDiv.textContent = 'i';
+        detailsDiv.dataset.details = item.details.trim();
+        detailsDiv.style.cursor = 'help';
+        detailsDiv.title = 'Hover for details';
+    } else {
+        detailsDiv.textContent = '';
+        delete detailsDiv.dataset.details;
+        detailsDiv.style.cursor = 'default';
+        detailsDiv.title = '';
+    }
 }
 // Update single stowed load
 function updateStowedLoad(readyI, stowedJ) {

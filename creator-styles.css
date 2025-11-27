@@ -976,24 +976,19 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 }
 /* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
 .hasDetails {
-    width: 10px;
+    width: 11px;
     height: 10px;
+    padding-top: 1px;
     margin:4px 0px 0px 6px;
-    font-weight: bold;
-    font-size: 12px;
+    font-size: 8px;
     line-height: 16px;
-    text-align: center;
     border-radius: 50%;
     background: #333;
     color: #d29a38;
-    border: 2px solid #d29a38;
-    cursor: help;
-    display: inline-flex;
+    cursor: context-menu;
+    display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-    user-select: none;
     position: relative;
     z-index: 10; /* ensures it's above other elements */
 }

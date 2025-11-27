@@ -555,7 +555,7 @@ function generateGearEntries() {
 
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
-                <option value="">– Ready Slot ${i} –</option>
+                <option value="">Ready Slot</option>
             </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
@@ -693,7 +693,7 @@ function renderStowed(i) {
 
         entry.innerHTML = `
             <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
-                <option value="">Select Gear</option>
+                <option value="">Stowed Slot</option>
             </select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>

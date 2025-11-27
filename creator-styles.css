@@ -554,12 +554,12 @@ dark leather: #5E4634
 .stowed-container select{background-color:rgba(89, 72, 54, 1);border:1px solid #6F6A63;}
 .stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
-#coinsGold{border:1px solid #d29a38}
-#coinsTok{border:1px solid teal}
-#coinsSilver{border:1px solid silver;}
-#coinsCopper{border: 1px solid #CD7F32}
+#coinsGold{border-color:#d29a38}
+#coinsTok{border-color: teal}
+#coinsSilver{border-color: silver;}
+#coinsCopper{border-color: #CD7F32}
 .gearCoinsLabel{font-size:14px}
-.gearCoins{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
+.gearCoins{width: 30px;border-size: 1px; border-style: solid; background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex;}
 

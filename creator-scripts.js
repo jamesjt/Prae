@@ -725,7 +725,6 @@ function renderStowed(i) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
 
-        // Start with no details div
         let detailsHtml = '';
 
         entry.innerHTML = `
@@ -745,9 +744,10 @@ function renderStowed(i) {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
+
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
-            optgroup.label poking = `-- ${cat} --`;
+            optgroup.label = `-- ${cat} --`;  // ← Fixed! Was "poking"
             grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g.name;
@@ -758,7 +758,7 @@ function renderStowed(i) {
             sel.appendChild(optgroup);
         });
 
-        // Restore saved selection
+        // Restore saved selection and add details if needed
         if (s.gear) {
             sel.value = s.gear;
             const item = nonPackOptions.find(g => g.name === s.gear);
@@ -777,11 +777,11 @@ function renderStowed(i) {
             const selectedName = sel.value;
             const item = nonPackOptions.find(g => g.name === selectedName);
 
-            // Remove old details if exists
+            // Remove old details
             const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
             if (oldDetails) oldDetails.remove();
 
-            // Add new one only if has details
+            // Add new details only if present
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;

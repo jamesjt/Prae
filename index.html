@@ -941,13 +941,13 @@
                       <div class="gearLoadHead">Load</div>
                     </div>
                     <div id="gearEntries"></div> <!-- JS will populate this -->
-                    <div id="coinPouchContainer" class="gearEntry">
-                      <div class="gearName" class="gearCoins">Coins</div>
-                      <div id="coinInputs">
-                        <input type="number" id="tok" min="0" value="0" placeholder="t (tok)">
-                        <input type="number" id="copper" min="0" value="0" placeholder="c (copper)">
-                        <input type="number" id="silver" min="0" value="0" placeholder="s (silver)">
-                        <input type="number" id="gold" min="0" value="0" placeholder="g (gold)">
+                    <div id="coinPouchContainer" class="gearEntry gearCoinsContainer">
+                      <div class="gearName gearCoins">Coins</div>
+                      <div id="coinInputs" class="">
+                        <input type="number" id="coinsTok" min="0" value="0" label="t" class="gearCoins">
+                        <input type="number" id="coinsCopper" min="0" value="0" class="gearCoins">c
+                        <input type="number" id="coinsSilver" min="0" value="0"  class="gearCoins">
+                        <input type="number" id="coingsGold" min="0" value="0"  class="gearCoins">
                       </div>
                     </div>
                     <div id="totalLoadDisplay">Total Load: <span id="totalLoadValue">0</span></div>

@@ -553,9 +553,14 @@ dark leather: #5E4634
 .stowed-container input{background-color:rgba(89, 72, 54, 1);border:none;width:30px;color:whitesmoke;margin-left:5px;}
 .stowed-container select{background-color:rgba(89, 72, 54, 1);border:1px solid #6F6A63;}
 .stowedGear{}
+.gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
+#coinsGold{border:1px solid #d29a38}
+#coinsTok{border:1px solid teal}
+#coinsSilver{border:1px solid silver;}
+#coinsCopper{border: 1px solid #CD7F32}
+.gearCoins{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
+.gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex;}
-#coinInputs input{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
-#coinInputs input:hover{background-color: white;color:black;}
 
 #ritualList {
   background-color:#9BAABF;

@@ -949,6 +949,21 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     white-space: pre-wrap; /* Preserve formatting if needed */
 }
 
+#gear-tooltip {
+    position: absolute;
+    background: #222;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    z-index: 10000;
+    max-width: 320px;
+    white-space: pre-wrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    pointer-events: none;
+    display: none;
+}
+
 .amountRow {
     display: flex;
     align-items: center;

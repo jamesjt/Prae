@@ -614,14 +614,14 @@ function handleReadySelectChange(i) {
     // Update ready state
     readyState[i - 1].gear = newGearName;
 
-    // Handle pack location cleanup
-    const prevGearName = readyState[i - 1].gear; // old value before change
+    // Pack location cleanup
+    const prevGearName = readyState[i - 1].gear; // old value
     const prevPack = allOptions.find(g => g.name === prevGearName);
     if (prevPack?.isPack) {
         usedLocations[prevPack.location] = null;
     }
 
-    // Handle new pack
+    // New pack handling
     if (item?.isPack) {
         if (usedLocations[item.location] && usedLocations[item.location] !== i) {
             alert(`Location ${item.location} already in use!`);
@@ -632,7 +632,7 @@ function handleReadySelectChange(i) {
         usedLocations[item.location] = i;
     }
 
-    // Update stowed slots if it's a pack
+    // Stowed slots for packs
     if (item?.isPack) {
         const slots = item.stowedslots || 0;
         readyState[i - 1].stowed = readyState[i - 1].stowed.slice(0, slots);
@@ -647,9 +647,9 @@ function handleReadySelectChange(i) {
     updateReadyLoad(i);
     calculateLoad();
 
-    // Update category class on gearEntry
+    // Update category class
     const entry = sel.closest('.gearEntry');
-    entry.className = 'gearEntry'; // reset
+    entry.className = 'gearEntry';
     if (item?.category) {
         entry.classList.add(`gear${item.category.replace(/\s+/g, '')}`);
     }
@@ -808,25 +808,33 @@ function createTooltip(details) {
     return tooltip;
 }
 
-// Hover logic for gear details (event delegation)
-    document.addEventListener('mouseover', e => {
-        if (e.target.matches('.gearDetails') && e.target.dataset.details) {
-            const tooltip = createTooltip(e.target.dataset.details);
+// ———————————————————————— GEAR DETAILS TOOLTIP (HOVER) ————————————————————————
+document.addEventListener('mouseover', e => {
+    if (e.target.matches('.gearDetails') && e.target.dataset.details?.trim()) {
+        // Create or reuse the single tooltip element
+        let tooltip = document.getElementById('gear-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'gear-tooltip';
+            tooltip.className = 'tooltip';
             document.body.appendChild(tooltip);
-            const rect = e.target.getBoundingClientRect();
-            tooltip.style.left = `${rect.left + window.scrollX}px`;
-            tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-            tooltip.style.display = 'block';
-            e.target._tooltip = tooltip; // Store for mouseout
         }
-    });
 
-    document.addEventListener('mouseout', e => {
-        if (e.target.matches('.gearDetails') && e.target._tooltip) {
-            e.target._tooltip.remove();
-            e.target._tooltip = null;
-        }
-    });
+        tooltip.textContent = e.target.dataset.details.trim();
+
+        const rect = e.target.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top  = `${rect.bottom + window.scrollY + 5}px`;
+        tooltip.style.display = 'block';
+    }
+});
+
+document.addEventListener('mouseout', e => {
+    if (e.target.matches('.gearDetails')) {
+        const tooltip = document.getElementById('gear-tooltip');
+        if (tooltip) tooltip.style.display = 'none';
+    }
+});
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
     calculateSkillPoints();

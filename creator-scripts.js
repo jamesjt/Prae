@@ -162,18 +162,19 @@ fetch(PROF_CSV_URL)
                     related.forEach(r => {
                         gear[r.suffix.toLowerCase()] = rows[rowIndex][r.idx]?.trim() || '';
                     });
-                    // Set isPack flag based on containers (case-insensitive)
-                    gear.isPack = (gear.containers || '').toLowerCase().includes('pack');
-                    // Normalize numbers
-                    gear.load = parseFloat(gear.load) || 0;
-                    gear.loadlimit = parseFloat(gear.loadlimit) || 0;
-                    gear.stowedslots = parseInt(gear.stowedslots) || 0;
                     gearData.push(gear);
                 }
             });
         }
 
-        // Separate packs and non-packs
+        // Normalize numbers and set isPack based on stowedslots > 0
+        gearData.forEach(g => {
+            g.load = parseFloat(g.load) || 0;
+            g.loadlimit = parseFloat(g.loadlimit) || 0;
+            g.stowedslots = parseInt(g.stowedslots) || 0;
+            g.isPack = g.stowedslots > 0;
+        });
+
         packData = gearData.filter(g => g.isPack);
         nonPackOptions = gearData.filter(g => !g.isPack);
         allOptions = gearData;

@@ -564,7 +564,7 @@ function generateGearEntries() {
             </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="gearDetails hasDetails"></div>  <!-- NOW EXISTS -->
+            <div id="gear${i}Details" class="gearDetails hasDetails">i</div>  <!-- NOW EXISTS -->
         `;
 
         container.appendChild(entry);
@@ -710,7 +710,7 @@ function renderStowed(i) {
             </select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
-            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails hasDetails"></div>
+            <div id="stowed-${i}-${stowedIndex}-details" class="gearDetails hasDetails">i</div>
         `;
 
         container.appendChild(entry);

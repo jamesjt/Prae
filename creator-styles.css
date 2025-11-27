@@ -558,6 +558,7 @@ dark leather: #5E4634
 #coinsTok{border:1px solid teal}
 #coinsSilver{border:1px solid silver;}
 #coinsCopper{border: 1px solid #CD7F32}
+.gearCoinsLabel{font-size:14px}
 .gearCoins{width: 30px;border: none;background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex;}

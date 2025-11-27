@@ -559,9 +559,9 @@ dark leather: #5E4634
 #coinsSilver{border-color: silver;}
 #coinsCopper{border-color: #CD7F32}
 .gearCoinsLabel{font-size:14px}
-.gearCoins{width: 30px;border-size: 1px; border-style: solid; background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
+.gearCoins{width: 30px;border-width: 1px; border-style: solid; background-color: #6F6A63;color: whitesmoke;margin-left: 10px;}
 .gearCoins:hover{background-color: white;color:black;}
-#coinInputs{display:flex;}
+#coinInputs{display:flex; border-}
 
 #ritualList {
   background-color:#9BAABF;

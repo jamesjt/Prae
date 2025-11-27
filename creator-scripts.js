@@ -585,27 +585,9 @@ function generateGearEntries() {
         });
 
         // On change: update load + conditionally add details icon
-        sel.addEventListener('change', () => {
-            const selectedName = sel.value;
-            const item = allOptions.find(g => g.name === selectedName);
-
-            // Remove existing details div if present
-            const existingDetails = document.getElementById(`gear${i}Details`);
-            if (existingDetails) existingDetails.remove();
-
-            // Add details icon only if item has details
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `gear${i}Details`;
-                detailsDiv.className = 'hasDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.dataset.details = item.details.trim();
-                entry.appendChild(detailsDiv);
-            }
-
-            updateReadyLoad(i);
-            calculateLoad();
-        });
+sel.addEventListener('change', () => {
+    handleReadySelectChange(i);  // This now handles EVERYTHING: details, packs, state, stowed rendering, and loads
+});
 
         // Amount input
         const amtInput = document.getElementById(`gear${i}Amt`);

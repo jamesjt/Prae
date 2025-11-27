@@ -949,21 +949,31 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     white-space: pre-wrap; /* Preserve formatting if needed */
 }
 
-#gear-tooltip {
+#universal-tooltip {
     position: absolute;
     background: #222;
     color: #fff;
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border-radius: 8px;
     font-size: 13px;
-    z-index: 10000;
-    max-width: 320px;
+    line-height: 1.4;
+    max-width: 340px;
     white-space: pre-wrap;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
     pointer-events: none;
-    display: none;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    left: 50%;
+    top: 0;
+    text-align: center;
 }
 
+#universal-tooltip.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 /* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
 .hasDetails {
     width: 16px;
@@ -984,6 +994,8 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     flex-shrink: 0;
     transition: all 0.2s ease;
     user-select: none;
+    position: relative;
+    z-index: 10; /* ensures it's above other elements */
 }
 
 /* Hide completely when empty */
@@ -1012,6 +1024,7 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 .hasDetails:empty::before {
     content: none;
 }
+
 .amountRow {
     display: flex;
     align-items: center;

@@ -857,31 +857,31 @@ function createTooltip(details) {
     return tooltip;
 }
 
-// ———————————————————————— GEAR DETAILS TOOLTIP (HOVER) ————————————————————————
+// ———————————————————————— UNIVERSAL TOOLTIP ————————————————————————
+const TOOLTIP_ID = 'universal-tooltip';
+
 document.addEventListener('mouseover', e => {
-    if (e.target.matches('.gearDetails') && e.target.dataset.details?.trim()) {
-        // Create the tooltip only once
-        let tooltip = document.getElementById('gear-tooltip');
+    if (e.target.matches('.hasDetails') && e.target.dataset.details?.trim()) {
+        let tooltip = document.getElementById(TOOLTIP_ID);
         if (!tooltip) {
             tooltip = document.createElement('div');
-            tooltip.id = 'gear-tooltip';
-            tooltip.className = 'tooltip';
+            tooltip.id = TOOLTIP_ID;
             document.body.appendChild(tooltip);
         }
 
         tooltip.textContent = e.target.dataset.details.trim();
+        tooltip.classList.add('visible');
 
         const rect = e.target.getBoundingClientRect();
-        tooltip.style.left = `${rect.left + window.scrollX}px`;
-        tooltip.style.top  = `${rect.bottom + window.scrollY + 5}px`;
-        tooltip.style.display = 'block';
+        tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+        tooltip.style.top = `${rect.bottom + window.scrollY + 8}px`;
     }
 });
 
 document.addEventListener('mouseout', e => {
-    if (e.target.matches('.gearDetails')) {
-        const tooltip = document.getElementById('gear-tooltip');
-        if (tooltip) tooltip.style.display = 'none';
+    if (e.target.matches('.hasDetails')) {
+        const tooltip = document.getElementById(TOOLTIP_ID);
+        if (tooltip) tooltip.classList.remove('visible');
     }
 });
 // ———————————————————————— INIT ————————————————————————

@@ -268,73 +268,64 @@ function updateTrickTables() {
 // ———————————————————————— ONE EVENT LISTENER (CLEAN & FIXED) ————————————————————————
 document.addEventListener('change', e => {
     const t = e.target;
-    // TALENT AMOUNT — FIXED
-    if (t.matches('#talentAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value; // Clamp input
-        document.getElementById('totalTalents').textContent = 1 + value;
-        updateTalentTables();
-        calculateAbilities();
-        return;
-    }
-    // TRICK AMOUNT — FIXED
-    if (t.matches('#tricksAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value; // Clamp input
-        document.getElementById('totalTricks').textContent = 1 + value;
-        updateTrickTables();
-        calculateAbilities();
-        return;
-    }
-    // Talent/Trick selection
-    if (t.matches('.talentSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
-        calculateAbilities();
-    }
-    else if (t.matches('.trickSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
-        calculateAbilities();
-    }
-    // Skill Ranks
-    else if (t.matches('select[id$="SkillRank"]')) {
-        updateSkillModAndPassive(t.id);
-        updateWayOptions();
-        calculateSkillPoints();
-        if (t.id === 'strikeSkillRank' || t.id === 'blastSkillRank' || t.id === 'invokeSkillRank') {
-            const type = t.id.replace('SkillRank', '').toLowerCase();
-            updateProficiencySelectors(type, parseInt(t.value) || 0);
+    const handlers = {
+        '#talentAmount': () => {
+            const value = Math.max(0, parseInt(t.value) || 0);
+            t.value = value;
+            document.getElementById('totalTalents').textContent = 1 + value;
+            updateTalentTables();
+            calculateAbilities();
+        },
+        '#tricksAmount': () => {
+            const value = Math.max(0, parseInt(t.value) || 0);
+            t.value = value;
+            document.getElementById('totalTricks').textContent = 1 + value;
+            updateTrickTables();
+            calculateAbilities();
+        },
+        '.talentSelector': () => {
+            populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
+            calculateAbilities();
+        },
+        '.trickSelector': () => {
+            populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
+            calculateAbilities();
+        },
+        'select[id$="SkillRank"]': () => {
+            updateSkillModAndPassive(t.id);
+            updateWayOptions();
+            calculateSkillPoints();
+            if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(t.id)) {
+                const type = t.id.replace('SkillRank', '').toLowerCase();
+                updateProficiencySelectors(type, parseInt(t.value) || 0);
+            }
+            updateAbilitySelectors('trick');
+            updateAbilitySelectors('talent');
+        },
+        '#bodyPriority, #mindPriority, #spiritPriority, #charLvl': () => {
+            calculateAttributeValues();
+            updateAttributeGroups();
+            updateAllSkillModsAndPassives();
+            calculateSkillPoints();
+            calculateAbilities();
+        },
+        'input[id$="Value"][type="number"]': () => {
+            const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
+                         t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
+                         ATTRIBUTE_GROUPS.spirit;
+            updateAttributeGroup(group);
+            updateSkillsForMod(t.id);
+        },
+        '#roleSelector': () => populateRoleInfo(e),
+        '.gearAmtInputField': () => {
+            const match = t.id.match(/gear(\d+)Amt/);
+            if (!match) return;
+            const i = match[1];
+            updateGearLoad(i);
+            calculateLoad();
         }
-        updateAbilitySelectors('trick');
-        updateAbilitySelectors('talent');
-    }
-    // Priorities & Level
-    else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
-        calculateAttributeValues();
-        updateAttributeGroups();
-        updateAllSkillModsAndPassives();
-        calculateSkillPoints();
-        calculateAbilities();
-    }
-    // Sub-attributes
-    else if (t.matches('input[id$="Value"][type="number"]')) {
-        const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
-                     t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
-                     ATTRIBUTE_GROUPS.spirit;
-        updateAttributeGroup(group);
-        updateSkillsForMod(t.id);
-    }
-    // Way Selector
-    else if (t.matches('#roleSelector')) {
-        populateRoleInfo(e);
-    }
-    // Amount Input Change
-    else if (t.matches('.gearAmtInputField')) {
-        const match = t.id.match(/gear(\d+)Amt/);
-        if (!match) return;
-        const i = match[1];
-        updateGearLoad(i);
-        calculateLoad();
-    }
+    };
+    Object.keys(handlers).find(key => t.matches(key))?.();
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
 function populateRoleSelector() {

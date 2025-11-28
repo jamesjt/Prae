@@ -28,7 +28,6 @@ let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = 
 
 // Add near top constants
 const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
-let packData = [];  // Will be populated from CSV
 
 
 // ———————————————————————— DATA LOADING ————————————————————————
@@ -196,7 +195,6 @@ fetch(PROF_CSV_URL)
 let allOptions = [];
 let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
-let usedLocations = { Back: null, Waist: null };
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config) {
     const {

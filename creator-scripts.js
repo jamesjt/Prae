@@ -72,8 +72,8 @@ fetch(ABILITIES_CSV_URL)
             abilitiesData[skill].push(ability);
         }
         console.log('Abilities Data:', abilitiesData);
-        updateTalentSelectors();
-        updateTrickSelectors();
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
     })
     .catch(err => console.error('Error loading Abilities CSV:', err));
 
@@ -194,7 +194,6 @@ fetch(PROF_CSV_URL)
     })
     .catch(err => console.error('Error loading PROF CSV:', err));
 
-// Remove any hardcoded gearData assignment outside the fetch (e.g., no gearData = [Sword, Shield] block)
 let allOptions = [];
 let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
@@ -253,7 +252,7 @@ function updateTalentTables() {
         itemPrefix: 'talent',
         itemClass: 'talentAbility',
         selectorClass: 'talentSelector',
-        populateFunction: updateTalentSelectors,
+        populateFunction: updateAbilitySelectors,
         abilityType: 'talent'
     });
 }
@@ -265,7 +264,7 @@ function updateTrickTables() {
         itemClass: 'trickAbility',
         selectorClass: 'trickSelector',
         extraOffset: 1,
-        populateFunction: updateTrickSelectors,
+        populateFunction: updateAbilitySelectors,
         abilityType: 'trick'
     });
 }
@@ -308,8 +307,8 @@ document.addEventListener('change', e => {
             const type = t.id.replace('SkillRank', '').toLowerCase();
             updateProficiencySelectors(type, parseInt(t.value) || 0);
         }
-        updateTalentSelectors();
-        updateTrickSelectors();
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
     }
     // Priorities & Level
     else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
@@ -356,19 +355,16 @@ function updateWayOptions() {
         if (opt) opt.disabled = !qualified;
     });
 }
-function updateTalentSelectors() {
-    const qualified = getQualifiedAbilities('talent');
-    document.querySelectorAll('.talentSelector').forEach(sel => {
+function updateAbilitySelectors(type) {
+    const qualified = getQualifiedAbilities(type);
+    const selectorClass = `${type}Selector`;
+    const emptyValue = `${type}Empty`;
+    const emptyLabel = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    
+    document.querySelectorAll(`.${selectorClass}`).forEach(sel => {
         const cur = sel.value;
-        sel.innerHTML = '<option value="talentEmpty">Select Talent</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
-        if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
-    });
-}
-function updateTrickSelectors() {
-    const qualified = getQualifiedAbilities('trick');
-    document.querySelectorAll('.trickSelector').forEach(sel => {
-        const cur = sel.value;
-        sel.innerHTML = '<option value="trickEmpty">Select Trick</option>' + qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        sel.innerHTML = `<option value="${emptyValue}">${emptyLabel}</option>` + 
+            qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }

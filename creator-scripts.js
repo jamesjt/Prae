@@ -133,64 +133,124 @@ fetch(PROF_CSV_URL)
         const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
 
-        // Known suffixes to ignore for main categories
-        const suffixes = ['Load', 'Descriptions', 'Containers', 'LoadLimit', 'StowedSlots', 'ReadyUsed', 'Location', 'Cost', 'Bonus', 'Details'];
+        const dataByCategory = parseCsvByCategories(headers, rows);
 
-        // Find main categories: headers starting with 'Gear ' and not ending with a suffix
-        const mainCategories = headers.filter(h => h.startsWith('Gear ') && !suffixes.some(s => h.endsWith(s)));
+        // For debugging
+        console.log('Parsed Data:', dataByCategory);
 
-        // For each main category, derive camelPrefix and find related columns
-        const categoryConfigs = mainCategories.map(main => {
-            const categoryName = main.replace('Gear ', '').trim();
-            const camelPrefix = 'Gear' + categoryName.replace(/\s+/g, '');
-            const related = headers.filter(h => h.startsWith(camelPrefix)).map(h => ({
-                suffix: h.replace(camelPrefix, '').trim(),
-                idx: headers.indexOf(h)
-            }));
-            return {
-                mainIdx: headers.indexOf(main),
-                category: categoryName,
-                related,
-                flag: `is${categoryName.replace(/\s+/g, '')}`,
-                class: `gear${categoryName.replace(/\s+/g, '')}`
-            };
-        });
+        // Assign for gear (update script to use dataByCategory.gear if refactoring further)
+        gearData = dataByCategory.gear || [];
+        allOptions = gearData;
+        nonPackOptions = gearData.filter(g => g.category === 'Packs');  // Use category for isPack
 
-        gearData = [];
+        // Assign for proficiencies
+        const proficiencies = dataByCategory.proficiencies || [];
+        profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
+        profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
+        profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
+
+        generateGearEntries();
+
+        // Initial proficiency population
+        ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
+    })
+    .catch(err => console.error('Error loading PROF CSV:', err));
+
+// Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
+function parseCsvByCategories(headers, rows) {
+    const dataByCategory = {};
+    const prefixMap = getPrefixMap(headers);
+
+    for (const [prefix, prefixedHeaders] of Object.entries(prefixMap)) {
+        if (prefixedHeaders.length < 2) continue;
+
+        const categoryKey = prefix.trim().toLowerCase();
+        dataByCategory[categoryKey] = [];
+
+        const configs = buildCategoryConfigs(prefix, prefixedHeaders, headers);
 
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            categoryConfigs.forEach(config => {
+            for (const config of configs) {
                 const name = row[config.mainIdx]?.trim();
-                if (name) {
-                    const item = {
-                        name,
-                        category: config.category,
-                        [config.flag]: true,
-                        isPack: config.category === 'Packs' // Special case for packs if needed
-                    };
-                    // Add related props
-                    config.related.forEach(rel => {
-                        let val = row[rel.idx]?.trim();
-                        if (rel.suffix === 'Load' || rel.suffix === 'LoadLimit' || rel.suffix === 'StowedSlots' || rel.suffix === 'ReadyUsed') {
-                            val = parseFloat(val) || 0;
-                        } else if (rel.suffix === 'Bonus') {
-                            val = parseInt(val) || 0;
-                        }
-                        if (val !== undefined && val !== '') {
-                            item[rel.suffix.toLowerCase()] = val;
-                        }
-                    });
-                    gearData.push(item);
-                }
-            });
+                if (!name) continue;
+
+                const item = { name, category: config.subCategory };
+                parseItemProps(item, config.related, row);
+                dataByCategory[categoryKey].push(item);
+            }
         }
 
-        allOptions = gearData;
-        nonPackOptions = gearData.filter(g => !g.isPack);
-        generateGearEntries();
-    })
-    .catch(err => console.error('Error loading PROF CSV:', err));
+        dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return dataByCategory;
+}
+
+// Helper: Detect prefixes
+function getPrefixMap(headers) {
+    const map = {};
+    headers.forEach(h => {
+        const parts = h.split(' ');
+        if (parts.length < 2) return;
+        const prefix = parts[0] + ' ';
+        map[prefix] ??= [];
+        map[prefix].push(h);
+    });
+    return map;
+}
+
+// Helper: Build configs for mains/related (allow mains without attributes)
+function buildCategoryConfigs(prefix, prefixedHeaders, allHeaders) {
+    return prefixedHeaders.map(main => {
+        const subCategory = main.replace(prefix, '').trim();
+        const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
+        const related = allHeaders
+            .map((hh, idx) => ({ hh, idx }))
+            .filter(({ hh }) => hh.startsWith(camelPrefix) && hh !== main)
+            .map(({ hh, idx }) => ({ suffix: hh.replace(camelPrefix, '').trim(), idx }));
+        return { mainIdx: allHeaders.indexOf(main), subCategory, related };  // Always return
+    });
+}
+
+// Helper: Parse item properties with dynamic type conversion
+function parseItemProps(item, related, row) {
+    related.forEach(rel => {
+        let val = row[rel.idx]?.trim();
+        if (!val) return;
+
+        const suffixLower = rel.suffix.toLowerCase();
+        // Pattern-based conversion
+        if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
+            val = parseFloat(val) || 0;
+        } else if (suffixLower.includes('bonus')) {
+            val = parseInt(val) || 0;
+        }
+        // Else: Keep as string (e.g., 'details')
+
+        item[rel.suffix.toLowerCase()] = val;
+    });
+}
+
+function populateProficiencySelectors(type) {
+    const profs = profData[type] || [];
+    for (let i = 1; i <= 5; i++) {
+        const sel = document.getElementById(type + 'ProfSelector' + i);
+        if (sel) {
+            sel.innerHTML = '<option value="">Select Proficiency</option>' + 
+                profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        }
+    }
+}
+
+// Update updateProficiencySelectors to call population after visibility
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
+    }
+    populateProficiencySelectors(type);  // Add this
+}
 
 let allOptions = [];
 let nonPackOptions = [];
@@ -839,4 +899,5 @@ window.addEventListener('load', () => {
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
+    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
 });

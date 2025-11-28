@@ -185,7 +185,7 @@ fetch(PROF_CSV_URL)
                     gearData.push(item);
                 }
             });
-        }
+    T    }
 
         allOptions = gearData;
         nonPackOptions = gearData.filter(g => !g.isPack);
@@ -754,25 +754,6 @@ function renderStowed(i) {
         updateStowedLoad(i, stowedIndex);
     });
 }
-function updateStowedDetails(readyI, stowedJ) {
-    const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
-    if (!sel) return;
-
-    const gearName = sel.value;
-    const item = allOptions.find(g => g.name === gearName);
-    const detailsDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
-
-    if (item && item.details && item.details.trim()) {
-        detailsDiv.classList.add('hasDetails');
-        detailsDiv.dataset.details = item.details.trim();
-        detailsDiv.title = 'Hover for details';
-    } else {
-        detailsDiv.classList.remove('hasDetails');
-        delete detailsDiv.dataset.details;
-        detailsDiv.title = '';
-        detailsDiv.textContent = '';
-    }
-}
 // Update single stowed load
 function updateStowedLoad(readyI, stowedJ) {
     const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
@@ -819,21 +800,6 @@ function calculateLoad() {
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
-
-// Reusable function to create a tooltip div
-function createTooltip(details) {
-    const tooltip = document.createElement('div');
-    tooltip.className = 'tooltip';
-    tooltip.textContent = details;
-    tooltip.style.position = 'absolute';
-    tooltip.style.background = '#fff';
-    tooltip.style.border = '1px solid #ccc';
-    tooltip.style.padding = '10px';
-    tooltip.style.zIndex = '1000';
-    tooltip.style.display = 'none'; // Hidden by default
-    return tooltip;
-}
-
 // ———————————————————————— UNIVERSAL TOOLTIP ————————————————————————
 const TOOLTIP_ID = 'universal-tooltip';
 

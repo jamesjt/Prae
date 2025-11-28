@@ -71,7 +71,6 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
-        console.log('Abilities Data:', abilitiesData);
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
     })
@@ -252,7 +251,7 @@ function updateTalentTables() {
         itemPrefix: 'talent',
         itemClass: 'talentAbility',
         selectorClass: 'talentSelector',
-        populateFunction: updateAbilitySelectors,
+        populateFunction: () => updateAbilitySelectors('talent'),
         abilityType: 'talent'
     });
 }
@@ -264,7 +263,7 @@ function updateTrickTables() {
         itemClass: 'trickAbility',
         selectorClass: 'trickSelector',
         extraOffset: 1,
-        populateFunction: updateAbilitySelectors,
+        populateFunction: () => updateAbilitySelectors('trick'),
         abilityType: 'trick'
     });
 }

@@ -477,11 +477,12 @@ function populateRoleInfo(e) {
             sel.value = '2';
             sel.dispatchEvent(new Event('change'));
         }
-    }
-    if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(skillId)) {
-    const type = skillId.replace('SkillRank', '').toLowerCase();
-    const rank = parseInt(sel.value) || 0;
-    updateProficiencySelectors(type, rank);
+        // Add this here: Trigger proficiency update
+        if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(skillId)) {
+            const type = skillId.replace('SkillRank', '').toLowerCase();
+            const rank = parseInt(sel.value) || 0;
+            updateProficiencySelectors(type, rank);
+        }
     }
     const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
     if (primary) {

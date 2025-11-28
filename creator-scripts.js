@@ -141,7 +141,7 @@ fetch(PROF_CSV_URL)
         // Assign for gear (update script to use dataByCategory.gear if refactoring further)
         gearData = dataByCategory.gear || [];
         allOptions = gearData;
-        nonPackOptions = gearData.filter(g => g.category === 'Packs');  // Use category for isPack
+        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
 
         // Assign for proficiencies
         const proficiencies = dataByCategory.proficiencies || [];

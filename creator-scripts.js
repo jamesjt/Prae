@@ -664,11 +664,9 @@ function handleReadySelectChange(i) {
     const sel = document.getElementById(`gear${i}Select`);
     const newGearName = sel.value;
     const item = allOptions.find(g => g.name === newGearName);
-
     // === 1. Remove old details icon (if any) ===
     const oldDetails = document.getElementById(`gear${i}Details`);
     if (oldDetails) oldDetails.remove();
-
     // === 2. Add details icon only if item has details ===
     if (item?.details?.trim()) {
         const detailsDiv = document.createElement('div');
@@ -678,35 +676,29 @@ function handleReadySelectChange(i) {
         detailsDiv.dataset.details = item.details.trim();
         sel.closest('.gearEntry').appendChild(detailsDiv);
     }
-
     // === 3. Handle pack logic (this was broken) ===
-    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.isPack;
-    const isPack = item?.isPack;
-
+    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Packs';
+    const isPack = item?.category === 'Packs';
     // If switching FROM a pack → clear stowed
     if (wasPack && !isPack) {
         readyState[i-1].stowed = [];
         renderStowed(i); // This removes the container
     }
-
     // If switching TO a pack → initialize stowed slots
     if (isPack && !wasPack) {
         const slots = item.stowedslots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i); // ← THIS IS THE MISSING CALL!
     }
-
     // If staying on same pack but changing item (shouldn't happen, but safe)
     if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
         const slots = item.stowedslots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
-
     // Update state
     readyState[i-1].gear = newGearName;
     readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
-
     // Update load
     updateReadyLoad(i);
     calculateLoad();
@@ -840,7 +832,7 @@ function updateReadyLoad(i) {
     if (item) {
         const baseLoad = item.baseLoad || item.load || 0;
         total += baseLoad * state.amt;
-        if (item.isPack) {
+        if (item?.category === 'Packs') {
             state.stowed.forEach(s => {
                 const sItem = nonPackOptions.find(g => g.name === s.gear);
                 if (sItem) total += (sItem.load || 0) * s.amt;
@@ -850,7 +842,7 @@ function updateReadyLoad(i) {
     const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        if (item?.isPack) loadDiv.style.color = total > item.loadLimit ? 'red' : '';
+        if (item?.category === 'Packs') loadDiv.style.color = total > item.loadLimit ? 'red' : '';
     }
 }
 // Updated calculateLoad (loop over state, no hard numbers beyond max)

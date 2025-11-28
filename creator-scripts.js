@@ -185,7 +185,7 @@ fetch(PROF_CSV_URL)
                     gearData.push(item);
                 }
             });
-    T    }
+        }
 
         allOptions = gearData;
         nonPackOptions = gearData.filter(g => !g.isPack);

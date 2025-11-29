@@ -118,43 +118,49 @@ fetch(WAYS_CSV_URL)
     .catch(err => console.error('Error loading Ways CSV:', err));
 
 fetch(PROF_CSV_URL)
-.then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
-.then(text => {
-const parsed = Papa.parse(text, {
-header: false,
-skipEmptyLines: true,
-dynamicTyping: false,
-delimitersToGuess: [',']
-});
-if (parsed.errors.length > 0) {
-console.error('PapaParse errors:', parsed.errors);
-throw new Error('Error parsing PROF CSV');
-}
-const rows = parsed.data;
-const headers = rows[0].map(h => h.trim());
-const dataByCategory = parseCsvByCategories(headers, rows);
-// For debugging
-console.log('Parsed Data:', dataByCategory);
-// Assign for gear (update script to use dataByCategory.gear if refactoring further)
-gearData = dataByCategory.gear || [];
-allOptions = gearData;
-nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs'); // Case-insensitive exclude
-// Assign for proficiencies
-const proficiencies = dataByCategory.proficiencies || [];
-profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
-profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
-profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
-generateGearEntries();
-const hoverRules = dataByCategory.hoverrules || []; // Assuming "hoverrules" category from CSV
-const hoverMap = {};
-hoverRules.forEach(rule => {
-hoverMap[rule.name.toLowerCase()] = rule.details || ''; // Key: rule word, value: details
-});
-console.log('Hover Map:', hoverMap); // Debug
-// Initial proficiency population
-['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-})
-.catch(err => console.error('Error loading PROF CSV:', err));
+    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
+    .then(text => {
+        const parsed = Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            delimitersToGuess: [',']
+        });
+        if (parsed.errors.length > 0) {
+            console.error('PapaParse errors:', parsed.errors);
+            throw new Error('Error parsing PROF CSV');
+        }
+        const rows = parsed.data;
+        const headers = rows[0].map(h => h.trim());
+
+        const dataByCategory = parseCsvByCategories(headers, rows);
+
+        // For debugging
+        console.log('Parsed Data:', dataByCategory);
+
+        // Assign for gear (update script to use dataByCategory.gear if refactoring further)
+        gearData = dataByCategory.gear || [];
+        allOptions = gearData;
+        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
+
+        // Assign for proficiencies
+        const proficiencies = dataByCategory.proficiencies || [];
+        profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
+        profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
+        profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
+
+        generateGearEntries();
+        const hoverRules = dataByCategory.hoverrules || [];  // Assuming "hoverrules" category from CSV
+        const hoverMap = {};
+        hoverRules.forEach(rule => {
+            hoverMap[rule.name.toLowerCase()] = rule.details || '';  // Key: rule word, value: details
+        });
+console.log('Hover Map:', hoverMap);  // Debug
+
+        // Initial proficiency population
+        ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
+    })
+    .catch(err => console.error('Error loading PROF CSV:', err));
 
 // Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
 function parseCsvByCategories(headers, rows) {
@@ -413,7 +419,6 @@ document.addEventListener('change', e => {
         calculateLoad();
     }
 });
- 
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');

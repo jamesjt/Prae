@@ -959,7 +959,6 @@ tippy('.hasDetails', {
 });
 
 // For charDetails (hover on .charInfoHover, click to show fully)
-// For charDetails (hover on .charInfoHover, click to show fully)
 document.querySelectorAll('.charInfoHover').forEach(trigger => {
   const detailsId = trigger.nextElementSibling?.id;  // Assumes sibling setup
   if (!detailsId) return;
@@ -999,4 +998,5 @@ document.querySelectorAll('.charInfoHover').forEach(trigger => {
   
   // Hide old showDesc/hideDesc if migrating (optional)
   trigger.onclick = null;  // Remove old onclick
+});
 });

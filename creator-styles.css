@@ -75,7 +75,7 @@
   cursor:alias;
 }
 
-.charInfoHover:hover + .charDetails{display: block !important;}
+/*.charInfoHover:hover + .charDetails{display: block !important;}*/
 
 .charDetails {
   position:absolute;

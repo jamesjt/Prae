@@ -857,7 +857,7 @@ a.internalLink{
 }
 
 
-/* Tool Tips */
+/* Tool Tips
 abbr {
     position: relative;
     display: inline;
@@ -904,19 +904,19 @@ abbr:hover:before {
 
 table { empty-cells: hide;}
 
-/* Durations */
+/* Durations
 abbr.short::after {content: "First use or end of creators next turn";}
 abbr.round::after{content: "Until end of creators next turn";}
 abbr.combat::after{content: "End of the encounter";}
 
-/* Buffs */
+/* Buffs
 abbr.vigilant::after{content: "Attackers get -1 die and you have +1 Armor against AoE";}
 abbr.boosted::after{content: "+1 die to rolls";}
 abbr.haste::after{content: "+1 Attack action";}
 abbr.quick::after{content: "+1 Move action";}
 abbr.focused::after{content: "+1 Focus action";}
 
-/* Debuffs */
+/* Debuffs 
 abbr.breached::after{content: "Attackers get +1 die and you have -1 Armor against AoE";}
 abbr.impaired::after{content: "-1 die on rolls";}
 abbr.blind::after{content: "Can not perform Physical maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
@@ -934,14 +934,14 @@ abbr.meek::after{content:"Decrease damage dealt by 1 for each instance";}
 
 abbr.pure::after {content: "Damage that ignores armor";}
 
-/* Armor Penalties */
+/* Armor Penalties
 abbr.lightPen::after {content: "-1 Blasts, Sprint, and Swim";}
 abbr.medPen::after {content: "-1 Ranked Strikes, Jumping, Climbing and Jogging \A -2 Blast \A -2 Acrobatics, Dance, Sneaking, Sprint, and Swim \A Acrobatics, Dance and Sneak maneuvers require an additional Momentum to use"; white-space: pre-wrap;}
 abbr.heavyPen::after {content: "-1 Pace \A -3 to Blast Rolls \A -2 to hit with Ranged Strikes \A -3 to sprinting and swimming rolls \A -2 to jumping, climbing and jogging rolls \A -4 to all rolls when using the Acrobatics, Dancing or Sneaking skills \A Can not use any abilities from Acrobatics, Dancing or Sneaking skills"; white-space: pre-wrap;}
 abbr.shieldPen::after {content: "-1 to Blast";}
 
-/* Fluff Terms */
-abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
+ /* Fluff Terms
+abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";} */
 
 .attvalue{width:30px;}
 
@@ -1059,4 +1059,28 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 .totalDisplay strong {
     color: #00ff00;
     font-size: 1.2em;
+}
+
+
+
+.tippy-box[data-theme~='custom'] {
+  position: absolute;
+  width: 650px;  /* Match charDetails */
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
+  background-size: 100% 100%;
+  color: black;
+  border: 3px solid black;
+  cursor: all-scroll;
+  z-index: 100;
+}
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: black;  /* Arrow matches border */
+}
+
+/* For predefined terms (smaller, like old abbr) */
+.tippy-box[data-theme~='custom'][data-reference='abbr'] {  /* Optional: Smaller for terms */
+  width: 270px;
+  padding: 5px 8px;
 }

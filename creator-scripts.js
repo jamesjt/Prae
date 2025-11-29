@@ -918,4 +918,65 @@ window.addEventListener('load', () => {
     updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
     ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
+    // Unified Tooltip Initialization with Tippy.js
+tippy.setDefaultProps({
+  theme: 'custom',  // We'll define this in CSS
+  arrow: true,  // Arrow pointer
+  animation: 'fade',  // Smooth fade in/out
+  allowHTML: true,  // For rich content (e.g., textareas in charDetails)
+  interactive: true,  // Allow interaction inside tooltip (e.g., clicks, close buttons)
+  maxWidth: 650,  // Match your charDetails width
+  placement: 'right-start',  // Default position (adjust per instance if needed)
+  offset: [0, 10],  // Slight offset from trigger
+  zIndex: 100,  // Match your z-index
+});
+
+// For predefined terms (abbr elements)
+document.querySelectorAll('abbr').forEach(el => {
+  const term = el.textContent.toLowerCase().trim();  // Or use a data-term attribute if needed
+  const predefinedMap = {
+    'short': 'First use or end of creators next turn',
+    'round': 'Until end of creators next turn',
+    'combat': 'End of the encounter',
+    'vigilant': 'Attackers get -1 die and you have +1 Armor against AoE',
+    'boosted': '+1 die to rolls',
+    // ... Add all your buffs/debuffs/fluff from CSS here
+    'yon': 'Pronounced (Y-oh-n). Series of movements used for Conjurations'
+  };
+  const content = predefinedMap[term] || 'Unknown term';  // Fallback
+  tippy(el, {
+    content: content,
+    trigger: 'mouseenter focus',  // Hover or focus for accessibility
+    hideOnClick: false  // Persistent on hover until leave
+  });
+});
+
+// For universal tooltips (.hasDetails with data-details)
+tippy('.hasDetails', {
+  content: reference => reference.dataset.details || 'No details',
+  trigger: 'mouseenter focus',
+  hideOnClick: false
+});
+
+// For charDetails (hover on .charInfoHover, click to show fully)
+document.querySelectorAll('.charInfoHover').forEach(trigger => {
+  const detailsId = trigger.nextElementSibling?.id;  // Assumes sibling setup
+  if (!detailsId) return;
+  const contentEl = document.getElementById(detailsId);
+  
+  tippy(trigger, {
+    content: contentEl.innerHTML,  // Clone content for tooltip
+    trigger: 'mouseenter focus click',  // Hover for preview, click for persistent
+    allowHTML: true,
+    interactive: true,  // Allow clicks inside (e.g., close button)
+    hideOnClick: 'toggle',  // Click to show/hide persistently
+    onShow(instance) {
+      // For persistent mode on click: Add close logic if needed
+      instance.popper.querySelector('.closeRitual')?.addEventListener('click', () => instance.hide());
+    }
+  });
+  
+  // Hide old showDesc/hideDesc if migrating (optional)
+  trigger.onclick = null;  // Remove old onclick
+});
 });

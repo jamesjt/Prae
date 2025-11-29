@@ -150,6 +150,12 @@ fetch(PROF_CSV_URL)
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
 
         generateGearEntries();
+        const hoverRules = dataByCategory.hoverrules || [];  // Assuming "hoverrules" category from CSV
+        const hoverMap = {};
+        hoverRules.forEach(rule => {
+            hoverMap[rule.name.toLowerCase()] = rule.details || '';  // Key: rule word, value: details
+        });
+console.log('Hover Map:', hoverMap);  // Debug
 
         // Initial proficiency population
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
@@ -231,14 +237,23 @@ function parseItemProps(item, related, row) {
         item[rel.suffix.toLowerCase()] = val;
     });
 }
+function addHoverWrappers(text, hoverMap) {
+  if (!text) return text;
+  let wrapped = text;
+  Object.keys(hoverMap).sort((a, b) => b.length - a.length).forEach(key => {  // Longer matches first
+    const regex = new RegExp(`\\b${key}\\b`, 'gi');  // Word boundary match
+    wrapped = wrapped.replace(regex, match => `<span class="hover-rule" data-details="${hoverMap[key.toLowerCase()]}">${match}</span>`);
+  });
+  return wrapped;
+}
 
 function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
     for (let i = 1; i <= 5; i++) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
-            sel.innerHTML = '<option value="">Select Proficiency</option>' + 
-                profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+            sel.innerHTML = '<option value="">Select Proficiency</option>' +
+                profs.map(p => `<option value="${p.name}">${addHoverWrappers(p.name, hoverMap)}</option>`).join('');
         }
     }
 }
@@ -387,6 +402,14 @@ document.addEventListener('change', e => {
     else if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
     }
+    // Proficiency selection (new block)
+    else if (t.matches('[id$="ProfSelector"]')) {
+        const match = t.id.match(/^(strike|blast|invoke)ProfSelector\d$/);
+        if (match) {
+            const type = match[1] + 'SkillRank';  // e.g., 'strikeSkillRank'
+            updateSkillModAndPassive(type);  // Update damage mod
+        }
+    }
     // Amount Input Change
     else if (t.matches('.gearAmtInputField')) {
         const match = t.id.match(/gear(\d+)Amt/);
@@ -449,7 +472,7 @@ function populateAbilityInfo(selectId, abilities, type) {
     }).forEach(key => {
         const div = document.createElement('div');
         div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
-        div.textContent = ability.details[key];
+        div.innerHTML = addHoverWrappers(ability.details[key], hoverMap);  // Use innerHTML for wrapped spans
         desc.appendChild(div);
     });
 }
@@ -465,7 +488,7 @@ function populateRoleInfo(e) {
         const val = way.props[Object.keys(way.props).find(k => k.toLowerCase().includes(key))];
         if (val) {
             const div = document.createElement('div');
-            div.textContent = val;
+            div.innerHTML = addHoverWrappers(val, hoverMap);  // Use innerHTML for wrapped spans
             desc.appendChild(div);
         }
     });

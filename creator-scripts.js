@@ -564,10 +564,10 @@ function updateSkillModAndPassive(skillId) {
     if (modEl) modEl.textContent = modVal;
     const passiveEl = document.getElementById(name + 'Passive');
     if (passiveEl) passiveEl.textContent = 2 + rank + modVal;
-    if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
+    /*if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
         const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
         if (dmgEl) dmgEl.textContent = modVal;
-    }
+    }*/
 }
 function updateSkillsForMod(subId) {
     Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {

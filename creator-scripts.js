@@ -959,6 +959,7 @@ tippy('.hasDetails', {
 });
 
 // For charDetails (hover on .charInfoHover, click to show fully)
+// For charDetails (hover on .charInfoHover, click to show fully)
 document.querySelectorAll('.charInfoHover').forEach(trigger => {
   const detailsId = trigger.nextElementSibling?.id;  // Assumes sibling setup
   if (!detailsId) return;
@@ -973,10 +974,29 @@ document.querySelectorAll('.charInfoHover').forEach(trigger => {
     onShow(instance) {
       // For persistent mode on click: Add close logic if needed
       instance.popper.querySelector('.closeRitual')?.addEventListener('click', () => instance.hide());
+
+      // Re-apply Interact.js to the dynamic .draggable element inside popper
+      const draggableEl = instance.popper.querySelector('.draggable');
+      if (draggableEl) {
+        interact(draggableEl)
+          .draggable({
+            inertia: true,
+            autoScroll: true,
+            listeners: {
+              move: (event) => {
+                const target = event.target;
+                const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                target.style.transform = `translate(${x}px, ${y}px)`;
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+              }
+            }
+          });
+      }
     }
   });
   
   // Hide old showDesc/hideDesc if migrating (optional)
   trigger.onclick = null;  // Remove old onclick
-});
 });

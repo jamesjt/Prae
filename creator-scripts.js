@@ -883,6 +883,26 @@ document.addEventListener('mouseout', e => {
         if (tooltip) tooltip.classList.remove('visible');
     }
 });
+
+// Make all .draggable elements movable (no restrictions, touch/mouse support)
+interact('.draggable')
+  .draggable({
+    inertia: true,  // Smooth momentum on release
+    autoScroll: true,  // Auto-scroll if dragging near edges
+    listeners: {
+      move: (event) => {
+        const target = event.target;
+        // Get current position (stored as data attributes)
+        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        // Apply transform for movement
+        target.style.transform = `translate(${x}px, ${y}px)`;
+        // Store new position
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+      }
+    }
+  });
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
     calculateSkillPoints();

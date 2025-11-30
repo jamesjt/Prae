@@ -1,3 +1,4 @@
+// creator-scripts.js
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
 const CHAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
@@ -410,6 +411,49 @@ function getQualifiedAbilities(type) {
     });
     return result;
 }
+function evaluateExpr(expr) {
+  // Replace skill names with current ranks
+  expr = expr.replace(/\b([A-Z][a-z]+)\b/g, match => {
+    const id = SKILL_ID_MAP[match];
+    if (id) {
+      return parseInt(document.getElementById(id)?.value) || 0;
+    }
+    return match;
+  });
+
+  // Tokenize: numbers and operators
+  const tokens = expr.match(/(\d+|[+\-*/])/g) || [];
+  if (tokens.length === 0) return 0;
+
+  // Handle * and / first (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '*' || tokens[i] === '/') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res;
+      if (tokens[i] === '*') {
+        res = left * right;
+      } else {
+        res = Math.floor(left / right);
+      }
+      tokens.splice(i - 1, 3, res);
+      i -= 2; // Adjust index after splice
+    }
+  }
+
+  // Handle + and - (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '+' || tokens[i] === '-') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res = tokens[i] === '+' ? left + right : left - right;
+      tokens.splice(i - 1, 3, res);
+      i -= 2;
+    }
+  }
+
+  return Math.floor(tokens[0]) || 0; // Final floor for safety
+}
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId)?.value;
     const ability = abilities.find(a => a.name === value);
@@ -422,9 +466,12 @@ function populateAbilityInfo(selectId, abilities, type) {
         const ib = order.indexOf(b.toLowerCase());
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
+        let processedValue = ability.details[key];
+        // Replace |expr| with evaluated value
+        processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
         const div = document.createElement('div');
         div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
-        div.textContent = ability.details[key];
+        div.textContent = processedValue;
         desc.appendChild(div);
     });
 }

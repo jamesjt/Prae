@@ -160,13 +160,14 @@ function parseItemProps(item, related, row) {
   related.forEach(rel => {
     let val = row[rel.idx]?.trim();
     if (!val) return;
-    const suffixLower = rel.suffix.toLowerCase();
+    let suffixLower = rel.suffix.toLowerCase();
+    const key = suffixLower.split(' ').map((w, i) => i > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join('');
     if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
       val = parseFloat(val) || 0;
     } else if (suffixLower.includes('bonus')) {
       val = parseInt(val) || 0;
     }
-    item[suffixLower] = val;
+    item[key] = val;
   });
 }
 
@@ -204,7 +205,7 @@ function updateWayOptions() {
   const sel = domCache.roleSelector;
   waysData.forEach(way => {
     const qualified = way.reqSkill === 'Any' ? Object.values(SKILL_ID_MAP).some(id => domCache[id]?.value > 1) : domCache[way.skillId]?.value > 1;
-    const opt = sel.querySelector(`option[value="${w.name}"]`);
+    const opt = sel.querySelector(`option[value="${way.name}"]`);
     if (opt) opt.disabled = !qualified;
   });
 }
@@ -457,7 +458,7 @@ function generateGearEntries() {
       optgroup.label = `-- ${cat} --`;
       grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
         const opt = new Option(g.name, g.name);
-        opt.dataset.load = g.baseload || g.load || 0;
+        opt.dataset.load = g.baseLoad || g.load || 0;
         optgroup.appendChild(opt);
       });
       sel.appendChild(optgroup);
@@ -488,12 +489,12 @@ function handleReadySelectChange(i) {
     renderStowed(i);
   }
   if (isPack && !wasPack) {
-    const slots = item.stowedslots || 0;
+    const slots = item.stowedSlots || 0;
     state.stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
     renderStowed(i);
   }
   if (isPack && wasPack && state.gear !== newGearName) {
-    const slots = item.stowedslots || 0;
+    const slots = item.stowedSlots || 0;
     state.stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
     renderStowed(i);
   }
@@ -543,7 +544,7 @@ function renderStowed(i) {
       optgroup.label = `-- ${cat} --`;
       grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
         const opt = new Option(g.name, g.name);
-        opt.dataset.load = g.baseload || g.load || 0;
+        opt.dataset.load = g.baseLoad || g.load || 0;
         optgroup.appendChild(opt);
       });
       sel.appendChild(optgroup);
@@ -583,7 +584,7 @@ function updateLoadForSlot(readyI, stowedJ = null) {
   const item = gearData.find(g => g.name === state.gear);
   let total = 0;
   if (item) {
-    const baseLoad = item.baseload || item.load || 0;
+    const baseLoad = item.baseLoad || item.load || 0;
     total += baseLoad * state.amt;
     if (item.category.toLowerCase() === 'packs') {
       state.stowed.forEach(s => {
@@ -595,7 +596,7 @@ function updateLoadForSlot(readyI, stowedJ = null) {
   const loadDiv = document.getElementById(`gear${readyI}Load`);
   if (loadDiv) {
     loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-    if (item && item.category.toLowerCase() === 'packs') loadDiv.style.color = total > (item.loadlimit || 0) ? 'red' : '';
+    if (item && item.category.toLowerCase() === 'packs') loadDiv.style.color = total > (item.loadLimit || 0) ? 'red' : '';
   }
 }
 
@@ -667,19 +668,6 @@ document.addEventListener('change', e => {
       const [,, readyI, stowedJ] = match;
       if (stowedJ) {
         readyState[readyI - 1].stowed[stowedJ - 1].gear = t.value;
-        const entry = t.parentNode;
-        const oldDetails = document.getElementById(`stowed-${readyI}-${stowedJ}-details`);
-        if (oldDetails) oldDetails.remove();
-        const nonPacks = gearData.filter(g => g.category.toLowerCase() !== 'packs');
-        const newItem = nonPacks.find(g => g.name === t.value);
-        if (newItem && newItem.details && newItem.details.trim()) {
-          const detailsDiv = document.createElement('div');
-          detailsDiv.id = `stowed-${readyI}-${stowedJ}-details`;
-          detailsDiv.className = 'hasDetails';
-          detailsDiv.textContent = 'i';
-          detailsDiv.dataset.details = newItem.details.trim();
-          entry.appendChild(detailsDiv);
-        }
         updateLoadForSlot(readyI, stowedJ);
       } else {
         handleReadySelectChange(readyI);

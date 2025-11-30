@@ -958,6 +958,9 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     transform: translateX(-50%) translateY(0);
 }
 /* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
+.hoverRules{
+  bottom-border:1px dotted black;
+}
 .gearDetails {
     width: 11px;
     height: 10px;

@@ -215,11 +215,28 @@ function parseItemProps(item, related, row) {
 
 function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
+    const saved = {};
     for (let i = 1; i <= 5; i++) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
+            saved[i] = sel.value;
             sel.innerHTML = '<option value="">Select Proficiency</option>' + 
                 profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        }
+    }
+    for (let i = 1; i <= 5; i++) {
+        const sel = document.getElementById(type + 'ProfSelector' + i);
+        if (sel) {
+            if (saved[i] && Array.from(sel.options).some(opt => opt.value === saved[i])) {
+                sel.value = saved[i];
+            }
+            let desc = document.getElementById(type + 'ProfSelector' + i + 'Description');
+            if (!desc) {
+                sel.insertAdjacentHTML('afterend', `<div id="${type}ProfSelector${i}Description"></div>`);
+            }
+            if (sel.value) {
+                populateProficiencyInfo(sel.id, type);
+            }
         }
     }
 }
@@ -350,6 +367,15 @@ document.addEventListener('change', e => {
         if (roleSel && roleSel.value !== 'wayEmpty') {
             populateRoleInfo({ target: roleSel });
         }
+        // Refresh proficiency descriptions if applicable
+        if (['strike', 'blast', 'invoke'].includes(type)) {
+            for (let i = 1; i <= 5; i++) {
+                const sel = document.getElementById(type + 'ProfSelector' + i);
+                if (sel && !sel.hidden && sel.value) {
+                    populateProficiencyInfo(sel.id, type);
+                }
+            }
+        }
         return;
     }
 
@@ -395,7 +421,10 @@ document.addEventListener('change', e => {
     // Proficiency Selectors
     if (t.matches('[id$="ProfSelector"]')) {
         const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
-        if (type) calculateProficiencyPoints(type);
+        if (type) {
+            calculateProficiencyPoints(type);
+            populateProficiencyInfo(t.id, type);
+        }
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
@@ -514,6 +543,14 @@ function populateAbilityInfo(selectId, abilities, type) {
         div.innerHTML = processWithTooltips(processedValue);
         desc.appendChild(div);
     });
+}
+function populateProficiencyInfo(selectId, type) {
+    const value = document.getElementById(selectId)?.value;
+    if (!value) return;
+    const prof = profData[type].find(p => p.name === value);
+    const desc = document.getElementById(selectId + 'Description');
+    if (!desc || !prof || !prof.details) { desc.innerHTML = ''; return; }
+    desc.innerHTML = processWithTooltips(prof.details);
 }
 function populateRoleInfo(e) {
     const name = e.target.value;
@@ -646,6 +683,7 @@ function updateProficiencySelectors(type, rank) {
         const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
+    populateProficiencySelectors(type);  // Add this
 }
 function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');

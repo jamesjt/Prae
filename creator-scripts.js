@@ -24,7 +24,7 @@ const ATTRIBUTE_GROUPS = {
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
-let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
+let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = new Map();
 
 // Add near top constants
 const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
@@ -65,8 +65,8 @@ async function loadAllData() {
             if (currentAbility) saveAbility(skill, currentAbility);
         });
         function saveAbility(skill, ability) {
-            if (!abilitiesData[skill]) abilitiesData[skill] = [];
-            abilitiesData[skill].push(ability);
+            if (!abilitiesData.has(skill)) abilitiesData.set(skill, []);
+            abilitiesData.get(skill).push(ability);
         }
 
         // Parse Ways
@@ -133,61 +133,50 @@ async function loadAllData() {
     }
 }
 
-// Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
+// Helper: Generic CSV parser (optimized with reduce)
 function parseCsvByCategories(headers, rows) {
     const dataByCategory = {};
-    const prefixMap = getPrefixMap(headers);
+    const prefixMap = headers.reduce((map, h, idx) => {
+        const parts = h.split(' ');
+        if (parts.length < 2) return map;
+        const prefix = parts[0] + ' ';
+        map[prefix] = map[prefix] || [];
+        map[prefix].push({ header: h, idx });
+        return map;
+    }, {});
 
-    for (const [prefix, prefixedHeaders] of Object.entries(prefixMap)) {
-        if (prefixedHeaders.length < 2) continue;
-
+    for (const [prefix, entries] of Object.entries(prefixMap)) {
+        if (entries.length < 2) continue;
         const categoryKey = prefix.trim().toLowerCase();
         dataByCategory[categoryKey] = [];
 
-        const configs = buildCategoryConfigs(prefix, prefixedHeaders, headers);
+        const configs = entries.map(({ header }) => {
+            const subCategory = header.replace(prefix, '').trim();
+            const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
+            const related = headers.reduce((acc, hh, idx) => {
+                if (hh.startsWith(camelPrefix) && hh !== header) {
+                    acc.push({ suffix: hh.replace(camelPrefix, '').trim(), idx });
+                }
+                return acc;
+            }, []);
+            return { mainIdx: headers.indexOf(header), subCategory, related };
+        });
 
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            for (const config of configs) {
+            configs.forEach(config => {
                 const name = row[config.mainIdx]?.trim();
-                if (!name) continue;
-
+                if (!name) return;
                 const item = { name, category: config.subCategory };
                 parseItemProps(item, config.related, row);
                 dataByCategory[categoryKey].push(item);
-            }
+            });
         }
 
         dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));
     }
 
     return dataByCategory;
-}
-
-// Helper: Detect prefixes
-function getPrefixMap(headers) {
-    const map = {};
-    headers.forEach(h => {
-        const parts = h.split(' ');
-        if (parts.length < 2) return;
-        const prefix = parts[0] + ' ';
-        map[prefix] ??= [];
-        map[prefix].push(h);
-    });
-    return map;
-}
-
-// Helper: Build configs for mains/related (allow mains without attributes)
-function buildCategoryConfigs(prefix, prefixedHeaders, allHeaders) {
-    return prefixedHeaders.map(main => {
-        const subCategory = main.replace(prefix, '').trim();
-        const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
-        const related = allHeaders
-            .map((hh, idx) => ({ hh, idx }))
-            .filter(({ hh }) => hh.startsWith(camelPrefix) && hh !== main)
-            .map(({ hh, idx }) => ({ suffix: hh.replace(camelPrefix, '').trim(), idx }));
-        return { mainIdx: allHeaders.indexOf(main), subCategory, related };  // Always return
-    });
 }
 
 // Helper: Parse item properties with dynamic type conversion
@@ -415,8 +404,8 @@ function getQualifiedAbilities(type) {
     const result = [];
     Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
         const sel = document.getElementById(id);
-        if (sel && parseInt(sel.value) >= 2 && abilitiesData[name.toLowerCase()]) {
-            result.push(...abilitiesData[name.toLowerCase()].filter(a => a.type === type));
+        if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
+            result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
         }
     });
     return result;

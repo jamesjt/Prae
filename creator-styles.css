@@ -24,12 +24,10 @@
 
 
 .tippy-box[data-theme~='ruleTip'] {
-  position: absolute;
   width: 650px;  /* Match charDetails */
-  padding: 25px;
+  padding: 2px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
-  background-size: 100% 100%;
   background-color: black;
   color: whitesmoke;
   cursor: all-scroll;
@@ -682,8 +680,9 @@ dark leather: #5E4634
 .trickKeywords{display:none}
 .trickDescription{display:none}
 .trickCost{color:black;background-color: rgba(217,217,217,1);padding:0px 5px; font-size: 14px;}
-.trickEffecSm{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
+.trickEffectSm{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
 .trickEffectBig{color:black;background-color: rgba(217,217,217,1);padding:0px 5px;font-size: 14px;}
+.trickManaUse{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
 
 
 .trickWrapper {width:500px;}

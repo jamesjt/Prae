@@ -32,10 +32,10 @@
   color: whitesmoke;
   cursor: all-scroll;
   z-index: 100;
-  border:1px solid #d29a38;
+  /*border:1px solid #d29a38;*/
 }
 .tippy-box[data-theme~='ruleTip'] .tippy-arrow {
-  color: black;  /* Arrow matches border */
+  background-color: #2A2A2A; /* Arrow matches border */
 }
 
 .filledField{
@@ -876,7 +876,6 @@ a.internalLink{
     border-radius: 50%;
     background: #333;
     color: #d29a38;
-    cursor: context-menu;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -259,10 +259,10 @@ function rebuildDynamicSelectors(config) {
         amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
-    const inputEl = document.getElementById(amountInputId);
-    if (!inputEl) return;
-    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0); // Clamp to 0+
-    inputEl.value = currentAmount; // Update input to reflect clamped value
+    const amountEl = document.getElementById(amountInputId);
+    if (!amountEl) return;
+    const currentAmount = Math.max(0, parseInt(amountEl.textContent) || 0); // Clamp to 0+
+    amountEl.textContent = currentAmount; // Update to reflect clamped value
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -327,16 +327,6 @@ function updateTrickTables() {
 document.addEventListener('change', e => {
     const t = e.target;
     const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
-
-    // Talent/Trick Amounts (combined)
-    if (t.matches('#talentAmount, #tricksAmount')) {
-        const type = t.id.replace('Amount', '');
-        const value = clamp(t);
-        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
-        (type === 'talent' ? updateTalentTables : updateTrickTables)();
-        calculateAbilities();
-        return;
-    }
 
     // Talent/Trick Selectors (combined)
     if (t.matches('.talentSelector, .trickSelector')) {
@@ -425,6 +415,24 @@ document.addEventListener('change', e => {
             calculateProficiencyPoints(type);
             populateProficiencyInfo(t.id, type);
         }
+    }
+});
+document.addEventListener('click', e => {
+    const t = e.target;
+    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
+        const type = t.id.includes('talent') ? 'talent' : 'tricks';
+        const amountEl = document.getElementById(type + 'Amount');
+        let value = parseInt(amountEl.textContent) || 0;
+        const min = type === 'talent' ? 0 : 1;
+        if (t.id.includes('Plus')) {
+            value += 1;
+        } else if (t.id.includes('Minus') && value > min) {
+            value -= 1;
+        }
+        amountEl.textContent = value;
+        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = (type === 'talent' ? 1 : 2) + value;
+        (type === 'talent' ? updateTalentTables : updateTrickTables)();
+        calculateAbilities();
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
@@ -610,10 +618,10 @@ function calculateSkillPoints() {
 }
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
-    const trExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
+    const tExtra = parseInt(document.getElementById('talentAmount').textContent) || 0;
+    const trExtra = parseInt(document.getElementById('tricksAmount').textContent) || 0;
     document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
-    const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
+    const remaining = level + 1 - Math.max(0, tExtra + trExtra);
     document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
 }
 function calculateAttributeValues() {
@@ -683,7 +691,6 @@ function updateProficiencySelectors(type, rank) {
         const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
-    populateProficiencySelectors(type);  // Add this
 }
 function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');
@@ -1020,6 +1027,11 @@ window.addEventListener('load', () => {
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
+    // Set initial amounts
+    document.getElementById('talentAmount').textContent = '0';
+    document.getElementById('tricksAmount').textContent = '1';
+    document.getElementById('totalTalents').textContent = '1';
+    document.getElementById('totalTricks').textContent = '2';
     // Unified Tooltip Initialization with Tippy.js
 tippy.setDefaultProps({
   theme: 'custom',  // We'll define this in CSS

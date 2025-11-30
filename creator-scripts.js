@@ -325,75 +325,84 @@ function updateTrickTables() {
         abilityType: 'trick'
     });
 }
-// ———————————————————————— ONE EVENT LISTENER (CLEAN & FIXED) ————————————————————————
+// ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
     const t = e.target;
-    // TALENT AMOUNT — FIXED
-    if (t.matches('#talentAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value; // Clamp input
-        document.getElementById('totalTalents').textContent = 1 + value;
-        updateTalentTables();
+    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
+
+    // Talent/Trick Amounts (combined)
+    if (t.matches('#talentAmount, #tricksAmount')) {
+        const type = t.id.replace('Amount', '');
+        const value = clamp(t);
+        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
+        (type === 'talent' ? updateTalentTables : updateTrickTables)();
         calculateAbilities();
         return;
     }
-    // TRICK AMOUNT — FIXED
-    if (t.matches('#tricksAmount')) {
-        const value = Math.max(0, parseInt(t.value) || 0);
-        t.value = value; // Clamp input
-        document.getElementById('totalTricks').textContent = 1 + value;
-        updateTrickTables();
+
+    // Talent/Trick Selectors (combined)
+    if (t.matches('.talentSelector, .trickSelector')) {
+        const type = t.className.replace('Selector', '');
+        populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
         calculateAbilities();
         return;
     }
-    // Talent/Trick selection
-    if (t.matches('.talentSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('talent'), 'talent');
-        calculateAbilities();
-    }
-    else if (t.matches('.trickSelector')) {
-        populateAbilityInfo(t.id, getQualifiedAbilities('trick'), 'trick');
-        calculateAbilities();
-    }
+
     // Skill Ranks
-    else if (t.matches('select[id$="SkillRank"]')) {
+    if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
         updateWayOptions();
         calculateSkillPoints();
-        if (t.id === 'strikeSkillRank' || t.id === 'blastSkillRank' || t.id === 'invokeSkillRank') {
-            const type = t.id.replace('SkillRank', '').toLowerCase();
-            updateProficiencySelectors(type, parseInt(t.value) || 0);
-        }
+        const type = t.id.replace('SkillRank', '').toLowerCase();
+        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
+        return;
     }
-    // Priorities & Level
-    else if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl')) {
+
+    // Priorities, Level, Sub-attributes (combined attribute-related)
+    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
         calculateAttributeValues();
         updateAttributeGroups();
         updateAllSkillModsAndPassives();
         calculateSkillPoints();
         calculateAbilities();
+        if (t.matches('input[id$="Value"][type="number"]')) {
+            const groupKey = /might|agility|brawn/.test(t.id) ? 'physical' : /will|wit|resolve/.test(t.id) ? 'mental' : 'spirit';
+            updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
+            updateSkillsForMod(t.id);
+        }
+        return;
     }
-    // Sub-attributes
-    else if (t.matches('input[id$="Value"][type="number"]')) {
-        const group = t.id.includes('might') || t.id.includes('agility') || t.id.includes('brawn') ? ATTRIBUTE_GROUPS.physical :
-                     t.id.includes('will') || t.id.includes('wit') || t.id.includes('resolve') ? ATTRIBUTE_GROUPS.mental :
-                     ATTRIBUTE_GROUPS.spirit;
-        updateAttributeGroup(group);
-        updateSkillsForMod(t.id);
-    }
+
     // Way Selector
-    else if (t.matches('#roleSelector')) {
+    if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
+        return;
     }
-    // Amount Input Change
-    else if (t.matches('.gearAmtInputField')) {
-        const match = t.id.match(/gear(\d+)Amt/);
-        if (!match) return;
-        const i = match[1];
-        updateGearLoad(i);
-        calculateLoad();
+
+    // Gear/Stowed Amounts/Selects (combined)
+    if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
+        if (t.matches('[id$="Select"]')) handleReadySelectChange(t.id.match(/gear(\d+)Select/)[1]);
+        const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt|select)/);
+        if (match) {
+            const [,, readyI, stowedJ] = match;
+            if (/Amt|amt/.test(t.id)) clamp(t, 1);
+            if (stowedJ) {
+                updateStowedLoad(readyI || readyI, stowedJ);
+                updateReadyLoad(readyI || readyI);
+            } else {
+                updateReadyLoad(readyI || readyI);
+            }
+            calculateLoad();
+        }
+        return;
+    }
+
+    // Proficiency Selectors
+    if (t.matches('[id$="ProfSelector"]')) {
+        const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
+        if (type) calculateProficiencyPoints(type);
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————

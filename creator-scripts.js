@@ -135,6 +135,8 @@ async function loadAllData() {
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
 
         // Post-parsing init (e.g., populate selectors, etc.)
+        TooltipManager.init();
+
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         populateRoleSelector();
@@ -543,7 +545,8 @@ function processWithTooltips(text) {
     let processed = text;
     hoverRulesData.forEach(({ rule, detail }) => {
         const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
-        processed = processed.replace(regex, `<span class="hoverRules" data-details="${escapeHtml(detail)}">$&</span>`);
+        processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
+
     });
     return processed;
 }

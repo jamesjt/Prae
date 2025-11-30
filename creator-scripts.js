@@ -371,6 +371,23 @@ document.addEventListener('change', e => {
 
     // Priorities, Level, Sub-attributes (combined attribute-related)
     if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
+        if (t.matches('#bodyPriority, #mindPriority, #spiritPriority')) {
+            const priorities = {
+                body: document.getElementById('bodyPriority'),
+                mind: document.getElementById('mindPriority'),
+                spirit: document.getElementById('spiritPriority')
+            };
+            const changedAttr = t.id.replace('Priority', '').toLowerCase();
+            const newPri = t.value;
+            const priorityUnassigned = '';
+            if (newPri !== priorityUnassigned) {
+                for (const [attr, sel] of Object.entries(priorities)) {
+                    if (attr !== changedAttr && sel.value === newPri) {
+                        sel.value = priorityUnassigned;
+                    }
+                }
+            }
+        }
         calculateAttributeValues();
         updateAttributeGroups();
         updateAllSkillModsAndPassives();
@@ -630,7 +647,7 @@ function calculateAttributeValues() {
     const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
     ['body', 'mind', 'spirit'].forEach(attr => {
         const priVal = document.getElementById(attr + 'Priority').value;
-        let val = priVal === '1' ? pri : priVal === '2' ? sec : ter;
+        let val = priVal === '1' ? pri : priVal === '2' ? sec : priVal === '3' ? ter : 0;
         document.getElementById(attr + 'Value').textContent = val;
     });
     updateSkillsForMod('bodyValue');
@@ -640,8 +657,8 @@ function calculateAttributeValues() {
 function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
 function updateAttributeGroup(group) {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const pri = document.getElementById(group.priorityId).value || '3';
-    let points = 1 + Math.floor((level - 1) / 3);
+    const pri = document.getElementById(group.priorityId).value;
+    let points = pri === '' ? 0 : 1 + Math.floor((level - 1) / 3);
     if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
     if (pri === '2') points = 2 + Math.floor(level / 3);
     const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
@@ -1080,7 +1097,7 @@ document.querySelectorAll('.charInfoHover').forEach(trigger => {
     trigger: 'mouseenter focus click',  // Hover for preview, click for persistent
     allowHTML: true,
     interactive: true,  // Allow clicks inside (e.g., close button)
-    hideOnClick: 'toggle',  // Click to show/hide persistently
+    hideOnClick: 'toggle',  // Persistent on hover? No, toggle on click
     onShow(instance) {
       // For persistent mode on click: Add close logic if needed
       instance.popper.querySelector('.closeRitual')?.addEventListener('click', () => instance.hide());

@@ -157,7 +157,7 @@ console.log('Hover Map:', hoverMap); // Debug
         // Build ATTRIBUTE_GROUPS from CSV
         const ATTRIBUTE_GROUPS = {};
         const mainAttrs = dataByCategory.mainattributes || [];
-        const groupMap = {
+        const groupMap = {  // Map primary to group key
             body: 'physical',
             mind: 'mental',
             spirit: 'spirit'
@@ -178,7 +178,7 @@ console.log('Hover Map:', hoverMap); // Debug
         });
         console.log('ATTRIBUTE_GROUPS:', ATTRIBUTE_GROUPS);  // Debug
 
-        // Build SKILL_MOD_MAP and SKILL_ID_MAP from CSV
+        // Build SKILL_ID_MAP and SKILL_MOD_MAP from CSV
         const SKILL_ID_MAP = {};
         const SKILL_MOD_MAP = {};
         const subAttrSkills = Object.keys(dataByCategory).filter(k => k.endsWith('skills'));
@@ -192,7 +192,7 @@ console.log('Hover Map:', hoverMap); // Debug
                 SKILL_MOD_MAP[skillId] = subAttr + 'Value';  // e.g., 'athleticsSkillRank': 'mightValue'
             });
         });
-        // Manually add Strike/Blast/Invoke if not in sub-skills (from CSV, tied to primaries)
+        // Manually add Strike/Blast/Invoke (tied to primaries in CSV, not subs)
         ['Strike', 'Blast', 'Invoke'].forEach(attack => {
             const primaryMap = { Strike: 'body', Blast: 'mind', Invoke: 'spirit' };  // Based on CSV patterns
             const skillId = attack.toLowerCase() + 'SkillRank';
@@ -207,6 +207,21 @@ console.log('Hover Map:', hoverMap); // Debug
 // Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
 function parseCsvByCategories(headers, rows) {
     const dataByCategory = {};
+
+    const SKILL_ID_MAP = {};
+    const SKILL_MOD_MAP = {};
+    const skills = dataByCategory.skills || [];
+    skills.forEach(skill => {
+        const name = (skill.name || '').trim(); // Adjust 'name' if your headers differ
+        const id = (skill.id || `${name.toLowerCase()}SkillRank`).trim(); // Fallback ID generation
+        const mod = (skill.mod || '').trim();
+        if (name && id) {
+            SKILL_ID_MAP[name] = id;
+            if (mod) SKILL_MOD_MAP[id] = mod;
+        }
+    });
+console.log('Built SKILL_ID_MAP:', SKILL_ID_MAP); // Debug: Check in console
+console.log('Built SKILL_MOD_MAP:', SKILL_MOD_MAP);
     const prefixMap = getPrefixMap(headers);
 
     for (const [prefix, prefixedHeaders] of Object.entries(prefixMap)) {

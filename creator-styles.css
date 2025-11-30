@@ -959,7 +959,7 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 }
 /* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
 .hoverRules{
-  bottom-border:1px dotted black;
+  border-bottom:2px dotted black;
 }
 .gearDetails {
     width: 11px;

@@ -648,7 +648,11 @@ dark leather: #5E4634
   border-radius: 8px 8px 0px 0px;
   text-align:center;
 }
-       
+.attackSkills {margin-left: 1px; color:whitesmoke; border: none;}
+.attackSkills:hover {margin-left: 1px;background-color: white;color:black;}
+.nonAttackSkills {margin-left: 1px; color:whitesmoke; border: none;}
+.nonAttackSkills:hover {margin-left: 1px;background-color: white;color:black;}
+
 .wayTalent{background-color:rgba(88, 89, 96, 1) !important;color:white !important;border:none;height:25px;font-size: 16px;} 
 .talentWrapper {width: 410px;border-radius: 8px 8px 0px 0px;margin-right:15px;}
 .talentAbility {margin-top:10px;}

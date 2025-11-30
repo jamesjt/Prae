@@ -146,7 +146,17 @@ function parseCsvByCategories(headers, rows) {
         const name = row[config.mainIdx]?.trim();
         if (name) {
           const item = { name, category: config.subCategory };
-          parseItemProps(item, config.related, row);
+          config.related.forEach(rel => {
+            let val = row[rel.idx]?.trim();
+            if (!val) return;
+            const suffixLower = rel.suffix.toLowerCase();
+            if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
+              val = parseFloat(val) || 0;
+            } else if (suffixLower.includes('bonus')) {
+              val = parseInt(val) || 0;
+            }
+            item[rel.suffix.toLowerCase()] = val;
+          });
           dataByCategory[categoryKey].push(item);
         }
       });
@@ -154,21 +164,6 @@ function parseCsvByCategories(headers, rows) {
     dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));
   }
   return dataByCategory;
-}
-
-function parseItemProps(item, related, row) {
-  related.forEach(rel => {
-    let val = row[rel.idx]?.trim();
-    if (!val) return;
-    let suffixLower = rel.suffix.toLowerCase();
-    const key = suffixLower.split(' ').map((w, i) => i > 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join('');
-    if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
-      val = parseFloat(val) || 0;
-    } else if (suffixLower.includes('bonus')) {
-      val = parseInt(val) || 0;
-    }
-    item[key] = val;
-  });
 }
 
 function initDomCache() {
@@ -489,12 +484,12 @@ function handleReadySelectChange(i) {
     renderStowed(i);
   }
   if (isPack && !wasPack) {
-    const slots = item.stowedSlots || 0;
+    const slots = item.stowedslots || 0;
     state.stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
     renderStowed(i);
   }
   if (isPack && wasPack && state.gear !== newGearName) {
-    const slots = item.stowedSlots || 0;
+    const slots = item.stowedslots || 0;
     state.stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
     renderStowed(i);
   }
@@ -560,6 +555,35 @@ function renderStowed(i) {
       detailsDiv.dataset.details = selectedItem.details.trim();
       entry.appendChild(detailsDiv);
     }
+
+    sel.addEventListener('change', () => {
+      const selectedName = sel.value;
+      const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
+      if (oldDetails) oldDetails.remove();
+      const newItem = nonPacks.find(g => g.name === selectedName);
+      if (newItem && newItem.details && newItem.details.trim()) {
+        const detailsDiv = document.createElement('div');
+        detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+        detailsDiv.className = 'hasDetails';
+        detailsDiv.textContent = 'i';
+        detailsDiv.dataset.details = newItem.details.trim();
+        entry.appendChild(detailsDiv);
+      }
+      state.stowed[j].gear = selectedName;
+      updateLoadForSlot(i, stowedIndex);
+      updateLoadForSlot(i);
+      calculateLoad();
+    });
+
+    const amtInput = entry.querySelector('input');
+    amtInput.addEventListener('input', () => {
+      const val = Math.max(1, parseInt(amtInput.value) || 1);
+      amtInput.value = val;
+      state.stowed[j].amt = val;
+      updateLoadForSlot(i, stowedIndex);
+      updateLoadForSlot(i);
+      calculateLoad();
+    });
 
     updateLoadForSlot(i, stowedIndex);
   });
@@ -662,15 +686,18 @@ document.addEventListener('change', e => {
     return;
   }
 
-  if (t.matches('[id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
-    const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-select/);
+  if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
+    const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt|select)/);
     if (match) {
       const [,, readyI, stowedJ] = match;
+      if (/Amt|amt/.test(t.id)) clampValue(t, 1);
       if (stowedJ) {
-        readyState[readyI - 1].stowed[stowedJ - 1].gear = t.value;
+        readyState[readyI - 1].stowed[stowedJ - 1].amt = parseInt(t.value) || 1;
         updateLoadForSlot(readyI, stowedJ);
-      } else {
+      } else if (t.matches('[id$="Select"]')) {
         handleReadySelectChange(readyI);
+      } else {
+        readyState[readyI - 1].amt = parseInt(t.value) || 1;
       }
       updateLoadForSlot(readyI);
       calculateLoad();
@@ -680,26 +707,7 @@ document.addEventListener('change', e => {
 
   if (t.matches('[id$="ProfSelector"]')) {
     const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
-  }
-});
-
-document.addEventListener('input', e => {
-  const t = e.target;
-  if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"]')) {
-    const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt)/);
-    if (match) {
-      const [,, readyI, stowedJ] = match;
-      clampValue(t, 1);
-      const value = parseInt(t.value) || 1;
-      if (stowedJ) {
-        readyState[readyI - 1].stowed[stowedJ - 1].amt = value;
-        updateLoadForSlot(readyI, stowedJ);
-      } else {
-        readyState[readyI - 1].amt = value;
-      }
-      updateLoadForSlot(readyI);
-      calculateLoad();
-    }
+    // Removed undefined calculateProficiencyPoints call
   }
 });
 

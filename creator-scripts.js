@@ -204,7 +204,7 @@ function updateWayOptions() {
   const sel = domCache.roleSelector;
   waysData.forEach(way => {
     const qualified = way.reqSkill === 'Any' ? Object.values(SKILL_ID_MAP).some(id => domCache[id]?.value > 1) : domCache[way.skillId]?.value > 1;
-    const opt = sel.querySelector(`option[value="${way.name}"]`);
+    const opt = sel.querySelector(`option[value="${w.name}"]`);
     if (opt) opt.disabled = !qualified;
   });
 }

@@ -268,21 +268,29 @@ function rebuildDynamicSelectors(config) {
     }
     calculateAbilities();
 }
-
-function updateAbilityTables(type) {
-    const config = {
-        amountInputId: `${type}Amount`,
-        containerSelector: `.${type}Wrapper`,
-        itemPrefix: type === 'talent' ? 'talent' : 'tricks',
-        itemClass: `${type}Ability`,
-        selectorClass: `${type}Selector`,
-        extraOffset: type === 'talent' ? 0 : 1,
-        populateFunction: () => updateAbilitySelectors(type),
-        abilityType: type
-    };
-    rebuildDynamicSelectors(config);
+function updateTalentTables() {
+    rebuildDynamicSelectors({
+        amountInputId: 'talentAmount',
+        containerSelector: '.talentWrapper',
+        itemPrefix: 'talent',
+        itemClass: 'talentAbility',
+        selectorClass: 'talentSelector',
+        populateFunction: () => updateAbilitySelectors('talent'),
+        abilityType: 'talent'
+    });
 }
-
+function updateTrickTables() {
+    rebuildDynamicSelectors({
+        amountInputId: 'tricksAmount',
+        containerSelector: '.trickWrapper',
+        itemPrefix: 'tricks',
+        itemClass: 'trickAbility',
+        selectorClass: 'trickSelector',
+        extraOffset: 1,
+        populateFunction: () => updateAbilitySelectors('trick'),
+        abilityType: 'trick'
+    });
+}
 // ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
     const t = e.target;
@@ -293,7 +301,7 @@ document.addEventListener('change', e => {
         const type = t.id.replace('Amount', '');
         const value = clamp(t);
         document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
-        updateAbilityTables(type);
+        (type === 'talent' ? updateTalentTables : updateTrickTables)();
         calculateAbilities();
         return;
     }
@@ -882,8 +890,8 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateAbilityTables('talent'); // Initial build for talents
-    updateAbilityTables('trick'); // Initial build for tricks
+    updateTalentTables(); // Initial build for talents
+    updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
     // Unified Tooltip Initialization with Tippy.js
 tippy.setDefaultProps({

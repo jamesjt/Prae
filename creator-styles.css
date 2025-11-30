@@ -958,7 +958,7 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     transform: translateX(-50%) translateY(0);
 }
 /* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
-.hasDetails {
+.gearDetails {
     width: 11px;
     height: 10px;
     padding-top: 1px;
@@ -977,7 +977,7 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 }
 
 /* Hide completely when empty */
-.hasDetails:empty {
+.gearDetails:empty {
     width: 0;
     height: 0;
     margin: 0;
@@ -988,20 +988,10 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
 }
 
 /* Hover glow */
-.hasDetails:hover {
+.gearDetails:hover {
     background: #d29a38;
     color: #000;
     box-shadow: 0 0 10px rgba(255, 204, 0, 0.9);
-}
-
-/* Optional: auto-show 'i' even if element is empty
-.hasDetails::before {
-    content: 'i';
-    font-style: italic;
-}
- */
-.hasDetails:empty::before {
-    content: none;
 }
 
 .amountRow {

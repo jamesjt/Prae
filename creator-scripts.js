@@ -430,7 +430,6 @@ document.addEventListener('click', e => {
             value -= 1;
         }
         amountEl.textContent = value;
-        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = value + 1;
         (type === 'talent' ? updateTalentTables : updateTrickTables)();
         calculateAbilities();
     }
@@ -1027,11 +1026,6 @@ window.addEventListener('load', () => {
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
-    // Set initial amounts
-    document.getElementById('talentAmount').textContent = '0';
-    document.getElementById('tricksAmount').textContent = '1';
-    document.getElementById('totalTalents').textContent = '1';
-    document.getElementById('totalTricks').textContent = '2';
     // Unified Tooltip Initialization with Tippy.js
 tippy.setDefaultProps({
   theme: 'custom',  // We'll define this in CSS

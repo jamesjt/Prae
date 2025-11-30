@@ -175,7 +175,9 @@ function initDomCache() {
     totalLoadValue: document.getElementById('totalLoadValue'),
     roleSelector: document.getElementById('roleSelector'),
     talentAmount: document.getElementById('talentAmount'),
-    tricksAmount: document.getElementById('tricksAmount')
+    tricksAmount: document.getElementById('tricksAmount'),
+    totalTalents: document.getElementById('totalTalents'),
+    totalTricks: document.getElementById('totalTricks')
   };
   Object.values(SKILL_ID_MAP).forEach(id => domCache[id] = document.getElementById(id));
   Object.values(ATTRIBUTE_GROUPS).forEach(g => {
@@ -248,7 +250,7 @@ function populateAbilityInfo(selectId, abilities, type) {
 }
 
 function updateAbilityTables(type) {
-  const amountInput = domCache[`${type}Amount`] || domCache[`${type}sAmount`];
+  const amountInput = domCache[`${type}sAmount`] || domCache[`${type}Amount`];
   if (!amountInput) return;
   const currentAmount = clampValue(amountInput);
   const totalSlots = currentAmount + (type === 'trick' ? 1 : 0);
@@ -338,9 +340,11 @@ function calculateAbilities() {
   const level = parseInt(domCache.charLvl.value) || 1;
   const tExtra = parseInt(domCache.talentAmount.value) || 1;
   const trExtra = parseInt(domCache.tricksAmount.value) || 1;
-  if (domCache.abilityNumber) domCache.abilityNumber.textContent = tExtra + trExtra + 2;
+  domCache.totalTalents.textContent = 1 + tExtra;
+  domCache.totalTricks.textContent = 1 + trExtra;
+  domCache.abilityNumber.textContent = tExtra + trExtra + 2;
   const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
-  if (domCache.remainingAbilities) domCache.remainingAbilities.textContent = Math.max(0, remaining);
+  domCache.remainingAbilities.textContent = Math.max(0, remaining);
 }
 
 function calculateAttributeValues() {
@@ -611,10 +615,7 @@ document.addEventListener('change', e => {
   if (t.matches('#talentAmount, #tricksAmount')) {
     const type = t.id.replace('Amount', '');
     clampValue(t);
-    const value = parseInt(t.value);
-    const totalId = `total${type.charAt(0).toUpperCase() + type.slice(1)}s`;
-    const totalEl = document.getElementById(totalId);
-    if (totalEl) totalEl.textContent = 1 + value;
+    domCache[`total${type.charAt(0).toUpperCase() + type.slice(1)}s`].textContent = 1 + parseInt(t.value);
     updateAbilityTables(type);
     calculateAbilities();
     return;

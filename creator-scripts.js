@@ -1,8 +1,8 @@
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
-const RULES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
+const CHAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
-/*const SKILL_ID_MAP = {
+const SKILL_ID_MAP = {
     'Athletics': 'athleticsSkillRank', 'Force': 'forceSkillRank', 'Acrobatics': 'acrobaticsSkillRank', 'Sneak': 'sneakSkillRank',
     'Endurance': 'enduranceSkillRank', 'Poise': 'poiseSkillRank', 'Lore': 'loreSkillRank', 'Tinkering': 'tinkeringSkillRank',
     'Deception': 'deceptionSkillRank', 'Insight': 'insightSkillRank', 'Awareness': 'awarenessSkillRank', 'Survival': 'survivalSkillRank',
@@ -23,7 +23,7 @@ const ATTRIBUTE_GROUPS = {
     mental:   { priorityId: 'mindPriority', pointsId: 'mentalAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
-*/
+
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = {};
 
 // Add near top constants
@@ -117,7 +117,7 @@ fetch(WAYS_CSV_URL)
     })
     .catch(err => console.error('Error loading Ways CSV:', err));
 
-fetch(RULES_CSV_URL)
+fetch(CHAR_CSV_URL)
     .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
     .then(text => {
         const parsed = Papa.parse(text, {
@@ -128,81 +128,33 @@ fetch(RULES_CSV_URL)
         });
         if (parsed.errors.length > 0) {
             console.error('PapaParse errors:', parsed.errors);
-            throw new Error('Error parsing RULES CSV');
+            throw new Error('Error parsing PROF CSV');
         }
         const rows = parsed.data;
         const headers = rows[0].map(h => h.trim());
+
         const dataByCategory = parseCsvByCategories(headers, rows);
+
         // For debugging
         console.log('Parsed Data:', dataByCategory);
+
         // Assign for gear (update script to use dataByCategory.gear if refactoring further)
         gearData = dataByCategory.gear || [];
         allOptions = gearData;
-        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs'); // Case-insensitive exclude
+        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
+
         // Assign for proficiencies
         const proficiencies = dataByCategory.proficiencies || [];
         profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
+
         generateGearEntries();
-        const hoverRules = dataByCategory.hoverrules || []; // Assuming "hoverrules" category from CSV
-        const hoverMap = {};
-        hoverRules.forEach(rule => {
-            hoverMap[rule.name.toLowerCase()] = rule.details || ''; // Key: rule word, value: details
-        });
-console.log('Hover Map:', hoverMap); // Debug
+
         // Initial proficiency population
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-
-        // Build ATTRIBUTE_GROUPS from CSV
-        const ATTRIBUTE_GROUPS = {};
-        const mainAttrs = dataByCategory.mainattributes || [];
-        const groupMap = {
-            body: 'physical',
-            mind: 'mental',
-            spirit: 'spirit'
-        };
-        mainAttrs.forEach(attr => {
-            const primary = attr.name.toLowerCase();
-            const groupKey = groupMap[primary];
-            if (groupKey) {
-                const subCategory = primary + 'subattributes';  // e.g., 'bodysubattributes'
-                const subs = dataByCategory[subCategory] || [];
-                ATTRIBUTE_GROUPS[groupKey] = {
-                    priorityId: primary + 'Priority',  // e.g., 'bodyPriority'
-                    pointsId: groupKey + 'AttributePoints',  // e.g., 'physicalAttributePoints'
-                    primaryValueId: primary + 'Value',  // e.g., 'bodyValue'
-                    subIds: subs.map(s => s.name.toLowerCase() + 'Value')  // e.g., ['mightValue', 'agilityValue', 'brawnValue']
-                };
-            }
-        });
-        console.log('ATTRIBUTE_GROUPS:', ATTRIBUTE_GROUPS);  // Debug
-
-        // Build SKILL_MOD_MAP and SKILL_ID_MAP from CSV
-        const SKILL_ID_MAP = {};
-        const SKILL_MOD_MAP = {};
-        const subAttrSkills = Object.keys(dataByCategory).filter(k => k.endsWith('skills'));
-        subAttrSkills.forEach(subKey => {
-            const subAttr = subKey.replace('skills', '');  // e.g., 'might'
-            const skills = dataByCategory[subKey] || [];
-            skills.forEach(skill => {
-                const skillName = skill.name;
-                const skillId = skillName.toLowerCase() + 'SkillRank';
-                SKILL_ID_MAP[skillName] = skillId;
-                SKILL_MOD_MAP[skillId] = subAttr + 'Value';  // e.g., 'athleticsSkillRank': 'mightValue'
-            });
-        });
-        // Manually add Strike/Blast/Invoke if not in sub-skills (from CSV, tied to primaries)
-        ['Strike', 'Blast', 'Invoke'].forEach(attack => {
-            const primaryMap = { Strike: 'body', Blast: 'mind', Invoke: 'spirit' };  // Based on CSV patterns
-            const skillId = attack.toLowerCase() + 'SkillRank';
-            SKILL_ID_MAP[attack] = skillId;
-            SKILL_MOD_MAP[skillId] = primaryMap[attack] + 'Value';
-        });
-        console.log('SKILL_ID_MAP:', SKILL_ID_MAP);
-        console.log('SKILL_MOD_MAP:', SKILL_MOD_MAP);
     })
-    .catch(err => console.error('Error loading RULES CSV:', err));
+    .catch(err => console.error('Error loading PROF CSV:', err));
 
 // Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
 function parseCsvByCategories(headers, rows) {

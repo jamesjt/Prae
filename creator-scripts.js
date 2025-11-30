@@ -468,7 +468,7 @@ function handleReadySelectChange(i) {
   const item = gearData.find(g => g.name === newGearName);
   const oldDetails = document.getElementById(`gear${i}Details`);
   if (oldDetails) oldDetails.remove();
-  if (item && item.details && item.details.trim()) {
+  if (item?.details?.trim()) {
     const detailsDiv = document.createElement('div');
     detailsDiv.id = `gear${i}Details`;
     detailsDiv.className = 'hasDetails';
@@ -477,8 +477,8 @@ function handleReadySelectChange(i) {
     sel.parentNode.appendChild(detailsDiv);
   }
   const state = readyState[i - 1];
-  const wasPack = state.gear && gearData.find(g => g.name === state.gear)?.category.toLowerCase() === 'packs';
-  const isPack = item && item.category.toLowerCase() === 'packs';
+  const wasPack = state.gear && gearData.find(g => g.name === state.gear)?.category === 'Packs';
+  const isPack = item?.category === 'Packs';
   if (wasPack && !isPack) {
     state.stowed = [];
     renderStowed(i);
@@ -545,45 +545,16 @@ function renderStowed(i) {
       sel.appendChild(optgroup);
     });
 
-    sel.value = s.gear || '';
-    const selectedItem = nonPacks.find(g => g.name === sel.value);
-    if (selectedItem && selectedItem.details && selectedItem.details.trim()) {
+    if (s.gear) sel.value = s.gear;
+    const item = nonPacks.find(g => g.name === s.gear);
+    if (item?.details?.trim()) {
       const detailsDiv = document.createElement('div');
       detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
       detailsDiv.className = 'hasDetails';
       detailsDiv.textContent = 'i';
-      detailsDiv.dataset.details = selectedItem.details.trim();
+      detailsDiv.dataset.details = item.details.trim();
       entry.appendChild(detailsDiv);
     }
-
-    sel.addEventListener('change', () => {
-      const selectedName = sel.value;
-      const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
-      if (oldDetails) oldDetails.remove();
-      const newItem = nonPacks.find(g => g.name === selectedName);
-      if (newItem && newItem.details && newItem.details.trim()) {
-        const detailsDiv = document.createElement('div');
-        detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-        detailsDiv.className = 'hasDetails';
-        detailsDiv.textContent = 'i';
-        detailsDiv.dataset.details = newItem.details.trim();
-        entry.appendChild(detailsDiv);
-      }
-      state.stowed[j].gear = selectedName;
-      updateLoadForSlot(i, stowedIndex);
-      updateLoadForSlot(i);
-      calculateLoad();
-    });
-
-    const amtInput = entry.querySelector('input');
-    amtInput.addEventListener('input', () => {
-      const val = Math.max(1, parseInt(amtInput.value) || 1);
-      amtInput.value = val;
-      state.stowed[j].amt = val;
-      updateLoadForSlot(i, stowedIndex);
-      updateLoadForSlot(i);
-      calculateLoad();
-    });
 
     updateLoadForSlot(i, stowedIndex);
   });
@@ -610,7 +581,7 @@ function updateLoadForSlot(readyI, stowedJ = null) {
   if (item) {
     const baseLoad = item.baseLoad || item.load || 0;
     total += baseLoad * state.amt;
-    if (item.category.toLowerCase() === 'packs') {
+    if (item.category === 'Packs') {
       state.stowed.forEach(s => {
         const sItem = gearData.find(g => g.name === s.gear && g.category.toLowerCase() !== 'packs');
         if (sItem) total += (sItem.load || 0) * s.amt;
@@ -620,7 +591,7 @@ function updateLoadForSlot(readyI, stowedJ = null) {
   const loadDiv = document.getElementById(`gear${readyI}Load`);
   if (loadDiv) {
     loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-    if (item && item.category.toLowerCase() === 'packs') loadDiv.style.color = total > (item.loadLimit || 0) ? 'red' : '';
+    if (item?.category === 'Packs') loadDiv.style.color = total > item.loadLimit ? 'red' : '';
   }
 }
 
@@ -707,7 +678,7 @@ document.addEventListener('change', e => {
 
   if (t.matches('[id$="ProfSelector"]')) {
     const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
-    // Removed undefined calculateProficiencyPoints call
+    if (type) calculateProficiencyPoints(type);
   }
 });
 

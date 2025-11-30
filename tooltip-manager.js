@@ -13,7 +13,7 @@ class TooltipManager {
       const instance = tippy(el, {
         content: html,
         allowHTML: true,
-        theme: "ruleHover",
+        theme: "ruleTip",
         maxWidth: 350,
         placement: "top",
         animation: "shift-away-subtle",

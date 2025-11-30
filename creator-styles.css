@@ -64,19 +64,6 @@
 #roleSelector {width: 110px; margin-left: 5px; margin-right:5px;}
 #charSave {width: 40px; margin-right:5px; margin-top:4px; border-radius: 6px; padding:2px; background-color:white; float:right;}
 
-
-.charInfoHover{
-  position:relative;
-  top:4px;
-  height:16px;
-  width:16px;
-  background-color:white;
-  border-radius: 3px;
-  cursor:alias;
-}
-
-/*.charInfoHover:hover + .charDetails{display: block !important;}*/
-
 .charDetails {
   position:absolute;
   display:none;
@@ -513,12 +500,10 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     z-index: 10;
 }
 
-.profDesc:empty{border:none;}
 .invokeProfSelector, .strikeProfSelector {position:relative;}
 .strikeProfSelector {border:1px solid #5F1717; color:whitesmoke;background-color: #B07C71;}
 .blastProfSelector {border:1px solid #1A305C; color:whitesmoke; background-color: #9BAABF;}
 .invokeProfSelector {border:1px solid #281957; color:whitesmoke;background-color: #797781;}
-.invokeProfSelector:hover .profDesc, .strikeProfSelector:hover .profDesc {display:block;}
 
 
 .gearListContainer{
@@ -538,7 +523,7 @@ dark leather: #5E4634
 .gearName{width:90%;}
 .gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #6F6A63;color:whitesmoke;}
 .gearDetails{border-radius: 20px; border:2px solid black;color:black;display: flex;justify-content: center;align-items: center; width:15px;}
-.gearAmtInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;margin-left:10px;}
+.gearAmtInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;margin-left:15px;}
 .gearAmtInputField:hover{background-color: white;color:black;}
 .gearLoad{display: flex;
     justify-content: center;

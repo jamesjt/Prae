@@ -168,356 +168,630 @@ function parseCsvByCategories(headers, rows) {
                 const name = row[config.mainIdx]?.trim();
                 if (!name) return;
                 const item = { name, category: config.subCategory };
-                config.related.forEach(rel => {
-                    item[rel.suffix.toLowerCase()] = row[rel.idx]?.trim();
-                });
+                parseItemProps(item, config.related, row);
                 dataByCategory[categoryKey].push(item);
             });
         }
+
+        dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));
     }
+
     return dataByCategory;
 }
 
-// ———————————————————————— POPULATORS ————————————————————————
+// Helper: Parse item properties with dynamic type conversion
+function parseItemProps(item, related, row) {
+    related.forEach(rel => {
+        let val = row[rel.idx]?.trim();
+        if (!val) return;
 
-function populateRoleSelector() {
-    const sel = document.getElementById('roleSelector');
-    waysData.forEach(way => {
-        const opt = document.createElement('option');
-        opt.value = way.name;
-        opt.textContent = way.name;
-        sel.appendChild(opt);
-    });
-    sel.addEventListener('change', () => {
-        const selected = waysData.find(w => w.name === sel.value);
-        if (selected) {
-            const talentKey = Object.keys(selected.props).find(k => k.includes('talent name'));
-            const talentDescKey = Object.keys(selected.props).find(k => k.includes('talent description'));
-            document.getElementById('wayTalentName').textContent = talentKey ? selected.props[talentKey] : 'Unknown Talent';
-            const desc = talentDescKey ? selected.props[talentDescKey] : 'No description';
-            document.getElementById('wayTalentDesc').innerHTML = replacePlaceholders(desc.replace(/\n/g, '<br>'));
-        } else {
-            document.getElementById('wayTalentName').textContent = 'Select Way';
-            document.getElementById('wayTalentDesc').textContent = '';
+        const suffixLower = rel.suffix.toLowerCase();
+        // Pattern-based conversion
+        if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
+            val = parseFloat(val) || 0;
+        } else if (suffixLower.includes('bonus')) {
+            val = parseInt(val) || 0;
         }
+        // Else: Keep as string (e.g., 'details')
+
+        item[rel.suffix.toLowerCase()] = val;
     });
 }
 
-// Populate ability selectors by type
-function updateAbilitySelectors(type) {
-    // Not fully implemented in provided code; assuming it's for dynamic selectors
-}
-
-// Update Way options (if needed)
-function updateWayOptions() {
-    // Placeholder if expansion needed
-}
-
-// Populate proficiency selectors
 function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
-    const containers = {
-        strike: document.getElementById('strikeProfContainer'),
-        blast: document.getElementById('blastProfContainer'),
-        invoke: document.getElementById('invokeProfContainer')
-    }[type];
-    if (!containers) return;
-
     for (let i = 1; i <= 5; i++) {
-        const sel = document.getElementById(`${type}ProfSelector${i}`);
-        if (!sel) continue;
-        sel.innerHTML = '<option value="profUnassigned"></option>';
-        profs.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.name;
-            opt.textContent = p.name;
-            sel.appendChild(opt);
-        });
+        const sel = document.getElementById(type + 'ProfSelector' + i);
+        if (sel) {
+            sel.innerHTML = '<option value="">Select Proficiency</option>' + 
+                profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        }
     }
 }
 
-// Update prof selectors based on rank
+// Update updateProficiencySelectors to call population after visibility
 function updateProficiencySelectors(type, rank) {
-    // Placeholder logic
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
+    }
+    populateProficiencySelectors(type);  // Add this
 }
 
-// ———————————————————————— CALCULATORS ————————————————————————
-
-function calculateSkillPoints() {
-    // Implement as needed
+let allOptions = [];
+let nonPackOptions = [];
+let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
+// ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
+function rebuildDynamicSelectors(config) {
+    const {
+        amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
+        descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
+    } = config;
+    const inputEl = document.getElementById(amountInputId);
+    if (!inputEl) return;
+    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0); // Clamp to 0+
+    inputEl.value = currentAmount; // Update input to reflect clamped value
+    const totalSlots = currentAmount + extraOffset;
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    // Save current selections
+    const saved = {};
+    for (let i = 1; i <= 20; i++) {
+        const sel = document.getElementById(`${itemPrefix}${i}`);
+        if (sel) saved[i] = sel.value;
+    }
+    // Remove ALL dynamic slots
+    if (itemPrefix === 'talent') {
+        container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
+    } else {
+        container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
+    }
+    // Build exactly the number of slots we need
+    for (let i = 1; i <= totalSlots; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.id = `${itemPrefix}sTable${i}`;
+        wrapper.className = itemClass;
+        wrapper.innerHTML = `
+            <select id="${itemPrefix}${i}" class="${selectorClass}"></select>
+            <div id="${itemPrefix}${i}${descriptionSuffix}"></div>
+        `;
+        container.appendChild(wrapper);
+    }
+    populateFunction();
+    // Restore saved values
+    for (let i = 1; i <= totalSlots; i++) {
+        const select = document.getElementById(`${itemPrefix}${i}`);
+        if (select && saved[i]) {
+            select.value = saved[i];
+            populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
+        }
+    }
+    calculateAbilities();
 }
-
-function calculateAbilities() {
-    // Implement as needed
-}
-
-function calculateAttributeValues() {
-    // Implement as needed
-}
-
-function updateAttributeGroups() {
-    // Implement as needed
-}
-
-function updateAllSkillModsAndPassives() {
-    // Implement as needed
-}
-
-// ———————————————————————— DYNAMIC TABLES ————————————————————————
-
 function updateTalentTables() {
-    const amount = parseInt(document.getElementById('talentAmount').value) || 1;
-    const container = document.getElementById('talentTables');
-    container.innerHTML = '';
-    for (let i = 1; i <= amount; i++) {
-        const table = document.createElement('div');
-        table.className = 'talentTable';
-        table.innerHTML = `
-            <select id="talentSkill${i}" class="talentSkillSelector">
-                <!-- Options populated dynamically -->
-            </select>
-            <select id="talentSelector${i}" class="talentSelector">
-                <option value="">Select Talent</option>
-            </select>
-            <div id="talentDesc${i}" class="talentInfo"></div>
-        `;
-        container.appendChild(table);
-
-        // Populate skill selector
-        const skillSel = table.querySelector(`#talentSkill${i}`);
-        Object.keys(SKILL_ID_MAP).forEach(skill => {
-            const opt = document.createElement('option');
-            opt.value = skill.toLowerCase();
-            opt.textContent = skill;
-            skillSel.appendChild(opt);
-        });
-
-        // On skill change, populate talents
-        skillSel.addEventListener('change', () => populateTalents(i, skillSel.value));
-
-        // On talent change, show desc
-        const talentSel = table.querySelector(`#talentSelector${i}`);
-        talentSel.addEventListener('change', () => {
-            const selected = abilitiesData.get(skillSel.value)?.find(a => a.name === talentSel.value && a.type === 'talent');
-            const desc = selected?.details?.Description || 'No description';
-            document.getElementById(`talentDesc${i}`).innerHTML = replacePlaceholders(desc.replace(/\n/g, '<br>'));
-        });
-    }
-}
-
-function populateTalents(index, skill) {
-    const sel = document.getElementById(`talentSelector${index}`);
-    sel.innerHTML = '<option value="">Select Talent</option>';
-    const talents = abilitiesData.get(skill)?.filter(a => a.type === 'talent') || [];
-    talents.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.name;
-        opt.textContent = t.name;
-        sel.appendChild(opt);
+    rebuildDynamicSelectors({
+        amountInputId: 'talentAmount',
+        containerSelector: '.talentWrapper',
+        itemPrefix: 'talent',
+        itemClass: 'talentAbility',
+        selectorClass: 'talentSelector',
+        populateFunction: () => updateAbilitySelectors('talent'),
+        abilityType: 'talent'
     });
 }
-
 function updateTrickTables() {
-    const amount = parseInt(document.getElementById('tricksAmount').value) || 1;
-    const container = document.getElementById('trickTables');
-    container.innerHTML = '';
-    for (let i = 1; i <= amount; i++) {
-        const table = document.createElement('div');
-        table.className = 'trickTable';
-        table.innerHTML = `
-            <select id="trickSkill${i}" class="trickSkillSelector">
-                <!-- Options populated dynamically -->
-            </select>
-            <select id="trickSelector${i}" class="trickSelector">
-                <option value="">Select Trick</option>
-            </select>
-            <div id="trickDesc${i}" class="trickInfo"></div>
-        `;
-        container.appendChild(table);
-
-        // Populate skill selector
-        const skillSel = table.querySelector(`#trickSkill${i}`);
-        Object.keys(SKILL_ID_MAP).forEach(skill => {
-            const opt = document.createElement('option');
-            opt.value = skill.toLowerCase();
-            opt.textContent = skill;
-            skillSel.appendChild(opt);
-        });
-
-        // On skill change, populate tricks
-        skillSel.addEventListener('change', () => populateTricks(i, skillSel.value));
-
-        // On trick change, show desc
-        const trickSel = table.querySelector(`#trickSelector${i}`);
-        trickSel.addEventListener('change', () => {
-            const selected = abilitiesData.get(skillSel.value)?.find(a => a.name === trickSel.value && a.type === 'trick');
-            const desc = selected?.details?.Description || 'No description';
-            document.getElementById(`trickDesc${i}`).innerHTML = replacePlaceholders(desc.replace(/\n/g, '<br>'));
-        });
-    }
-}
-
-function populateTricks(index, skill) {
-    const sel = document.getElementById(`trickSelector${index}`);
-    sel.innerHTML = '<option value="">Select Trick</option>';
-    const tricks = abilitiesData.get(skill)?.filter(a => a.type === 'trick') || [];
-    tricks.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.name;
-        opt.textContent = t.name;
-        sel.appendChild(opt);
+    rebuildDynamicSelectors({
+        amountInputId: 'tricksAmount',
+        containerSelector: '.trickWrapper',
+        itemPrefix: 'tricks',
+        itemClass: 'trickAbility',
+        selectorClass: 'trickSelector',
+        extraOffset: 1,
+        populateFunction: () => updateAbilitySelectors('trick'),
+        abilityType: 'trick'
     });
 }
+// ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
+document.addEventListener('change', e => {
+    const t = e.target;
+    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
 
-// ———————————————————————— GEAR MANAGEMENT ————————————————————————
+    // Talent/Trick Amounts (combined)
+    if (t.matches('#talentAmount, #tricksAmount')) {
+        const type = t.id.replace('Amount', '');
+        const value = clamp(t);
+        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
+        (type === 'talent' ? updateTalentTables : updateTrickTables)();
+        calculateAbilities();
+        return;
+    }
 
-let readyState = Array.from({length: MAX_READY_SLOTS}, () => ({ gear: '', amt: 1, stowed: [] }));
-let allOptions = [], nonPackOptions = [];
+    // Talent/Trick Selectors (combined)
+    if (t.matches('.talentSelector, .trickSelector')) {
+        const type = t.className.replace('Selector', '');
+        populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
+        calculateAbilities();
+        return;
+    }
 
+    // Skill Ranks
+    if (t.matches('select[id$="SkillRank"]')) {
+        updateSkillModAndPassive(t.id);
+        updateWayOptions();
+        calculateSkillPoints();
+        const type = t.id.replace('SkillRank', '').toLowerCase();
+        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
+        return;
+    }
+
+    // Priorities, Level, Sub-attributes (combined attribute-related)
+    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
+        calculateAttributeValues();
+        updateAttributeGroups();
+        updateAllSkillModsAndPassives();
+        calculateSkillPoints();
+        calculateAbilities();
+        if (t.matches('input[id$="Value"][type="number"]')) {
+            const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
+            updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
+            updateSkillsForMod(t.id);
+        }
+        return;
+    }
+
+    // Way Selector
+    if (t.matches('#roleSelector')) {
+        populateRoleInfo(e);
+        return;
+    }
+
+    // Gear/Stowed Amounts/Selects (combined)
+    if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
+        if (t.matches('[id$="Select"]')) handleReadySelectChange(t.id.match(/gear(\d+)Select/)[1]);
+        const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt|select)/);
+        if (match) {
+            const [,, readyI, stowedJ] = match;
+            if (/Amt|amt/.test(t.id)) clamp(t, 1);
+            if (stowedJ) {
+                updateStowedLoad(readyI || readyI, stowedJ);
+                updateReadyLoad(readyI || readyI);
+            } else {
+                updateReadyLoad(readyI || readyI);
+            }
+            calculateLoad();
+        }
+        return;
+    }
+
+    // Proficiency Selectors
+    if (t.matches('[id$="ProfSelector"]')) {
+        const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
+        if (type) calculateProficiencyPoints(type);
+    }
+});
+// ———————————————————————— CORE FUNCTIONS ————————————————————————
+function populateRoleSelector() {
+    const sel = document.getElementById('roleSelector');
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
+    waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
+}
+function updateWayOptions() {
+    const sel = document.getElementById('roleSelector');
+    waysData.forEach(way => {
+        let qualified = way.reqSkill === 'Any'
+            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
+            : document.getElementById(way.skillId)?.value > 1;
+        const opt = sel.querySelector(`option[value="${way.name}"]`);
+        if (opt) opt.disabled = !qualified;
+    });
+}
+function updateAbilitySelectors(type) {
+    const qualified = getQualifiedAbilities(type);
+    const selectorClass = `${type}Selector`;
+    const emptyValue = `${type}Empty`;
+    const emptyLabel = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    
+    document.querySelectorAll(`.${selectorClass}`).forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = `<option value="${emptyValue}">${emptyLabel}</option>` + 
+            qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
+    });
+}
+function getQualifiedAbilities(type) {
+    const result = [];
+    Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
+        const sel = document.getElementById(id);
+        if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
+            result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
+        }
+    });
+    return result;
+}
+function populateAbilityInfo(selectId, abilities, type) {
+    const value = document.getElementById(selectId)?.value;
+    const ability = abilities.find(a => a.name === value);
+    const desc = document.getElementById(selectId + 'Description');
+    if (!desc || !ability) { desc.innerHTML = ''; return; }
+    desc.innerHTML = '';
+    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    Object.keys(ability.details).sort((a, b) => {
+        const ia = order.indexOf(a.toLowerCase());
+        const ib = order.indexOf(b.toLowerCase());
+        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    }).forEach(key => {
+        const div = document.createElement('div');
+        div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
+        div.textContent = ability.details[key];
+        desc.appendChild(div);
+    });
+}
+function populateRoleInfo(e) {
+    const name = e.target.value;
+    if (!name) return;
+    const way = waysData.find(w => w.name === name);
+    if (!way) return;
+    document.getElementById('wayTalentName').textContent = way.name;
+    const desc = document.getElementById('wayTalentDesc');
+    desc.innerHTML = '';
+    ['passive', 'focus', 'critical effect'].forEach(key => {
+        const val = way.props[Object.keys(way.props).find(k => k.toLowerCase().includes(key))];
+        if (val) {
+            const div = document.createElement('div');
+            div.textContent = val;
+            desc.appendChild(div);
+        }
+    });
+    const attackSkill = way.props[Object.keys(way.props).find(k => k.includes('attack skill'))] || way.reqSkill;
+    const skillId = SKILL_ID_MAP[attackSkill];
+    if (skillId) {
+        const sel = document.getElementById(skillId);
+        if (sel && parseInt(sel.value) < 2) {
+            sel.value = '2';
+            sel.dispatchEvent(new Event('change'));
+        }
+        // Add this here: Trigger proficiency update
+        if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(skillId)) {
+            const type = skillId.replace('SkillRank', '').toLowerCase();
+            const rank = parseInt(sel.value) || 0;
+            updateProficiencySelectors(type, rank);
+        }
+    }
+    const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
+    if (primary) {
+        const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
+        const pri = document.getElementById(map[primary]);
+        if (pri) {
+            pri.value = '1';
+            pri.dispatchEvent(new Event('change'));
+        }
+    }
+    calculateAttributeValues();
+    updateAttributeGroups();
+    updateAllSkillModsAndPassives();
+}
+function calculateSkillPoints() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const total = level * 3 + 9;
+    let spent = 0;
+    Object.values(SKILL_ID_MAP).forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) spent += parseInt(sel.value) || 0;
+    });
+    document.getElementById('skillPoints').textContent = total - spent;
+}
+function calculateAbilities() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
+    const trExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
+    document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
+    const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
+    document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
+}
+function calculateAttributeValues() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
+    const sec = 2 + (level >= 6 ? 1 : 0);
+    const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
+    ['body', 'mind', 'spirit'].forEach(attr => {
+        const priVal = document.getElementById(attr + 'Priority').value;
+        let val = priVal === '1' ? pri : priVal === '2' ? sec : ter;
+        document.getElementById(attr + 'Value').textContent = val;
+    });
+    updateSkillsForMod('bodyValue');
+    updateSkillsForMod('mindValue');
+    updateSkillsForMod('spiritValue');
+}
+function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
+function updateAttributeGroup(group) {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = document.getElementById(group.priorityId).value || '3';
+    let points = 1 + Math.floor((level - 1) / 3);
+    if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
+    if (pri === '2') points = 2 + Math.floor(level / 3);
+    const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
+    let sum = 0;
+    group.subIds.forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp) {
+            inp.max = max;
+            let v = Math.min(max, Math.max(0, parseInt(inp.value) || 0));
+            inp.value = v;
+            sum += v;
+        }
+    });
+    const rem = points - sum;
+    const el = document.getElementById(group.pointsId);
+    el.textContent = rem;
+    el.classList.toggle('hidden', rem === 0);
+    group.subIds.forEach(id => updateSkillsForMod(id));
+}
+function updateSkillModAndPassive(skillId) {
+    const sel = document.getElementById(skillId);
+    if (!sel) return;
+    const rank = parseInt(sel.value) || 0;
+    const modId = SKILL_MOD_MAP[skillId];
+    const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
+    const name = skillId.replace('SkillRank', '');
+    const modEl = document.getElementById(name + 'Mod');
+    if (modEl) modEl.textContent = modVal;
+    const passiveEl = document.getElementById(name + 'Passive');
+    if (passiveEl) passiveEl.textContent = 2 + rank + modVal;
+    /*if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
+        const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
+        if (dmgEl) dmgEl.textContent = modVal;
+    }*/
+}
+function updateSkillsForMod(subId) {
+    Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {
+        if (modId === subId) updateSkillModAndPassive(skillId);
+    });
+}
+function updateAllSkillModsAndPassives() {
+    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
+}
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
+    }
+}
+function updateGearLoad(i) {
+    const select = document.getElementById('gear' + i + 'Select');
+    if (!select) return;
+    const selectedOption = select.options[select.selectedIndex];
+    const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
+    const amtInput = document.getElementById('gear' + i + 'Amt');
+    const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
+    if (amtInput) amtInput.value = qty; // Enforce clamp
+    const totalLoad = baseLoad * qty;
+    const loadDiv = document.getElementById('gear' + i + 'Load');
+    if (loadDiv) {
+        const formattedLoad = totalLoad.toFixed(2).replace(/\.?0+$/, '');
+        loadDiv.textContent = totalLoad > 0 ? formattedLoad : '';
+        // Color red if qty >1 AND baseLoad >1
+        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+    }
+}
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
+
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
-        entry.id = `gear${i}`;
+
+        // We'll build the details HTML only if needed later
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
-                <option value=""></option>
+                <option value="emptyStowedGearSlot">Ready Slot</option>
             </select>
-            <input type="number" id="gear${i}Amt" min="1" value="1" class="gearAmt">
+            <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            <div id="gear${i}Details" class="hasDetails"></div>
-            <div id="stowed${i}" class="stowedContainer"></div>
+            ${detailsHtml}
         `;
+
         container.appendChild(entry);
 
         // Populate selector
-        const sel = entry.querySelector(`#gear${i}Select`);
+        const sel = document.getElementById(`gear${i}Select`);
+        const grouped = {};
         allOptions.forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g.name;
-            opt.textContent = g.name;
-            opt.setAttribute('data-load', g.load || 0);
-            opt.setAttribute('data-category', g.category);
-            opt.setAttribute('data-limit', g.loadLimit || 0); // For packs
-            sel.appendChild(opt);
+            if (!grouped[g.category]) grouped[g.category] = [];
+            grouped[g.category].push(g);
         });
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `-- ${cat} --`;
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.baseLoad || g.load || 0;
+                optgroup.appendChild(opt);
+            });
+            sel.appendChild(optgroup);
+        });
+
+        // On change: update load + conditionally add details icon
+sel.addEventListener('change', () => {
+    handleReadySelectChange(i);  // This now handles EVERYTHING: details, packs, state, stowed rendering, and loads
+});
+
+        // Amount input
+        const amtInput = document.getElementById(`gear${i}Amt`);
+        amtInput.addEventListener('input', function () {
+            const val = Math.max(1, parseInt(this.value) || 1);
+            this.value = val;
+            readyState[i - 1].amt = val;
+            updateReadyLoad(i);
+            calculateLoad();
+        });
+    }
+
+    calculateLoad();
+}
+function handleReadySelectChange(i) {
+    const sel = document.getElementById(`gear${i}Select`);
+    const newGearName = sel.value;
+    const item = allOptions.find(g => g.name === newGearName);
+    // === 1. Remove old details icon (if any) ===
+    const oldDetails = document.getElementById(`gear${i}Details`);
+    if (oldDetails) oldDetails.remove();
+    // === 2. Add details icon only if item has details ===
+    if (item?.details?.trim()) {
+        const detailsDiv = document.createElement('div');
+        detailsDiv.id = `gear${i}Details`;
+        detailsDiv.className = 'hasDetails';
+        detailsDiv.textContent = 'i';
+        detailsDiv.dataset.details = item.details.trim();
+        sel.closest('.gearEntry').appendChild(detailsDiv);
+    }
+    // === 3. Handle pack logic (this was broken) ===
+    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Packs';
+    const isPack = item?.category === 'Packs';
+    // If switching FROM a pack → clear stowed
+    if (wasPack && !isPack) {
+        readyState[i-1].stowed = [];
+        renderStowed(i); // This removes the container
+    }
+    // If switching TO a pack → initialize stowed slots
+    if (isPack && !wasPack) {
+        const slots = item.stowedslots || 0;
+        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
+        renderStowed(i); // ← THIS IS THE MISSING CALL!
+    }
+    // If staying on same pack but changing item (shouldn't happen, but safe)
+    if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
+        const slots = item.stowedslots || 0;
+        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
+        renderStowed(i);
+    }
+    // Update state
+    readyState[i-1].gear = newGearName;
+    readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
+    // Update load
+    updateReadyLoad(i);
+    calculateLoad();
+}
+function renderStowed(i) {
+    let container = document.getElementById(`stowed-container-${i}`);
+    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
+
+    if (readyState[i-1].stowed.length === 0) {
+        if (container) container.remove();
+        return;
+    }
+
+    if (!container) {
+        container = document.createElement('div');
+        container.id = `stowed-container-${i}`;
+        container.className = 'stowed-container';
+        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);
+    }
+    container.innerHTML = '';
+
+    readyState[i-1].stowed.forEach((s, j) => {
+        const stowedIndex = j + 1;
+        const entry = document.createElement('div');
+        entry.className = 'gearEntry gearStowed';
+
+        let detailsHtml = '';
+
+        entry.innerHTML = `
+            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
+                <option value="emptyStowedGearSlot">Stowed Slot</option>
+            </select>
+            <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
+            <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
+            ${detailsHtml}
+        `;
+
+        container.appendChild(entry);
+
+        const sel = entry.querySelector('select');
+        const grouped = {};
+        nonPackOptions.forEach(g => {
+            if (!grouped[g.category]) grouped[g.category] = [];
+            grouped[g.category].push(g);
+        });
+
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `-- ${cat} --`;  // ← Fixed! Was "poking"
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.baseLoad || g.load || 0;
+                optgroup.appendChild(opt);
+            });
+            sel.appendChild(optgroup);
+        });
+
+        // Restore saved selection and add details if needed
+        if (s.gear) {
+            sel.value = s.gear;
+            const item = nonPackOptions.find(g => g.name === s.gear);
+            if (item?.details?.trim()) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+                detailsDiv.className = 'hasDetails';
+                detailsDiv.textContent = 'i';
+                detailsDiv.dataset.details = item.details.trim();
+                entry.appendChild(detailsDiv);
+            }
+        }
 
         // On change
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
-            const item = allOptions.find(g => g.name === selectedName);
-            readyState[i-1].gear = selectedName;
-            readyState[i-1].amt = 1;
-            entry.querySelector(`#gear${i}Amt`).value = 1;
+            const item = nonPackOptions.find(g => g.name === selectedName);
 
-            // Handle details
-            const detailsDiv = entry.querySelector(`#gear${i}Details`);
-            detailsDiv.textContent = item?.details?.trim() ? 'i' : '';
-            detailsDiv.dataset.details = item?.details?.trim() || '';
+            // Remove old details
+            const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
+            if (oldDetails) oldDetails.remove();
 
-            // Handle stowed for packs
-            const stowedContainer = entry.querySelector(`#stowed${i}`);
-            stowedContainer.innerHTML = '';
-            if (item?.category === 'Packs') {
-                readyState[i-1].stowed = Array.from({length: item.stowedSlots || 3}, () => ({ gear: '', amt: 1 }));
-                readyState[i-1].stowed.forEach((s, j) => addStowedEntry(i, j + 1));
-            } else {
-                readyState[i-1].stowed = [];
+            // Add new details only if present
+            if (item?.details?.trim()) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+                detailsDiv.className = 'hasDetails';
+                detailsDiv.textContent = 'i';
+                detailsDiv.dataset.details = item.details.trim();
+                entry.appendChild(detailsDiv);
             }
 
+            readyState[i-1].stowed[j].gear = selectedName;
+            updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
             calculateLoad();
         });
 
-        // On amount change
-        entry.querySelector(`#gear${i}Amt`).addEventListener('input', () => {
-            const val = Math.max(1, parseInt(this.value) || 1);
-            this.value = val;
-            readyState[i-1].amt = val;
+        const amtInput = entry.querySelector('input');
+        amtInput.addEventListener('input', () => {
+            const val = Math.max(1, parseInt(amtInput.value) || 1);
+            amtInput.value = val;
+            readyState[i-1].stowed[j].amt = val;
+            updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
             calculateLoad();
         });
-    }
-}
 
-// Add stowed entry
-function addStowedEntry(i, stowedIndex) {
-    const container = document.getElementById(`stowed${i}`);
-    const entry = document.createElement('div');
-    entry.className = 'stowedEntry';
-    entry.id = `stowed-${i}-${stowedIndex}`;
-    entry.innerHTML = `
-        <select id="stowed-${i}-${stowedIndex}-select" class="stowedSelector">
-            <option value=""></option>
-        </select>
-        <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="1" class="stowedAmt">
-        <div id="stowed-${i}-${stowedIndex}-load" class="stowedLoad"></div>
-        <div id="stowed-${i}-${stowedIndex}-details" class="hasDetails"></div>
-    `;
-    container.appendChild(entry);
-
-    // Populate selector
-    const sel = entry.querySelector(`#stowed-${i}-${stowedIndex}-select`);
-    nonPackOptions.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g.name;
-        opt.textContent = g.name;
-        opt.setAttribute('data-load', g.load || 0);
-        sel.appendChild(opt);
-    });
-
-    // Initial value if state exists
-    const j = stowedIndex - 1;
-    const s = readyState[i-1].stowed[j];
-    if (s) {
-        sel.value = s.gear;
-        entry.querySelector('input').value = s.amt;
-        const item = nonPackOptions.find(g => g.name === s.gear);
-        if (item?.details?.trim()) {
-            const detailsDiv = entry.querySelector(`#stowed-${i}-${stowedIndex}-details`);
-            detailsDiv.textContent = 'i';
-            detailsDiv.dataset.details = item.details.trim();
-        }
-    }
-
-    // On change
-    sel.addEventListener('change', () => {
-        const selectedName = sel.value;
-        const item = nonPackOptions.find(g => g.name === selectedName);
-
-        // Update details
-        const detailsDiv = entry.querySelector(`#stowed-${i}-${stowedIndex}-details`);
-        detailsDiv.textContent = item?.details?.trim() ? 'i' : '';
-        detailsDiv.dataset.details = item?.details?.trim() || '';
-
-        readyState[i-1].stowed[j].gear = selectedName;
         updateStowedLoad(i, stowedIndex);
-        updateReadyLoad(i);
-        calculateLoad();
     });
-
-    // On amount change
-    entry.querySelector('input').addEventListener('input', () => {
-        const val = Math.max(1, parseInt(this.value) || 1);
-        this.value = val;
-        readyState[i-1].stowed[j].amt = val;
-        updateStowedLoad(i, stowedIndex);
-        updateReadyLoad(i);
-        calculateLoad();
-    });
-
-    updateStowedLoad(i, stowedIndex);
 }
-
 // Update single stowed load
 function updateStowedLoad(readyI, stowedJ) {
     const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
     if (!sel) return;
     const opt = sel.options[sel.selectedIndex];
     const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
-    const qty = parseInt(document.getElementById(`stowed-${readyI}-${stowedJ}-amt`).value) || 1;
+    const qty = readyState[readyI-1].stowed[stowedJ-1].amt;
     const total = baseLoad * qty;
     const loadDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-load`);
     if (loadDiv) {
@@ -525,7 +799,6 @@ function updateStowedLoad(readyI, stowedJ) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-
 // Update ready load (for pack: sum stowed + base; for non-pack: base * amt)
 function updateReadyLoad(i) {
     const state = readyState[i-1];
@@ -547,8 +820,7 @@ function updateReadyLoad(i) {
         if (item?.category === 'Packs') loadDiv.style.color = total > item.loadLimit ? 'red' : '';
     }
 }
-
-// Calculate total load
+// Updated calculateLoad (loop over state, no hard numbers beyond max)
 function calculateLoad() {
     let totalLoad = 0;
     readyState.forEach((state, idx) => {
@@ -559,7 +831,6 @@ function calculateLoad() {
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
-
 // ———————————————————————— UNIVERSAL TOOLTIP ————————————————————————
 const TOOLTIP_ID = 'universal-tooltip';
 
@@ -704,23 +975,3 @@ document.querySelectorAll('.charInfoHover').forEach(trigger => {
   trigger.onclick = null;  // Remove old onclick
 });
 });
-// Helper to get current skill rank by name
-function getSkillRank(skillName) {
-    const capitalized = skillName.charAt(0).toUpperCase() + skillName.slice(1);
-    const id = SKILL_ID_MAP[capitalized];
-    if (!id) return 0;
-    const el = document.getElementById(id);
-    return parseInt(el?.value) || 0;
-}
-
-// Helper to replace |skill/divisor| placeholders in text
-function replacePlaceholders(text) {
-    return text.replace(/\|([^/]+)\/(\d+)\|/g, (match, skill, div) => {
-        const rank = getSkillRank(skill);
-        return Math.floor(rank / parseInt(div));
-    });
-}
-
-function saveCharacter() {
-    // Implement save logic if needed
-}

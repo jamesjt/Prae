@@ -274,7 +274,7 @@ function rebuildDynamicSelectors(config) {
     }
     // Remove ALL dynamic slots
     if (itemPrefix === 'talent') {
-        container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
+        container.querySelectorAll('[id^="talentsTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
@@ -423,7 +423,7 @@ document.addEventListener('click', e => {
         const type = t.id.includes('talent') ? 'talent' : 'tricks';
         const amountEl = document.getElementById(type + 'Amount');
         let value = parseInt(amountEl.textContent) || 0;
-        const min = type === 'talent' ? 1 : 2;
+        const min = type === 'talent' ? 1 : 1;
         if (t.id.includes('Plus')) {
             value += 1;
         } else if (t.id.includes('Minus') && value > min) {

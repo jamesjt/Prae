@@ -19,8 +19,8 @@ const SKILL_MOD_MAP = {
 };
 
 const ATTRIBUTE_GROUPS = {
-    physical: { priorityId: 'bodyPriority', pointsId: 'physicalAttributePoints', primaryValueId: 'bodyValue', subIds: ['mightValue', 'agilityValue', 'brawnValue'] },
-    mental:   { priorityId: 'mindPriority', pointsId: 'mentalAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
+    body: { priorityId: 'bodyPriority', pointsId: 'bodyAttributePoints', primaryValueId: 'bodyValue', subIds: ['mightValue', 'agilityValue', 'brawnValue'] },
+    mind:   { priorityId: 'mindPriority', pointsId: 'indAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
@@ -334,7 +334,7 @@ document.addEventListener('change', e => {
         calculateSkillPoints();
         calculateAbilities();
         if (t.matches('input[id$="Value"][type="number"]')) {
-            const groupKey = /might|agility|brawn/.test(t.id) ? 'physical' : /will|wit|resolve/.test(t.id) ? 'mental' : 'spirit';
+            const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
             updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
             updateSkillsForMod(t.id);
         }

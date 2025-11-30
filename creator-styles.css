@@ -833,131 +833,9 @@ a.internalLink{
 }
 
 
-/* Tool Tips
-abbr {
-    position: relative;
-    display: inline;
-    border-bottom: 1px dotted black;
-    z-index: 1;
-}
-
-abbr::after {
-    border-color: black;
-    border-radius: 8px;
-    border-width: 3px;
-    border-style: solid;
-    display: block;
-    position: absolute;
-    visibility: hidden;
-    text-align: center;
-    width: 270px;
-    bottom: 17px;
-  background-color: black;
-  color: white;
-    padding: 5px 8px;
-    border-radius:5px;
-}
-
-abbr::before {
-  position: absolute;
-  visibility: hidden;
-  width: 0;
-  height: 0;
-  left: 30%;
-  content: "";
-  border-style: solid;
-  border-width: 6px 12px 0 12px;
-  border-color: black transparent transparent transparent;
-}
-
-abbr:hover:after {
-    visibility: visible;
-}
-
-abbr:hover:before {
-    visibility: visible;
-}
-
-table { empty-cells: hide;}
-
-/* Durations
-abbr.short::after {content: "First use or end of creators next turn";}
-abbr.round::after{content: "Until end of creators next turn";}
-abbr.combat::after{content: "End of the encounter";}
-
-/* Buffs
-abbr.vigilant::after{content: "Attackers get -1 die and you have +1 Armor against AoE";}
-abbr.boosted::after{content: "+1 die to rolls";}
-abbr.haste::after{content: "+1 Attack action";}
-abbr.quick::after{content: "+1 Move action";}
-abbr.focused::after{content: "+1 Focus action";}
-
-/* Debuffs 
-abbr.breached::after{content: "Attackers get +1 die and you have -1 Armor against AoE";}
-abbr.impaired::after{content: "-1 die on rolls";}
-abbr.blind::after{content: "Can not perform Physical maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
-abbr.dizzy::after{content: "Can not perform Mental maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
-abbr.gagged::after{content: "Can not perform Social maneuvers, -1 die on all attacks. Can not Threaten or Cover";}
-
-abbr.stun::after{content: "Can not take actions";}
-abbr.restrained::after{content: "-1 Attack Action";}
-abbr.slow::after{content: "-1 Move Action";}
-abbr.dazed::after{content: "-1 Minor Action";}
-
-abbr.burning::after{content: "Take 1 damage at the beginning of your turn for each instance of Burning";}
-abbr.vulnerable::after{content:"Increase damage taken by 1 for each instance of damage";}
-abbr.meek::after{content:"Decrease damage dealt by 1 for each instance";}
-
-abbr.pure::after {content: "Damage that ignores armor";}
-
-/* Armor Penalties
-abbr.lightPen::after {content: "-1 Blasts, Sprint, and Swim";}
-abbr.medPen::after {content: "-1 Ranked Strikes, Jumping, Climbing and Jogging \A -2 Blast \A -2 Acrobatics, Dance, Sneaking, Sprint, and Swim \A Acrobatics, Dance and Sneak maneuvers require an additional Momentum to use"; white-space: pre-wrap;}
-abbr.heavyPen::after {content: "-1 Pace \A -3 to Blast Rolls \A -2 to hit with Ranged Strikes \A -3 to sprinting and swimming rolls \A -2 to jumping, climbing and jogging rolls \A -4 to all rolls when using the Acrobatics, Dancing or Sneaking skills \A Can not use any abilities from Acrobatics, Dancing or Sneaking skills"; white-space: pre-wrap;}
-abbr.shieldPen::after {content: "-1 to Blast";}
-
- /* Fluff Terms
-abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";} */
-
 .attvalue{width:30px;}
 
-.tooltip {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
-    z-index: 1000;
-    max-width: 300px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    white-space: pre-wrap; /* Preserve formatting if needed */
-}
 
-#universal-tooltip {
-    position: absolute;
-    background: #222;
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    line-height: 1.4;
-    max-width: 340px;
-    white-space: pre-wrap;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
-    pointer-events: none;
-    z-index: 10000;
-    opacity: 0;
-    transform: translateX(-50%) translateY(8px);
-    transition: opacity 0.18s ease, transform 0.18s ease;
-    left: 50%;
-    top: 0;
-    text-align: center;
-}
-
-#universal-tooltip.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-/* ——————— GENERIC TOOLTIP TRIGGER (works anywhere!) ——————— */
 .hoverRules{
   border-bottom:2px dotted black;
 }
@@ -1020,36 +898,18 @@ abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Con
     border-radius: 6px;
 }
 
-.totalDisplay {
-    color: #00cc00;
-    font-size: 1em;
-}
-
-.totalDisplay strong {
-    color: #00ff00;
-    font-size: 1.2em;
-}
-
-
-
-.tippy-box[data-theme~='custom'] {
+.tippy-box[data-theme~='ruleTip'] {
   position: absolute;
   width: 650px;  /* Match charDetails */
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
   background-size: 100% 100%;
-  color: black;
-  border: 3px solid black;
+  background-color: black;
+  color: whitesmoke;
   cursor: all-scroll;
   z-index: 100;
 }
-.tippy-box[data-theme~='custom'] .tippy-arrow {
+.tippy-box[data-theme~='ruleTip'] .tippy-arrow {
   color: black;  /* Arrow matches border */
-}
-
-/* For predefined terms (smaller, like old abbr) */
-.tippy-box[data-theme~='custom'][data-reference='abbr'] {  /* Optional: Smaller for terms */
-  width: 270px;
-  padding: 5px 8px;
 }

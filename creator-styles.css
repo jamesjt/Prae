@@ -28,10 +28,11 @@
   padding: 2px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
-  background-color: black;
+  background-color: #2A2A2A;
   color: whitesmoke;
   cursor: all-scroll;
   z-index: 100;
+  border:1px solid #d29a38;
 }
 .tippy-box[data-theme~='ruleTip'] .tippy-arrow {
   color: black;  /* Arrow matches border */

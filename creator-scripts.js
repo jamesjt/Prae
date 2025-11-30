@@ -324,6 +324,18 @@ document.addEventListener('change', e => {
         if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
+        // Refresh existing ability descriptions
+        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
+            if (sel.value && sel.value !== `${sel.className.replace('Selector', '')}Empty`) {
+                const abType = sel.className.replace('Selector', '');
+                populateAbilityInfo(sel.id, getQualifiedAbilities(abType), abType);
+            }
+        });
+        // Refresh way talent if selected
+        const roleSel = document.getElementById('roleSelector');
+        if (roleSel && roleSel.value !== 'wayEmpty') {
+            populateRoleInfo({ target: roleSel });
+        }
         return;
     }
 
@@ -477,15 +489,17 @@ function populateAbilityInfo(selectId, abilities, type) {
 }
 function populateRoleInfo(e) {
     const name = e.target.value;
-    if (!name) return;
+    if (!name || name === 'wayEmpty') return;
     const way = waysData.find(w => w.name === name);
     if (!way) return;
     document.getElementById('wayTalentName').textContent = way.name;
     const desc = document.getElementById('wayTalentDesc');
     desc.innerHTML = '';
     ['passive', 'focus', 'critical effect'].forEach(key => {
-        const val = way.props[Object.keys(way.props).find(k => k.toLowerCase().includes(key))];
+        const propKey = Object.keys(way.props).find(k => k.toLowerCase().includes(key));
+        let val = propKey ? way.props[propKey] : '';
         if (val) {
+            val = val.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
             const div = document.createElement('div');
             div.textContent = val;
             desc.appendChild(div);

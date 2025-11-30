@@ -490,7 +490,7 @@ function processWithTooltips(text) {
     let processed = text;
     hoverRulesData.forEach(({ rule, detail }) => {
         const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
-        processed = processed.replace(regex, `<span class="hasDetails" data-details="${escapeHtml(detail)}">$&</span>`);
+        processed = processed.replace(regex, `<span class="hoverRules" data-details="${escapeHtml(detail)}">$&</span>`);
     });
     return processed;
 }
@@ -735,7 +735,7 @@ function handleReadySelectChange(i) {
     if (item?.details?.trim()) {
         const detailsDiv = document.createElement('div');
         detailsDiv.id = `gear${i}Details`;
-        detailsDiv.className = 'hasDetails';
+        detailsDiv.className = 'gearDetails';
         detailsDiv.textContent = 'i';
         detailsDiv.dataset.details = item.details.trim();
         sel.closest('.gearEntry').appendChild(detailsDiv);
@@ -829,7 +829,7 @@ function renderStowed(i) {
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-                detailsDiv.className = 'hasDetails';
+                detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
                 detailsDiv.dataset.details = item.details.trim();
                 entry.appendChild(detailsDiv);
@@ -849,7 +849,7 @@ function renderStowed(i) {
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-                detailsDiv.className = 'hasDetails';
+                detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
                 detailsDiv.dataset.details = item.details.trim();
                 entry.appendChild(detailsDiv);
@@ -924,7 +924,7 @@ function calculateLoad() {
 const TOOLTIP_ID = 'universal-tooltip';
 
 document.addEventListener('mouseover', e => {
-    if (e.target.matches('.hasDetails') && e.target.dataset.details?.trim()) {
+    if (e.target.matches('.hoverRules, .gearDetails') && e.target.dataset.details?.trim()) {
         let tooltip = document.getElementById(TOOLTIP_ID);
         if (!tooltip) {
             tooltip = document.createElement('div');
@@ -942,7 +942,7 @@ document.addEventListener('mouseover', e => {
 });
 
 document.addEventListener('mouseout', e => {
-    if (e.target.matches('.hasDetails')) {
+    if (e.target.matches('.hoverRules, .gearDetails')) {
         const tooltip = document.getElementById(TOOLTIP_ID);
         if (tooltip) tooltip.classList.remove('visible');
     }
@@ -1016,7 +1016,7 @@ document.querySelectorAll('abbr').forEach(el => {
 });
 
 // For universal tooltips (.hasDetails with data-details)
-tippy('.hasDetails', {
+tippy('.hoverRules, .gearDetails', {
   content: reference => reference.dataset.details || 'No details',
   trigger: 'mouseenter focus',
   hideOnClick: false

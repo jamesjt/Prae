@@ -20,26 +20,17 @@ const SKILL_MOD_MAP = {
 
 const ATTRIBUTE_GROUPS = {
     body: { priorityId: 'bodyPriority', pointsId: 'bodyAttributePoints', primaryValueId: 'bodyValue', subIds: ['mightValue', 'agilityValue', 'brawnValue'] },
-    mind: { priorityId: 'mindPriority', pointsId: 'mindAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
-    spirit: { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
+    mind:   { priorityId: 'mindPriority', pointsId: 'mindAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
+    spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
-const MAX_READY_SLOTS = 5;
-const MAX_PROF_SLOTS = 5;
-
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = new Map();
-let allOptions = [];
-let nonPackOptions = [];
-let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
 
-const elementCache = new Map();
+// Add near top constants
+const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
 
-function getElement(id) {
-    if (!elementCache.has(id)) {
-        elementCache.set(id, document.getElementById(id));
-    }
-    return elementCache.get(id);
-}
+
+// ———————————————————————— DATA LOADING ————————————————————————
 
 async function loadAllData() {
     try {
@@ -49,6 +40,7 @@ async function loadAllData() {
             fetch(CHAR_CSV_URL).then(r => { if (!r.ok) throw new Error(`Char fetch failed: ${r.status}`); return r.text(); })
         ]);
 
+        // Parse Abilities
         const abilitiesParsed = Papa.parse(abilitiesRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (abilitiesParsed.errors.length) throw new Error('Abilities parse error');
         const abilitiesRows = abilitiesParsed.data;
@@ -77,11 +69,12 @@ async function loadAllData() {
             abilitiesData.get(skill).push(ability);
         }
 
+        // Parse Ways
         const waysParsed = Papa.parse(waysRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (waysParsed.errors.length) throw new Error('Ways parse error');
         const waysRows = waysParsed.data;
         let includeRowIdx = waysRows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
-        if (includeRowIdx === -1) throw new Error('Missing "Include" row');
+        if (includeRowIdx === -1) return console.error('Missing "Include" row');
         const includeRow = waysRows[includeRowIdx];
         for (let col = 1; col < includeRow.length; col++) {
             const includeValue = (includeRow[col] || '').toUpperCase().trim();
@@ -104,6 +97,7 @@ async function loadAllData() {
             }
         }
 
+        // Parse Char/PROF
         const charParsed = Papa.parse(charRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (charParsed.errors.length) throw new Error('Char parse error');
         const charRows = charParsed.data;
@@ -111,15 +105,21 @@ async function loadAllData() {
 
         const dataByCategory = parseCsvByCategories(headers, charRows);
 
+        // For debugging
+        console.log('Parsed Data:', dataByCategory);
+
+        // Assign for gear (update script to use dataByCategory.gear if refactoring further)
         gearData = dataByCategory.gear || [];
         allOptions = gearData;
-        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');
+        nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
 
+        // Assign for proficiencies
         const proficiencies = dataByCategory.proficiencies || [];
         profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
 
+        // Post-parsing init (e.g., populate selectors, etc.)
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         populateRoleSelector();
@@ -127,10 +127,13 @@ async function loadAllData() {
         generateGearEntries();
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     } catch (err) {
+        console.error('Data load error:', err);
+        // UI feedback, e.g.:
         document.getElementById('content-sections').innerHTML = '<div class="no-results">Error loading data: ' + err.message + '</div>';
     }
 }
 
+// Helper: Generic CSV parser (optimized with reduce)
 function parseCsvByCategories(headers, rows) {
     const dataByCategory = {};
     const prefixMap = headers.reduce((map, h, idx) => {
@@ -147,16 +150,16 @@ function parseCsvByCategories(headers, rows) {
         const categoryKey = prefix.trim().toLowerCase();
         dataByCategory[categoryKey] = [];
 
-        const configs = entries.map(({ header, idx }) => {
+        const configs = entries.map(({ header }) => {
             const subCategory = header.replace(prefix, '').trim();
             const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
-            const related = headers.reduce((acc, hh, i) => {
+            const related = headers.reduce((acc, hh, idx) => {
                 if (hh.startsWith(camelPrefix) && hh !== header) {
-                    acc.push({ suffix: hh.replace(camelPrefix, '').trim(), idx: i });
+                    acc.push({ suffix: hh.replace(camelPrefix, '').trim(), idx });
                 }
                 return acc;
             }, []);
-            return { mainIdx: idx, subCategory, related };
+            return { mainIdx: headers.indexOf(header), subCategory, related };
         });
 
         for (let r = 1; r < rows.length; r++) {
@@ -176,25 +179,29 @@ function parseCsvByCategories(headers, rows) {
     return dataByCategory;
 }
 
+// Helper: Parse item properties with dynamic type conversion
 function parseItemProps(item, related, row) {
     related.forEach(rel => {
         let val = row[rel.idx]?.trim();
         if (!val) return;
 
         const suffixLower = rel.suffix.toLowerCase();
+        // Pattern-based conversion
         if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
             val = parseFloat(val) || 0;
         } else if (suffixLower.includes('bonus')) {
             val = parseInt(val) || 0;
         }
+        // Else: Keep as string (e.g., 'details')
+
         item[rel.suffix.toLowerCase()] = val;
     });
 }
 
 function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
-    for (let i = 1; i <= MAX_PROF_SLOTS; i++) {
-        const sel = getElement(type + 'ProfSelector' + i);
+    for (let i = 1; i <= 5; i++) {
+        const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
             sel.innerHTML = '<option value="">Select Proficiency</option>' + 
                 profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
@@ -202,40 +209,44 @@ function populateProficiencySelectors(type) {
     }
 }
 
+// Update updateProficiencySelectors to call population after visibility
 function updateProficiencySelectors(type, rank) {
-    for (let i = 1; i <= MAX_PROF_SLOTS; i++) {
-        const el = getElement(type + 'ProfSelector' + i);
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
-    populateProficiencySelectors(type);
+    populateProficiencySelectors(type);  // Add this
 }
 
-function calculateProficiencyPoints(type) {
-    // TODO: Implement proficiency points calculation if needed
-}
-
+let allOptions = [];
+let nonPackOptions = [];
+let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
+// ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config) {
     const {
         amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
-    const inputEl = getElement(amountInputId);
+    const inputEl = document.getElementById(amountInputId);
     if (!inputEl) return;
-    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0);
-    inputEl.value = currentAmount;
+    const currentAmount = Math.max(0, parseInt(inputEl.value) || 0); // Clamp to 0+
+    inputEl.value = currentAmount; // Update input to reflect clamped value
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
+    // Save current selections
     const saved = {};
     for (let i = 1; i <= 20; i++) {
-        const sel = getElement(`${itemPrefix}${i}`);
+        const sel = document.getElementById(`${itemPrefix}${i}`);
         if (sel) saved[i] = sel.value;
     }
+    // Remove ALL dynamic slots
     if (itemPrefix === 'talent') {
         container.querySelectorAll('[id^="talentTable"]:not(#wayTalent)').forEach(el => el.remove());
     } else {
         container.querySelectorAll(`[id^="${itemPrefix}sTable"]`).forEach(el => el.remove());
     }
+    // Build exactly the number of slots we need
     for (let i = 1; i <= totalSlots; i++) {
         const wrapper = document.createElement('div');
         wrapper.id = `${itemPrefix}sTable${i}`;
@@ -247,8 +258,9 @@ function rebuildDynamicSelectors(config) {
         container.appendChild(wrapper);
     }
     populateFunction();
+    // Restore saved values
     for (let i = 1; i <= totalSlots; i++) {
-        const select = getElement(`${itemPrefix}${i}`);
+        const select = document.getElementById(`${itemPrefix}${i}`);
         if (select && saved[i]) {
             select.value = saved[i];
             populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
@@ -256,7 +268,6 @@ function rebuildDynamicSelectors(config) {
     }
     calculateAbilities();
 }
-
 function updateTalentTables() {
     rebuildDynamicSelectors({
         amountInputId: 'talentAmount',
@@ -268,7 +279,6 @@ function updateTalentTables() {
         abilityType: 'talent'
     });
 }
-
 function updateTrickTables() {
     rebuildDynamicSelectors({
         amountInputId: 'tricksAmount',
@@ -281,21 +291,22 @@ function updateTrickTables() {
         abilityType: 'trick'
     });
 }
-
+// ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
     const t = e.target;
-    const clamp = (val, min = 0) => Math.max(min, parseInt(val) || min);
+    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
 
+    // Talent/Trick Amounts (combined)
     if (t.matches('#talentAmount, #tricksAmount')) {
         const type = t.id.replace('Amount', '');
-        const value = clamp(t.value);
-        t.value = value;
-        getElement(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
+        const value = clamp(t);
+        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = 1 + value;
         (type === 'talent' ? updateTalentTables : updateTrickTables)();
         calculateAbilities();
         return;
     }
 
+    // Talent/Trick Selectors (combined)
     if (t.matches('.talentSelector, .trickSelector')) {
         const type = t.className.replace('Selector', '');
         populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
@@ -303,17 +314,19 @@ document.addEventListener('change', e => {
         return;
     }
 
+    // Skill Ranks
     if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
         updateWayOptions();
         calculateSkillPoints();
         const type = t.id.replace('SkillRank', '').toLowerCase();
-        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, clamp(t.value));
+        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         return;
     }
 
+    // Priorities, Level, Sub-attributes (combined attribute-related)
     if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
         calculateAttributeValues();
         updateAttributeGroups();
@@ -328,51 +341,52 @@ document.addEventListener('change', e => {
         return;
     }
 
+    // Way Selector
     if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
         return;
     }
 
+    // Gear/Stowed Amounts/Selects (combined)
     if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
         if (t.matches('[id$="Select"]')) handleReadySelectChange(t.id.match(/gear(\d+)Select/)[1]);
         const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt|select)/);
         if (match) {
             const [,, readyI, stowedJ] = match;
-            if (/Amt|amt/.test(t.id)) t.value = clamp(t.value, 1);
+            if (/Amt|amt/.test(t.id)) clamp(t, 1);
             if (stowedJ) {
-                updateStowedLoad(readyI, stowedJ);
-                updateReadyLoad(readyI);
+                updateStowedLoad(readyI || readyI, stowedJ);
+                updateReadyLoad(readyI || readyI);
             } else {
-                updateReadyLoad(readyI);
+                updateReadyLoad(readyI || readyI);
             }
             calculateLoad();
         }
         return;
     }
 
+    // Proficiency Selectors
     if (t.matches('[id$="ProfSelector"]')) {
         const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
         if (type) calculateProficiencyPoints(type);
     }
 });
-
+// ———————————————————————— CORE FUNCTIONS ————————————————————————
 function populateRoleSelector() {
-    const sel = getElement('roleSelector');
+    const sel = document.getElementById('roleSelector');
     sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
     waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
 }
-
 function updateWayOptions() {
-    const sel = getElement('roleSelector');
+    const sel = document.getElementById('roleSelector');
     waysData.forEach(way => {
         let qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => getElement(id)?.value > 1)
-            : getElement(way.skillId)?.value > 1;
+            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
+            : document.getElementById(way.skillId)?.value > 1;
         const opt = sel.querySelector(`option[value="${way.name}"]`);
         if (opt) opt.disabled = !qualified;
     });
 }
-
 function updateAbilitySelectors(type) {
     const qualified = getQualifiedAbilities(type);
     const selectorClass = `${type}Selector`;
@@ -386,22 +400,20 @@ function updateAbilitySelectors(type) {
         if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
     });
 }
-
 function getQualifiedAbilities(type) {
     const result = [];
     Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
-        const sel = getElement(id);
+        const sel = document.getElementById(id);
         if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
             result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
         }
     });
     return result;
 }
-
 function populateAbilityInfo(selectId, abilities, type) {
-    const value = getElement(selectId)?.value;
+    const value = document.getElementById(selectId)?.value;
     const ability = abilities.find(a => a.name === value);
-    const desc = getElement(selectId + 'Description');
+    const desc = document.getElementById(selectId + 'Description');
     if (!desc || !ability) { desc.innerHTML = ''; return; }
     desc.innerHTML = '';
     const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
@@ -416,14 +428,13 @@ function populateAbilityInfo(selectId, abilities, type) {
         desc.appendChild(div);
     });
 }
-
 function populateRoleInfo(e) {
     const name = e.target.value;
     if (!name) return;
     const way = waysData.find(w => w.name === name);
     if (!way) return;
-    getElement('wayTalentName').textContent = way.name;
-    const desc = getElement('wayTalentDesc');
+    document.getElementById('wayTalentName').textContent = way.name;
+    const desc = document.getElementById('wayTalentDesc');
     desc.innerHTML = '';
     ['passive', 'focus', 'critical effect'].forEach(key => {
         const val = way.props[Object.keys(way.props).find(k => k.toLowerCase().includes(key))];
@@ -436,11 +447,12 @@ function populateRoleInfo(e) {
     const attackSkill = way.props[Object.keys(way.props).find(k => k.includes('attack skill'))] || way.reqSkill;
     const skillId = SKILL_ID_MAP[attackSkill];
     if (skillId) {
-        const sel = getElement(skillId);
+        const sel = document.getElementById(skillId);
         if (sel && parseInt(sel.value) < 2) {
             sel.value = '2';
             sel.dispatchEvent(new Event('change'));
         }
+        // Add this here: Trigger proficiency update
         if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(skillId)) {
             const type = skillId.replace('SkillRank', '').toLowerCase();
             const rank = parseInt(sel.value) || 0;
@@ -450,7 +462,7 @@ function populateRoleInfo(e) {
     const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
     if (primary) {
         const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
-        const pri = getElement(map[primary]);
+        const pri = document.getElementById(map[primary]);
         if (pri) {
             pri.value = '1';
             pri.dispatchEvent(new Event('change'));
@@ -460,54 +472,49 @@ function populateRoleInfo(e) {
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
 }
-
 function calculateSkillPoints() {
-    const level = parseInt(getElement('charLvl').value) || 1;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
     const total = level * 3 + 9;
     let spent = 0;
     Object.values(SKILL_ID_MAP).forEach(id => {
-        const sel = getElement(id);
+        const sel = document.getElementById(id);
         if (sel) spent += parseInt(sel.value) || 0;
     });
-    getElement('skillPoints').textContent = total - spent;
+    document.getElementById('skillPoints').textContent = total - spent;
 }
-
 function calculateAbilities() {
-    const level = parseInt(getElement('charLvl').value) || 1;
-    const tExtra = parseInt(getElement('talentAmount').value) || 1;
-    const trExtra = parseInt(getElement('tricksAmount').value) || 1;
-    getElement('abilityNumber').textContent = tExtra + trExtra + 2;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const tExtra = parseInt(document.getElementById('talentAmount').value) || 1;
+    const trExtra = parseInt(document.getElementById('tricksAmount').value) || 1;
+    document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
     const remaining = level + 1 - Math.max(0, (tExtra - 1) + (trExtra - 1));
-    getElement('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
+    document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
 }
-
 function calculateAttributeValues() {
-    const level = parseInt(getElement('charLvl').value) || 1;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
     const pri = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
     const sec = 2 + (level >= 6 ? 1 : 0);
     const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
     ['body', 'mind', 'spirit'].forEach(attr => {
-        const priVal = getElement(attr + 'Priority').value;
+        const priVal = document.getElementById(attr + 'Priority').value;
         let val = priVal === '1' ? pri : priVal === '2' ? sec : ter;
-        getElement(attr + 'Value').textContent = val;
+        document.getElementById(attr + 'Value').textContent = val;
     });
     updateSkillsForMod('bodyValue');
     updateSkillsForMod('mindValue');
     updateSkillsForMod('spiritValue');
 }
-
 function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
-
 function updateAttributeGroup(group) {
-    const level = parseInt(getElement('charLvl').value) || 1;
-    const pri = getElement(group.priorityId).value || '3';
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = document.getElementById(group.priorityId).value || '3';
     let points = 1 + Math.floor((level - 1) / 3);
     if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
     if (pri === '2') points = 2 + Math.floor(level / 3);
-    const max = parseInt(getElement(group.primaryValueId).textContent) || 0;
+    const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
     let sum = 0;
     group.subIds.forEach(id => {
-        const inp = getElement(id);
+        const inp = document.getElementById(id);
         if (inp) {
             inp.max = max;
             let v = Math.min(max, Math.max(0, parseInt(inp.value) || 0));
@@ -516,54 +523,82 @@ function updateAttributeGroup(group) {
         }
     });
     const rem = points - sum;
-    const el = getElement(group.pointsId);
-    if (el) {
-        el.textContent = rem;
-        el.classList.toggle('hidden', rem === 0);
-    }
+    const el = document.getElementById(group.pointsId);
+    el.textContent = rem;
+    el.classList.toggle('hidden', rem === 0);
     group.subIds.forEach(id => updateSkillsForMod(id));
 }
-
 function updateSkillModAndPassive(skillId) {
-    const sel = getElement(skillId);
+    const sel = document.getElementById(skillId);
     if (!sel) return;
     const rank = parseInt(sel.value) || 0;
     const modId = SKILL_MOD_MAP[skillId];
-    const modVal = parseInt(getElement(modId)?.value || getElement(modId)?.textContent || 0);
+    const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
     const name = skillId.replace('SkillRank', '');
-    const modEl = getElement(name + 'Mod');
+    const modEl = document.getElementById(name + 'Mod');
     if (modEl) modEl.textContent = modVal;
-    const passiveEl = getElement(name + 'Passive');
+    const passiveEl = document.getElementById(name + 'Passive');
     if (passiveEl) passiveEl.textContent = 2 + rank + modVal;
+    /*if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
+        const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
+        if (dmgEl) dmgEl.textContent = modVal;
+    }*/
 }
-
 function updateSkillsForMod(subId) {
     Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {
         if (modId === subId) updateSkillModAndPassive(skillId);
     });
 }
-
 function updateAllSkillModsAndPassives() {
     Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
 }
-
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
+    }
+}
+function updateGearLoad(i) {
+    const select = document.getElementById('gear' + i + 'Select');
+    if (!select) return;
+    const selectedOption = select.options[select.selectedIndex];
+    const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
+    const amtInput = document.getElementById('gear' + i + 'Amt');
+    const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
+    if (amtInput) amtInput.value = qty; // Enforce clamp
+    const totalLoad = baseLoad * qty;
+    const loadDiv = document.getElementById('gear' + i + 'Load');
+    if (loadDiv) {
+        const formattedLoad = totalLoad.toFixed(2).replace(/\.?0+$/, '');
+        loadDiv.textContent = totalLoad > 0 ? formattedLoad : '';
+        // Color red if qty >1 AND baseLoad >1
+        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+    }
+}
 function generateGearEntries() {
-    const container = getElement('gearEntries');
+    const container = document.getElementById('gearEntries');
     container.innerHTML = '';
 
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
+
+        // We'll build the details HTML only if needed later
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
                 <option value="emptyStowedGearSlot">Ready Slot</option>
             </select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
+            ${detailsHtml}
         `;
+
         container.appendChild(entry);
 
-        const sel = getElement(`gear${i}Select`);
+        // Populate selector
+        const sel = document.getElementById(`gear${i}Select`);
         const grouped = {};
         allOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
@@ -582,11 +617,13 @@ function generateGearEntries() {
             sel.appendChild(optgroup);
         });
 
-        sel.addEventListener('change', () => {
-            handleReadySelectChange(i);
-        });
+        // On change: update load + conditionally add details icon
+sel.addEventListener('change', () => {
+    handleReadySelectChange(i);  // This now handles EVERYTHING: details, packs, state, stowed rendering, and loads
+});
 
-        const amtInput = getElement(`gear${i}Amt`);
+        // Amount input
+        const amtInput = document.getElementById(`gear${i}Amt`);
         amtInput.addEventListener('input', function () {
             const val = Math.max(1, parseInt(this.value) || 1);
             this.value = val;
@@ -598,13 +635,14 @@ function generateGearEntries() {
 
     calculateLoad();
 }
-
 function handleReadySelectChange(i) {
-    const sel = getElement(`gear${i}Select`);
+    const sel = document.getElementById(`gear${i}Select`);
     const newGearName = sel.value;
     const item = allOptions.find(g => g.name === newGearName);
-    const oldDetails = getElement(`gear${i}Details`);
+    // === 1. Remove old details icon (if any) ===
+    const oldDetails = document.getElementById(`gear${i}Details`);
     if (oldDetails) oldDetails.remove();
+    // === 2. Add details icon only if item has details ===
     if (item?.details?.trim()) {
         const detailsDiv = document.createElement('div');
         detailsDiv.id = `gear${i}Details`;
@@ -613,30 +651,35 @@ function handleReadySelectChange(i) {
         detailsDiv.dataset.details = item.details.trim();
         sel.closest('.gearEntry').appendChild(detailsDiv);
     }
+    // === 3. Handle pack logic (this was broken) ===
     const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Packs';
     const isPack = item?.category === 'Packs';
+    // If switching FROM a pack → clear stowed
     if (wasPack && !isPack) {
         readyState[i-1].stowed = [];
-        renderStowed(i);
+        renderStowed(i); // This removes the container
     }
+    // If switching TO a pack → initialize stowed slots
     if (isPack && !wasPack) {
         const slots = item.stowedslots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
-        renderStowed(i);
+        renderStowed(i); // ← THIS IS THE MISSING CALL!
     }
+    // If staying on same pack but changing item (shouldn't happen, but safe)
     if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
         const slots = item.stowedslots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
+    // Update state
     readyState[i-1].gear = newGearName;
-    readyState[i-1].amt = parseInt(getElement(`gear${i}Amt`).value) || 1;
+    readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
+    // Update load
     updateReadyLoad(i);
     calculateLoad();
 }
-
 function renderStowed(i) {
-    let container = getElement(`stowed-container-${i}`);
+    let container = document.getElementById(`stowed-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
 
     if (readyState[i-1].stowed.length === 0) {
@@ -656,13 +699,18 @@ function renderStowed(i) {
         const stowedIndex = j + 1;
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
+
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
                 <option value="emptyStowedGearSlot">Stowed Slot</option>
             </select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
+            ${detailsHtml}
         `;
+
         container.appendChild(entry);
 
         const sel = entry.querySelector('select');
@@ -674,7 +722,7 @@ function renderStowed(i) {
 
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = `-- ${cat} --`;
+            optgroup.label = `-- ${cat} --`;  // ← Fixed! Was "poking"
             grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g.name;
@@ -685,6 +733,7 @@ function renderStowed(i) {
             sel.appendChild(optgroup);
         });
 
+        // Restore saved selection and add details if needed
         if (s.gear) {
             sel.value = s.gear;
             const item = nonPackOptions.find(g => g.name === s.gear);
@@ -698,11 +747,16 @@ function renderStowed(i) {
             }
         }
 
+        // On change
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
             const item = nonPackOptions.find(g => g.name === selectedName);
-            const oldDetails = getElement(`stowed-${i}-${stowedIndex}-details`);
+
+            // Remove old details
+            const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
             if (oldDetails) oldDetails.remove();
+
+            // Add new details only if present
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
@@ -711,6 +765,7 @@ function renderStowed(i) {
                 detailsDiv.dataset.details = item.details.trim();
                 entry.appendChild(detailsDiv);
             }
+
             readyState[i-1].stowed[j].gear = selectedName;
             updateStowedLoad(i, stowedIndex);
             updateReadyLoad(i);
@@ -730,21 +785,21 @@ function renderStowed(i) {
         updateStowedLoad(i, stowedIndex);
     });
 }
-
+// Update single stowed load
 function updateStowedLoad(readyI, stowedJ) {
-    const sel = getElement(`stowed-${readyI}-${stowedJ}-select`);
+    const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
     if (!sel) return;
     const opt = sel.options[sel.selectedIndex];
     const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
     const qty = readyState[readyI-1].stowed[stowedJ-1].amt;
     const total = baseLoad * qty;
-    const loadDiv = getElement(`stowed-${readyI}-${stowedJ}-load`);
+    const loadDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-
+// Update ready load (for pack: sum stowed + base; for non-pack: base * amt)
 function updateReadyLoad(i) {
     const state = readyState[i-1];
     const item = allOptions.find(g => g.name === state.gear);
@@ -759,29 +814,29 @@ function updateReadyLoad(i) {
             });
         }
     }
-    const loadDiv = getElement(`gear${i}Load`);
+    const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
         if (item?.category === 'Packs') loadDiv.style.color = total > item.loadLimit ? 'red' : '';
     }
 }
-
+// Updated calculateLoad (loop over state, no hard numbers beyond max)
 function calculateLoad() {
     let totalLoad = 0;
     readyState.forEach((state, idx) => {
         const i = idx + 1;
-        const loadText = getElement(`gear${i}Load`)?.textContent || '0';
+        const loadText = document.getElementById(`gear${i}Load`)?.textContent || '0';
         totalLoad += parseFloat(loadText) || 0;
     });
     const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-    getElement('totalLoadValue').textContent = formattedTotal;
+    document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
-
+// ———————————————————————— UNIVERSAL TOOLTIP ————————————————————————
 const TOOLTIP_ID = 'universal-tooltip';
 
 document.addEventListener('mouseover', e => {
     if (e.target.matches('.hasDetails') && e.target.dataset.details?.trim()) {
-        let tooltip = getElement(TOOLTIP_ID);
+        let tooltip = document.getElementById(TOOLTIP_ID);
         if (!tooltip) {
             tooltip = document.createElement('div');
             tooltip.id = TOOLTIP_ID;
@@ -799,27 +854,31 @@ document.addEventListener('mouseover', e => {
 
 document.addEventListener('mouseout', e => {
     if (e.target.matches('.hasDetails')) {
-        const tooltip = getElement(TOOLTIP_ID);
+        const tooltip = document.getElementById(TOOLTIP_ID);
         if (tooltip) tooltip.classList.remove('visible');
     }
 });
 
+// Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')
   .draggable({
-    inertia: true,
-    autoScroll: true,
+    inertia: true,  // Smooth momentum on release
+    autoScroll: true,  // Auto-scroll if dragging near edges
     listeners: {
       move: (event) => {
         const target = event.target;
+        // Get current position (stored as data attributes)
         const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
         const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        // Apply transform for movement
         target.style.transform = `translate(${x}px, ${y}px)`;
+        // Store new position
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
       }
     }
   });
-
+// ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
     loadAllData();
     calculateSkillPoints();
@@ -828,80 +887,91 @@ window.addEventListener('load', () => {
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
     ['strike', 'blast', 'invoke'].forEach(t => {
-        const sel = getElement(t + 'SkillRank');
+        const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTalentTables();
-    updateTrickTables();
-    calculateLoad();
-    tippy.setDefaultProps({
-      theme: 'custom',
-      arrow: true,
-      animation: 'fade',
-      allowHTML: true,
-      interactive: true,
-      maxWidth: 650,
-      placement: 'right-start',
-      offset: [0, 10],
-      zIndex: 100,
-    });
+    updateTalentTables(); // Initial build for talents
+    updateTrickTables(); // Initial build for tricks
+    calculateLoad(); // Initial total (will be 0 until data loads)
+    // Unified Tooltip Initialization with Tippy.js
+tippy.setDefaultProps({
+  theme: 'custom',  // We'll define this in CSS
+  arrow: true,  // Arrow pointer
+  animation: 'fade',  // Smooth fade in/out
+  allowHTML: true,  // For rich content (e.g., textareas in charDetails)
+  interactive: true,  // Allow interaction inside tooltip (e.g., clicks, close buttons)
+  maxWidth: 650,  // Match your charDetails width
+  placement: 'right-start',  // Default position (adjust per instance if needed)
+  offset: [0, 10],  // Slight offset from trigger
+  zIndex: 100,  // Match your z-index
+});
 
-    document.querySelectorAll('abbr').forEach(el => {
-      const term = el.textContent.toLowerCase().trim();
-      const predefinedMap = {
-        'short': 'First use or end of creators next turn',
-        'round': 'Until end of creators next turn',
-        'combat': 'End of the encounter',
-        'vigilant': 'Attackers get -1 die and you have +1 Armor against AoE',
-        'boosted': '+1 die to rolls',
-        'yon': 'Pronounced (Y-oh-n). Series of movements used for Conjurations'
-      };
-      const content = predefinedMap[term] || 'Unknown term';
-      tippy(el, {
-        content: content,
-        trigger: 'mouseenter focus',
-        hideOnClick: false
-      });
-    });
+// For predefined terms (abbr elements)
+document.querySelectorAll('abbr').forEach(el => {
+  const term = el.textContent.toLowerCase().trim();  // Or use a data-term attribute if needed
+  const predefinedMap = {
+    'short': 'First use or end of creators next turn',
+    'round': 'Until end of creators next turn',
+    'combat': 'End of the encounter',
+    'vigilant': 'Attackers get -1 die and you have +1 Armor against AoE',
+    'boosted': '+1 die to rolls',
+    // ... Add all your buffs/debuffs/fluff from CSS here
+    'yon': 'Pronounced (Y-oh-n). Series of movements used for Conjurations'
+  };
+  const content = predefinedMap[term] || 'Unknown term';  // Fallback
+  tippy(el, {
+    content: content,
+    trigger: 'mouseenter focus',  // Hover or focus for accessibility
+    hideOnClick: false  // Persistent on hover until leave
+  });
+});
 
-    tippy('.hasDetails', {
-      content: reference => reference.dataset.details || 'No details',
-      trigger: 'mouseenter focus',
-      hideOnClick: false
-    });
+// For universal tooltips (.hasDetails with data-details)
+tippy('.hasDetails', {
+  content: reference => reference.dataset.details || 'No details',
+  trigger: 'mouseenter focus',
+  hideOnClick: false
+});
 
-    document.querySelectorAll('.charInfoHover').forEach(trigger => {
-      const detailsId = trigger.nextElementSibling?.id;
-      if (!detailsId) return;
-      const contentEl = getElement(detailsId);
-      
-      tippy(trigger, {
-        content: contentEl.innerHTML,
-        trigger: 'mouseenter focus click',
-        allowHTML: true,
-        interactive: true,
-        hideOnClick: 'toggle',
-        onShow(instance) {
-          instance.popper.querySelector('.closeRitual')?.addEventListener('click', () => instance.hide());
-          const draggableEl = instance.popper.querySelector('.draggable');
-          if (draggableEl) {
-            interact(draggableEl)
-              .draggable({
-                inertia: true,
-                autoScroll: true,
-                listeners: {
-                  move: (event) => {
-                    const target = event.target;
-                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-                    target.style.transform = `translate(${x}px, ${y}px)`;
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-                  }
-                }
-              });
-          }
-        }
-      });
-    });
+// For charDetails (hover on .charInfoHover, click to show fully)
+document.querySelectorAll('.charInfoHover').forEach(trigger => {
+  const detailsId = trigger.nextElementSibling?.id;  // Assumes sibling setup
+  if (!detailsId) return;
+  const contentEl = document.getElementById(detailsId);
+  
+  tippy(trigger, {
+    content: contentEl.innerHTML,  // Clone content for tooltip
+    trigger: 'mouseenter focus click',  // Hover for preview, click for persistent
+    allowHTML: true,
+    interactive: true,  // Allow clicks inside (e.g., close button)
+    hideOnClick: 'toggle',  // Click to show/hide persistently
+    onShow(instance) {
+      // For persistent mode on click: Add close logic if needed
+      instance.popper.querySelector('.closeRitual')?.addEventListener('click', () => instance.hide());
+
+      // Re-apply Interact.js to the dynamic .draggable element inside popper
+      const draggableEl = instance.popper.querySelector('.draggable');
+      if (draggableEl) {
+        interact(draggableEl)
+          .draggable({
+            inertia: true,
+            autoScroll: true,
+            listeners: {
+              move: (event) => {
+                const target = event.target;
+                const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                target.style.transform = `translate(${x}px, ${y}px)`;
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+              }
+            }
+          });
+      }
+    }
+  });
+  
+  // Hide old showDesc/hideDesc if migrating (optional)
+  trigger.onclick = null;  // Remove old onclick
+});
 });

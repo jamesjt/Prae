@@ -17,7 +17,7 @@ class TooltipManager {
         maxWidth: 350,
         placement: "top",
         animation: "shift-away-subtle",
-        interactive: false,
+        interactive: true,
       });
 
       TooltipManager.instances.set(el, instance);

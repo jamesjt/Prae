@@ -2,26 +2,12 @@ const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4
 const CHAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
 const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
-const SKILL_ID_MAP = {
-    'Athletics': 'athleticsSkillRank', 'Force': 'forceSkillRank', 'Acrobatics': 'acrobaticsSkillRank', 'Sneak': 'sneakSkillRank',
-    'Endurance': 'enduranceSkillRank', 'Poise': 'poiseSkillRank', 'Lore': 'loreSkillRank', 'Tinkering': 'tinkeringSkillRank',
-    'Deception': 'deceptionSkillRank', 'Insight': 'insightSkillRank', 'Awareness': 'awarenessSkillRank', 'Survival': 'survivalSkillRank',
-    'Compel': 'compelSkillRank', 'Rouse': 'rouseSkillRank', 'Assure': 'assureSkillRank', 'Charm': 'charmSkillRank',
-    'Calm': 'calmSkillRank', 'Command': 'commandSkillRank', 'Strike': 'strikeSkillRank', 'Blast': 'blastSkillRank', 'Invoke': 'invokeSkillRank'
-};
-
-const SKILL_MOD_MAP = {
-    'athleticsSkillRank': 'mightValue', 'forceSkillRank': 'mightValue', 'acrobaticsSkillRank': 'agilityValue', 'sneakSkillRank': 'agilityValue',
-    'enduranceSkillRank': 'brawnValue', 'poiseSkillRank': 'brawnValue', 'loreSkillRank': 'willValue', 'tinkeringSkillRank': 'willValue',
-    'deceptionSkillRank': 'witValue', 'insightSkillRank': 'witValue', 'awarenessSkillRank': 'resolveValue', 'survivalSkillRank': 'resolveValue',
-    'compelSkillRank': 'vigorValue', 'rouseSkillRank': 'vigorValue', 'assureSkillRank': 'empathyValue', 'charmSkillRank': 'empathyValue',
-    'calmSkillRank': 'faithValue', 'commandSkillRank': 'faithValue', 'strikeSkillRank': 'bodyValue', 'blastSkillRank': 'mindValue', 'invokeSkillRank': 'spiritValue'
-};
-
+let SKILL_ID_MAP = {};
+let SKILL_MOD_MAP = {};
 const ATTRIBUTE_GROUPS = {
-    physical: { priorityId: 'bodyPriority', pointsId: 'physicalAttributePoints', primaryValueId: 'bodyValue', subIds: ['mightValue', 'agilityValue', 'brawnValue'] },
-    mental:   { priorityId: 'mindPriority', pointsId: 'mentalAttributePoints', primaryValueId: 'mindValue', subIds: ['willValue', 'witValue', 'resolveValue'] },
-    spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
+    physical: { priorityId: 'bodyPriority', pointsId: 'physicalAttributePoints', primaryValueId: 'bodyValue', subIds: [] },
+    mental:   { priorityId: 'mindPriority', pointsId: 'mentalAttributePoints', primaryValueId: 'mindValue', subIds: [] },
+    spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: [] }
 };
 
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = new Map();
@@ -44,7 +30,7 @@ async function loadAllData() {
         const abilitiesParsed = Papa.parse(abilitiesRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (abilitiesParsed.errors.length) throw new Error('Abilities parse error');
         const abilitiesRows = abilitiesParsed.data;
-        const skills = abilitiesRows[0].slice(1).map(s => s.trim().toLowerCase());
+        const skills = abilitiesRows[0].slice(1).map(s => s.trim());
         skills.forEach((skill, colIndex) => {
             let currentAbility = null;
             for (let r = 1; r < abilitiesRows.length; r++) {
@@ -53,21 +39,53 @@ async function loadAllData() {
                 const key = keyCell ? keyCell.trim() : '';
                 const value = valueCell ? valueCell.trim() : '';
                 if (key.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
-                    if (currentAbility) saveAbility(skill, currentAbility);
+                    if (currentAbility) saveAbility(skill.toLowerCase(), currentAbility);
                     const typeMatch = key.match(/^(Talent|Trick|Ritual)/i);
                     const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
-                    currentAbility = { type, name: value || `(Unnamed ${type})`, skill, details: {} };
+                    currentAbility = { type, name: value || `(Unnamed ${type})`, skill: skill.toLowerCase(), details: {} };
                 } else if (currentAbility && key && key.includes(' ')) {
                     const detailKey = key.split(' ').slice(2).join(' ');
                     currentAbility.details[detailKey] = value;
                 }
             }
-            if (currentAbility) saveAbility(skill, currentAbility);
+            if (currentAbility) saveAbility(skill.toLowerCase(), currentAbility);
         });
         function saveAbility(skill, ability) {
             if (!abilitiesData.has(skill)) abilitiesData.set(skill, []);
             abilitiesData.get(skill).push(ability);
         }
+
+        // Dynamically build SKILL_ID_MAP from skills
+        SKILL_ID_MAP = skills.reduce((map, skill) => {
+            map[skill] = skill.toLowerCase() + 'SkillRank';
+            return map;
+        }, {});
+        // Add attack skills (not in CSV headers)
+        SKILL_ID_MAP['Strike'] = 'strikeSkillRank';
+        SKILL_ID_MAP['Blast'] = 'blastSkillRank';
+        SKILL_ID_MAP['Invoke'] = 'invokeSkillRank';
+
+        // Dynamically build SKILL_MOD_MAP based on grouped categories (18 skills + 3 attacks)
+        const physicalSubs = ['mightValue', 'mightValue', 'agilityValue', 'agilityValue', 'brawnValue', 'brawnValue'];
+        const mentalSubs = ['willValue', 'willValue', 'witValue', 'witValue', 'resolveValue', 'resolveValue'];
+        const socialSubs = ['vigorValue', 'vigorValue', 'empathyValue', 'empathyValue', 'faithValue', 'faithValue'];
+        SKILL_MOD_MAP = skills.reduce((map, skill, i) => {
+            let mod;
+            if (i < 6) mod = physicalSubs[i];
+            else if (i < 12) mod = mentalSubs[i - 6];
+            else mod = socialSubs[i - 12];
+            map[skill.toLowerCase() + 'SkillRank'] = mod;
+            return map;
+        }, {});
+        // Add for attacks
+        SKILL_MOD_MAP['strikeSkillRank'] = 'bodyValue';
+        SKILL_MOD_MAP['blastSkillRank'] = 'mindValue';
+        SKILL_MOD_MAP['invokeSkillRank'] = 'spiritValue';
+
+        // Dynamically assign subIds to ATTRIBUTE_GROUPS from MOD_MAP groups
+        ATTRIBUTE_GROUPS.physical.subIds = physicalSubs.filter((v, i, a) => a.indexOf(v) === i); // Unique: ['mightValue', 'agilityValue', 'brawnValue']
+        ATTRIBUTE_GROUPS.mental.subIds = mentalSubs.filter((v, i, a) => a.indexOf(v) === i);
+        ATTRIBUTE_GROUPS.spirit.subIds = socialSubs.filter((v, i, a) => a.indexOf(v) === i);
 
         // Parse Ways
         const waysParsed = Papa.parse(waysRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
@@ -383,7 +401,7 @@ function updateWayOptions() {
         let qualified = way.reqSkill === 'Any'
             ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
             : document.getElementById(way.skillId)?.value > 1;
-        const opt = sel.querySelector(`option[value="${way.name}"]`);
+        const opt = sel.querySelector(`option[value="${w.name}"]`);
         if (opt) opt.disabled = !qualified;
     });
 }

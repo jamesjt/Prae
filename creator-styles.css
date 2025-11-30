@@ -117,9 +117,9 @@
 
 /* Attributes */
 
-#physicalStatsWrapper {background-color: #5F1817;margin-bottom: 5px;width:100%;}
-#mentalStatsWrapper {background-color: #19315C;margin-bottom: 5px;width: 100%;}
-#socialStatsWrapper {background-color: #281957;width: 100%;}
+#bodyStatsWrapper {background-color: #5F1817;margin-bottom: 5px;width:100%;}
+#mindStatsWrapper {background-color: #19315C;margin-bottom: 5px;width: 100%;}
+#spiritStatsWrapper {background-color: #281957;width: 100%;}
 
 #bodyPriority {}
 .att-desc-font{font-size: 8px}
@@ -190,14 +190,14 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .subMiddle {margin-top: 2px;margin-bottom: 2px;}
 
 
-#physicalAttributePoints {background-color: #b07c70}
-#mentalAttributePoints {background-color: #9BAABF;}
+#bodyAttributePoints {background-color: #b07c70}
+#mindAttributePoints {background-color: #9BAABF;}
 #spiritAttributePoints {background-color: #797781;}
 
 
-.physicalAtt {background-color: #5F1817;}
-.mentalAtt {background-color: #19315C;}
-.socialAtt {background-color: #281957;}
+.bodyAtt {background-color: #5F1817;}
+.mmindAtt {background-color: #19315C;}
+.spiritAtt {background-color: #281957;}
 
 .attributePoints {
     border: 1px solid black;
@@ -670,34 +670,6 @@ dark leather: #5E4634
     background-color: white;
     color:black;
 }
-.attackSkills {margin-left: 1px; color:whitesmoke; border: none;}
-.attackSkills:hover {margin-left: 1px;background-color: white;color:black;}
-.nonAttackSkills {margin-left: 1px; color:whitesmoke; border: none;}
-.nonAttackSkills:hover {margin-left: 1px;background-color: white;color:black;}
-
-
-
-
-.physicalTalent { background-color: #b36b00 !important; color: white; }
-.mentalTalent { background-color: #006666 !important; color: white;}
-.socialTalent { background-color: #8E7CC3 !important; color: white;}
-.physicalNonAtkMan {background-color: #ac3939 !important; color: white;}
-.mentalNonAtkMan {background-color: #004c99 !important; color: white;}
-.socialNonAtkMan {background-color: #7300e6 !important; color: white;}
-.physicalAtkMan {background-color: #5F1817 !important; color: white;}
-.mentalAtkMan {background-color: #204077 !important; color: white;}
-.socialAtkMan {background-color: #4f1f4c !important; color: white;}
-/*.physicalAtkMan {background-color: #800000 !important; color: white;}
-.mentalAtkMan {background-color: #002266 !important; color: white;}
-.socialAtkMan {background-color: #862d59 !important; color: white;}
-.socialExploit {background-color: #B4A7D6 !important;color:white;}
-.physicalExploit {background-color: #cc9900 !important; color: white;}*/
-
-.mentalExploit {background-color: #A4C2F4 !important; color: white;}
-
-
-
-.borderNone {border-style:none;}
 
 .charInfo{
     border-bottom-right-radius: 8px;

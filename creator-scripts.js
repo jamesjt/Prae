@@ -381,7 +381,7 @@ document.addEventListener('change', e => {
             };
             const changedAttr = t.id.replace('Priority', '').toLowerCase();
             const newPri = t.value;
-            const priorityUnassigned = '';
+            const priorityUnassigned = 'priorityUnassigned';
             if (newPri !== priorityUnassigned) {
                 for (const [attr, sel] of Object.entries(priorities)) {
                     if (attr !== changedAttr && sel.value === newPri) {
@@ -801,7 +801,7 @@ function handleReadySelectChange(i) {
         detailsDiv.id = `gear${i}Details`;
         detailsDiv.className = 'gearDetails';
         detailsDiv.textContent = 'i';
-        detailsDiv.dataset.details = item.details.trim();
+        detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
         sel.closest('.gearEntry').appendChild(detailsDiv);
     }
     // === 3. Handle pack logic (this was broken) ===
@@ -895,7 +895,7 @@ function renderStowed(i) {
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
                 detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
-                detailsDiv.dataset.details = item.details.trim();
+                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
                 entry.appendChild(detailsDiv);
             }
         }
@@ -915,7 +915,7 @@ function renderStowed(i) {
                 detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
                 detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
-                detailsDiv.dataset.details = item.details.trim();
+                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
                 entry.appendChild(detailsDiv);
             }
 
@@ -985,7 +985,7 @@ function calculateLoad() {
     document.getElementById('totalLoadValue').textContent = formattedTotal;
 }
 // ———————————————————————— UNIVERSAL TOOLTIP ————————————————————————
-const TOOLTIP_ID = 'universal-tooltip';
+/* const TOOLTIP_ID = 'universal-tooltip';
 
 document.addEventListener('mouseover', e => {
     if (e.target.matches('.hoverRules, .gearDetails') && e.target.dataset.details?.trim()) {
@@ -1010,7 +1010,7 @@ document.addEventListener('mouseout', e => {
         const tooltip = document.getElementById(TOOLTIP_ID);
         if (tooltip) tooltip.classList.remove('visible');
     }
-});
+});*/
 
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')

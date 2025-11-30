@@ -32,26 +32,24 @@ const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
-fetch(ABILITIES_CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
-    .then(text => {
-        const parsed = Papa.parse(text, {
-            header: false,
-            skipEmptyLines: true,
-            dynamicTyping: false,
-            delimitersToGuess: [',']
-        });
-        if (parsed.errors.length > 0) {
-            console.error('PapaParse errors:', parsed.errors);
-            throw new Error('Error parsing Abilities CSV');
-        }
-        const rows = parsed.data;
-        const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
+async function loadAllData() {
+    try {
+        const [abilitiesRes, waysRes, charRes] = await Promise.all([
+            fetch(ABILITIES_CSV_URL).then(r => { if (!r.ok) throw new Error(`Abilities fetch failed: ${r.status}`); return r.text(); }),
+            fetch(WAYS_CSV_URL).then(r => { if (!r.ok) throw new Error(`Ways fetch failed: ${r.status}`); return r.text(); }),
+            fetch(CHAR_CSV_URL).then(r => { if (!r.ok) throw new Error(`Char fetch failed: ${r.status}`); return r.text(); })
+        ]);
+
+        // Parse Abilities
+        const abilitiesParsed = Papa.parse(abilitiesRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
+        if (abilitiesParsed.errors.length) throw new Error('Abilities parse error');
+        const abilitiesRows = abilitiesParsed.data;
+        const skills = abilitiesRows[0].slice(1).map(s => s.trim().toLowerCase());
         skills.forEach((skill, colIndex) => {
             let currentAbility = null;
-            for (let r = 1; r < rows.length; r++) {
-                const keyCell = rows[r][0];
-                const valueCell = rows[r][colIndex + 1];
+            for (let r = 1; r < abilitiesRows.length; r++) {
+                const keyCell = abilitiesRows[r][0];
+                const valueCell = abilitiesRows[r][colIndex + 1];
                 const key = keyCell ? keyCell.trim() : '';
                 const value = valueCell ? valueCell.trim() : '';
                 if (key.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
@@ -70,33 +68,19 @@ fetch(ABILITIES_CSV_URL)
             if (!abilitiesData[skill]) abilitiesData[skill] = [];
             abilitiesData[skill].push(ability);
         }
-        updateAbilitySelectors('trick');
-        updateAbilitySelectors('talent');
-    })
-    .catch(err => console.error('Error loading Abilities CSV:', err));
 
-fetch(WAYS_CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
-    .then(text => {
-        const parsed = Papa.parse(text, {
-            header: false,
-            skipEmptyLines: true,
-            dynamicTyping: false,
-            delimitersToGuess: [',']
-        });
-        if (parsed.errors.length > 0) {
-            console.error('PapaParse errors:', parsed.errors);
-            throw new Error('Error parsing Ways CSV');
-        }
-        const rows = parsed.data;
-        let includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
+        // Parse Ways
+        const waysParsed = Papa.parse(waysRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
+        if (waysParsed.errors.length) throw new Error('Ways parse error');
+        const waysRows = waysParsed.data;
+        let includeRowIdx = waysRows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
         if (includeRowIdx === -1) return console.error('Missing "Include" row');
-        const includeRow = rows[includeRowIdx];
+        const includeRow = waysRows[includeRowIdx];
         for (let col = 1; col < includeRow.length; col++) {
             const includeValue = (includeRow[col] || '').toUpperCase().trim();
             if (includeValue === 'TRUE' || includeValue === '1') {
                 const props = {};
-                rows.forEach(row => {
+                waysRows.forEach(row => {
                     const key = (row[0] || '').trim().toLowerCase();
                     if (key) props[key] = (row[col] || '').trim();
                 });
@@ -112,28 +96,14 @@ fetch(WAYS_CSV_URL)
                 }
             }
         }
-        populateRoleSelector();
-        updateWayOptions();
-    })
-    .catch(err => console.error('Error loading Ways CSV:', err));
 
-fetch(CHAR_CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
-    .then(text => {
-        const parsed = Papa.parse(text, {
-            header: false,
-            skipEmptyLines: true,
-            dynamicTyping: false,
-            delimitersToGuess: [',']
-        });
-        if (parsed.errors.length > 0) {
-            console.error('PapaParse errors:', parsed.errors);
-            throw new Error('Error parsing PROF CSV');
-        }
-        const rows = parsed.data;
-        const headers = rows[0].map(h => h.trim());
+        // Parse Char/PROF
+        const charParsed = Papa.parse(charRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
+        if (charParsed.errors.length) throw new Error('Char parse error');
+        const charRows = charParsed.data;
+        const headers = charRows[0].map(h => h.trim());
 
-        const dataByCategory = parseCsvByCategories(headers, rows);
+        const dataByCategory = parseCsvByCategories(headers, charRows);
 
         // For debugging
         console.log('Parsed Data:', dataByCategory);
@@ -149,12 +119,19 @@ fetch(CHAR_CSV_URL)
         profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
 
+        // Post-parsing init (e.g., populate selectors, etc.)
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
+        populateRoleSelector();
+        updateWayOptions();
         generateGearEntries();
-
-        // Initial proficiency population
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-    })
-    .catch(err => console.error('Error loading PROF CSV:', err));
+    } catch (err) {
+        console.error('Data load error:', err);
+        // UI feedback, e.g.:
+        document.getElementById('content-sections').innerHTML = '<div class="no-results">Error loading data: ' + err.message + '</div>';
+    }
+}
 
 // Helper: Generic CSV parser (no hardcoded suffixes, allows mains without attributes)
 function parseCsvByCategories(headers, rows) {
@@ -914,6 +891,7 @@ interact('.draggable')
   });
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('load', () => {
+    loadAllData();
     calculateSkillPoints();
     calculateAbilities();
     calculateAttributeValues();
@@ -926,7 +904,6 @@ window.addEventListener('load', () => {
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
     calculateLoad(); // Initial total (will be 0 until data loads)
-    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     // Unified Tooltip Initialization with Tippy.js
 tippy.setDefaultProps({
   theme: 'custom',  // We'll define this in CSS

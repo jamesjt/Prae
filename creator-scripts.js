@@ -430,7 +430,7 @@ document.addEventListener('click', e => {
             value -= 1;
         }
         amountEl.textContent = value;
-        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = (type === 'talent' ? 1 : 2) + value;
+        document.getElementById(`total${type.charAt(0).toUpperCase() + type.slice(1)}s`).textContent = value + 1;
         (type === 'talent' ? updateTalentTables : updateTrickTables)();
         calculateAbilities();
     }

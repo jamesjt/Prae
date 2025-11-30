@@ -25,7 +25,7 @@ const ATTRIBUTE_GROUPS = {
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
-let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = new Map();
+let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData = [], abilitiesData = new Map(), hoverRulesData = [];
 
 // Add near top constants
 const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
@@ -106,8 +106,22 @@ async function loadAllData() {
 
         const dataByCategory = parseCsvByCategories(headers, charRows);
 
+        // Parse hoverRules specially
+        const hoverIdx = headers.indexOf('hoverRules');
+        const detailsIdx = headers.indexOf('hoverRules Details');
+        if (hoverIdx !== -1 && detailsIdx !== -1) {
+            for (let r = 1; r < charRows.length; r++) {
+                const rule = charRows[r][hoverIdx]?.trim();
+                const detail = charRows[r][detailsIdx]?.trim();
+                if (rule && detail) {
+                    hoverRulesData.push({ rule, detail });
+                }
+            }
+        }
+
         // For debugging
         console.log('Parsed Data:', dataByCategory);
+        console.log('Hover Rules Data:', hoverRulesData);
 
         // Assign for gear (update script to use dataByCategory.gear if refactoring further)
         gearData = dataByCategory.gear || [];
@@ -466,6 +480,20 @@ function evaluateExpr(expr) {
 
   return Math.floor(tokens[0]) || 0; // Final floor for safety
 }
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function escapeHtml(string) {
+    return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function processWithTooltips(text) {
+    let processed = text;
+    hoverRulesData.forEach(({ rule, detail }) => {
+        const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="hasDetails" data-details="${escapeHtml(detail)}">$&</span>`);
+    });
+    return processed;
+}
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId)?.value;
     const ability = abilities.find(a => a.name === value);
@@ -483,7 +511,7 @@ function populateAbilityInfo(selectId, abilities, type) {
         processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
         const div = document.createElement('div');
         div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
-        div.textContent = processedValue;
+        div.innerHTML = processWithTooltips(processedValue);
         desc.appendChild(div);
     });
 }
@@ -501,7 +529,7 @@ function populateRoleInfo(e) {
         if (val) {
             val = val.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
             const div = document.createElement('div');
-            div.textContent = val;
+            div.innerHTML = processWithTooltips(val);
             desc.appendChild(div);
         }
     });

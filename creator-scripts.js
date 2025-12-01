@@ -453,7 +453,7 @@ document.addEventListener('click', e => {
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
-ffunction populateWayOptions() {
+function populateWayOptions() {
     const sel = document.getElementById('roleSelector');
     if (!sel) return;
     sel.innerHTML = '';

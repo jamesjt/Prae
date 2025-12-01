@@ -12,6 +12,16 @@
 @font-face { font-family: daniel; src: url(../fonts/Daniela.ttf); }
 @font-face { font-family: gaelic; src: url(../fonts/GAELIC.TTF); }
 
+
+:root{
+  --gearList: #372f24;
+  --gearStowed:;
+  --gearLiquids:;
+  --bodyColor0:#5F1817;
+  --bodyColor1:#7B1C19;
+  --bodyColor2:#A34A47;
+  --bddyColor3:#B07C71;
+}
 .charInfoHover{
   position:relative;
   top:4px;
@@ -531,40 +541,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .blastProfSelector {border:1px solid #1A305C; color:whitesmoke; background-color: #9BAABF;}
 .invokeProfSelector {border:1px solid #281957; color:whitesmoke;background-color: #797781;}
 
-select {
-  background-image:
-    linear-gradient(45deg, transparent 50%, gray 50%),
-    linear-gradient(135deg, gray 50%, transparent 50%),
-    linear-gradient(to right, #ccc, #ccc);
-  background-position:
-    calc(100% - 20px) calc(1em + 2px),
-    calc(100% - 15px) calc(1em + 2px),
-    calc(100% - 2.5em) 0.5em;
-  background-size:
-    5px 5px,
-    5px 5px,
-    1px 1.5em;
-  background-repeat: no-repeat;
-}
-
-select {
-
-  /* styling */
-  display: inline-block;
-  font: inherit;
-  line-height: 1.5em;
-  padding: 0.5em 3.5em 0.5em 1em;
-
-  /* reset */
-
-  margin: 0;      
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
 
 /* gear colors 
 warm graphite: #6F6A63;
@@ -576,16 +552,18 @@ Muted Saddle Brown (#7C6A59;)
 Weathered Leather Gray-Brown (#6F655D;)
 Dead Olive Canvas (#5E6156;)
 Stormwater Slate Sea (#5F6F72;)
+#372f24;
 */
+
 .gearListContainer{
-    background-color: #6F6A63;
+    background-color: var(--gearList);
     width:240px;
 }
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitewmoke;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
-.gearSelector{width:130px;border:none; background-color: #6F6A63;color:whitesmoke;}
-.gearAmtInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;margin-left:15px;}
+.gearSelector{width:130px;border:none; background-color: var(--gearList);color:whitesmoke;}
+.gearAmtInputField{width: 30px;border: none;background-color:var(--gearList);color: whitesmoke;margin-left:15px;}
 .gearAmtInputField:hover{background-color: white;color:black;}
 .gearLoad{display: flex;
     justify-content: center;

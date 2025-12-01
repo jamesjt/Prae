@@ -380,61 +380,6 @@ document.addEventListener('change', e => {
                 spirit: document.getElementById('spiritPriority')
             };
             const changedAttr = t.id.replace('Priority', '').toLowerCase();
-            const newPri = t.value;// creator-scripts.js
-document.addEventListener('change', e => {
-    const t = e.target;
-    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
-
-    // Talent/Trick Selectors (combined)
-    if (t.matches('.talentSelector, .trickSelector')) {
-        const type = t.className.replace('Selector', '');
-        populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
-        calculateAbilities();
-        return;
-    }
-
-    // Skill Ranks
-    if (t.matches('select[id$="SkillRank"]')) {
-        updateSkillModAndPassive(t.id);
-        updateWayOptions();
-        calculateSkillPoints();
-        const type = t.id.replace('SkillRank', '').toLowerCase();
-        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
-        updateAbilitySelectors('trick');
-        updateAbilitySelectors('talent');
-        // Refresh existing ability descriptions
-        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
-            if (sel.value && sel.value !== `${sel.className.replace('Selector', '')}Empty`) {
-                const abType = sel.className.replace('Selector', '');
-                populateAbilityInfo(sel.id, getQualifiedAbilities(abType), abType);
-            }
-        });
-        // Refresh way talent if selected
-        const roleSel = document.getElementById('roleSelector');
-        if (roleSel && roleSel.value !== 'wayEmpty') {
-            populateRoleInfo({ target: roleSel });
-        }
-        // Refresh proficiency descriptions if applicable
-        if (['strike', 'blast', 'invoke'].includes(type)) {
-            for (let i = 1; i <= 5; i++) {
-                const sel = document.getElementById(type + 'ProfSelector' + i);
-                if (sel && !sel.hidden && sel.value) {
-                    populateProficiencyInfo(sel.id, type);
-                }
-            }
-        }
-        return;
-    }
-
-    // Priorities, Level, Sub-attributes (combined attribute-related)
-    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
-        if (t.matches('#bodyPriority, #mindPriority, #spiritPriority')) {
-            const priorities = {
-                body: document.getElementById('bodyPriority'),
-                mind: document.getElementById('mindPriority'),
-                spirit: document.getElementById('spiritPriority')
-            };
-            const changedAttr = t.id.replace('Priority', '').toLowerCase();
             const newPri = t.value;
             const priorityUnassigned = 'priorityUnassigned';
             if (newPri !== priorityUnassigned) {
@@ -473,7 +418,6 @@ document.addEventListener('change', e => {
         }
     }
 });
-
 document.addEventListener('click', e => {
     const t = e.target;
     if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
@@ -749,13 +693,6 @@ function updateProficiencySelectors(type, rank) {
         if (el) el.hidden = i > rank;
     }
 }
-/************************************************************
- * CLEANED GEAR UI SECTION (Phase 2)
- * ---------------------------------
- * This version contains ONLY UI creation for ready slots.
- * All logic is now handled by GearManager + GearSlot.
- ************************************************************/
-
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
@@ -764,59 +701,41 @@ function generateGearEntries() {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
 
-        // Pure UI construction — GearManager handles all logic
+        // We'll build the details HTML only if needed later
+        let detailsHtml = '';
+
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
                 <option value="emptyStowedGearSlot">Ready Slot</option>
             </select>
-            <input
-                type="number"
-                id="gear${i}Amt"
-                class="gearAmtInputField"
-                min="1"
-                value="1"
-            />
+            <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
+            ${detailsHtml}
         `;
 
         container.appendChild(entry);
 
-        // Populate selector with categories
+        // Populate selector
         const sel = document.getElementById(`gear${i}Select`);
         const grouped = {};
-
         allOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
-
-        Object.keys(grouped)
-            .sort()
-            .forEach(cat => {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = `-- ${cat} --`;
-
-                grouped[cat]
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .forEach(g => {
-                        const opt = document.createElement('option');
-                        opt.value = g.name;
-                        opt.textContent = g.name;
-
-                        // Keep load info ONLY as data for GearManager (not used here)
-                        opt.dataset.load = g.baseLoad || g.load || 0;
-
-                        optgroup.appendChild(opt);
-                    });
-
-                sel.appendChild(optgroup);
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `-- ${cat} --`;
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.baseLoad || g.load || 0;
+                optgroup.appendChild(opt);
             });
+            sel.appendChild(optgroup);
+        });
 
-        // IMPORTANT:
-        // Do NOT add event listeners here.
-        // GearManager.init() binds and manages all slot/stowed behavior.
     }
 }
-
 
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')

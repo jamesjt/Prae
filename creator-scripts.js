@@ -591,7 +591,7 @@ function populateAbilityInfo(selectId, abilities, type) {
     if (type === 'trick' && ritualSkills.includes(ability.skill) && ability.details.trickManaUse) {
         const ritualName = ability.details.trickManaUse.trim();
         const ritualDiv = document.createElement('div');
-        ritualDiv.className = 'trickRitual';
+        ritualDiv.className = 'trickManaUse';
         ritualDiv.innerHTML = `Ritual: <span data-tip="ritual:${ritualName}">${ritualName}</span>`;
         desc.appendChild(ritualDiv);
     }

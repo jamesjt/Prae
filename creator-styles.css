@@ -11,7 +11,8 @@
 @font-face { font-family: blackcha; src: url(../fonts/Blackcha.ttf); }
 @font-face { font-family: daniel; src: url(../fonts/Daniela.ttf); }
 @font-face { font-family: gaelic; src: url(../fonts/GAELIC.TTF); }
-
+/*
+#2A2E50 talent color?*/
 
 :root{
   --gearStowed: #372f24;
@@ -220,6 +221,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     justify-content: center;
     align-items: center;
 }
+.subAttinputField:hover{background-color: whitesmoke;color: black;}
 
 .subMiddle {margin-top: 2px;margin-bottom: 2px;}
 

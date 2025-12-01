@@ -337,62 +337,7 @@ document.addEventListener('change', e => {
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         // Refresh existing ability descriptions
-        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
-            if (sel.value && sel.value !== `${sel.className.replace('Selector', '')}Empty`) {
-                const abType = sel.className.replace('Selector', '');
-                populateAbilityInfo(sel.id, getQualifiedAbilities(abType), abType);
-            }
-        });
-        // Refresh way talent if selected
-        const roleSel = document.getElementById('roleSelector');
-        if (roleSel && roleSel.value !== 'wayEmpty') {
-            populateRoleInfo({ target: roleSel });
-        }
-        // Refresh proficiency descriptions if applicable
-        if (['strike', 'blast', 'invoke'].includes(type)) {
-            for (let i = 1; i <= 5; i++) {
-                const sel = document.getElementById(type + 'ProfSelector' + i);
-                if (sel && !sel.hidden && sel.value) {
-                    populateProficiencyInfo(sel.id, type);
-                }
-            }
-        }
-        return;
-    }
-
-    // Priorities, Level, Sub-attributes (combined attribute-related)
-    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
-        if (t.matches('#bodyPriority, #mindPriority, #spiritPriority')) {
-            const priorities = {
-                body: document.getElementById('bodyPriority'),
-                mind: document.getElementById('mindPriority'),
-                spirit: document.getElementById('spiritPriority')
-            };
-            const changedAttr = t.id.replace('Priority', '').toLowerCase();
-            const newPri = t.value;
-            const priorityUnassigned = 'priorityUnassigned';
-            if (newPri !== priorityUnassigned) {
-                for (const [attr, sel] of Object.entries(priorities)) {
-                    if (attr !== changedAttr && sel.value === newPri) {
-                        sel.value = priorityUnassigned;
-                    }
-                }
-            }
-        }
-        calculateAttributeValues();
-        updateAttributeGroups();
-        updateAllSkillModsAndPassives();
-        calculateSkillPoints();
-        calculateAbilities();
-        if (t.matches('input[id$="Value"][type="number"]')) {
-            const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
-            updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
-            updateSkillsForMod(t.id);
-        }
-        return;
-    }
-
-    // Way selector
+        document.querySelectorAll('.ta...(truncated 2510 characters)...ector
     if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
         return;
@@ -563,38 +508,47 @@ function processWithTooltips(text) {
     });
     return processed;
 }
-function populateAbilityInfo(selectId, abilities, type) {
+
+// New reusable helper: Populates a description div with processed details from an item
+function populateDescription(selectId, dataArray, type, order = [], processValue = val => val) {
     const value = document.getElementById(selectId)?.value;
-    const ability = abilities.find(a => a.name === value);
+    const item = dataArray.find(a => a.name === value);
     const desc = document.getElementById(selectId + 'Description');
-    if (!desc || !ability) { desc.innerHTML = ''; return; }
+    if (!desc || !item) { 
+        if (desc) desc.innerHTML = ''; 
+        return; 
+    }
     desc.innerHTML = '';
-    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
-    Object.keys(ability.details).sort((a, b) => {
+    const details = item.details || { details: item.details }; // Normalize simple cases like proficiencies
+    const keys = order.length > 0 ? Object.keys(details).sort((a, b) => {
         const ia = order.indexOf(a.toLowerCase());
         const ib = order.indexOf(b.toLowerCase());
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-    }).forEach(key => {
-        let processedValue = ability.details[key];
-        // Replace |expr| with spanned value
-        processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => {
-            const computed = evaluateExpr(expr);
-            return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
-        });
+    }) : Object.keys(details);
+    keys.forEach(key => {
+        let processedValue = processValue(details[key]);
         const div = document.createElement('div');
-        div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
+        div.className = type + key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '');
         div.innerHTML = processWithTooltips(processedValue);
         desc.appendChild(div);
     });
 }
-function populateProficiencyInfo(selectId, type) {
-    const value = document.getElementById(selectId)?.value;
-    if (!value) return;
-    const prof = profData[type].find(p => p.name === value);
-    const desc = document.getElementById(selectId + 'Description');
-    if (!desc || !prof || !prof.details) { desc.innerHTML = ''; return; }
-    desc.innerHTML = processWithTooltips(prof.details);
+
+function populateAbilityInfo(selectId, abilities, type) {
+    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    const processValue = val => val.replace(/\|([^|]+)\|/g, (match, expr) => {
+        const computed = evaluateExpr(expr);
+        return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
+    });
+    populateDescription(selectId, abilities, type, order, processValue);
 }
+
+function populateProficiencyInfo(selectId, type) {
+    const profs = profData[type] || [];
+    const processValue = val => val; // No expr replacement for proficiencies
+    populateDescription(selectId, profs, 'prof', [], processValue);
+}
+
 function populateRoleInfo(e) {
     const name = e.target.value;
     if (!name || name === 'wayEmpty') return;

@@ -28,7 +28,6 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
 let talentAmount = 1;
 let tricksAmount = 1;
-let ritualAmount = 1;
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
@@ -305,110 +304,15 @@ function updateTalentTables() {
     }, talentAmount);
 }
 function updateTrickTables() {
-    const container = document.getElementById('trickTables');
-    container.innerHTML = '';
-    for (let i = 1; i <= tricksAmount; i++) {
-        const div = document.createElement('div');
-        div.className = 'trickAbility';
-        div.innerHTML = `
-            <select class="trickSelector"></select>
-            <div class="filledField trickCost">Cost</div>
-            <div class="filledField trickEffectSm">Effect</div>
-            <div class="filledField trickEffectBig">Effect</div>
-            <div class="filledField trickManaUse">Mana Use</div>
-            <img class="showTrickDetails" src="images/details.png">
-            <div class="draggable trickDetails" style="display:none;">
-                <div class="closeTrick">X</div>
-                <div class="trickBody">
-                    <div class="trickName"></div>
-                    <div class="trickKeywords"></div>
-                    <div class="trickDescription"></div>
-                    <div class="trickCostFull"></div>
-                    <div class="trickEffectSmFull"></div>
-                    <div class="trickEffectBigFull"></div>
-                    <div class="trickManaUseFull"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-        const sel = div.querySelector('.trickSelector');
-        populateTrickSelector(sel);
-        sel.addEventListener('change', () => {
-            updateTrickInfo(div, sel.value);
-            updateRitualSelectors();
-        });
-        const showImg = div.querySelector('.showTrickDetails');
-        const detailsDiv = div.querySelector('.trickDetails');
-        showImg.addEventListener('click', () => detailsDiv.style.display = 'block');
-        const close = div.querySelector('.closeTrick');
-        close.addEventListener('click', () => detailsDiv.style.display = 'none');
-    }
-}
-function updateRitualTables() {
-    const container = document.getElementById('ritualTables');
-    container.innerHTML = '';
-    for (let i = 1; i <= ritualAmount; i++) {
-        const div = document.createElement('div');
-        div.className = 'ritualAbility';
-        div.innerHTML = `
-            <select class="ritualSelector"></select>
-            <div class="filledField ritualCost">Cost</div>
-            <div class="filledField ritualCastTime">Cast Time</div>
-            <div class="filledField ritualDuration">Duration</div>
-            <img class="showRitualDetails" src="images/details.png">
-            <div class="draggable ritualDetails" style="display:none;">
-                <div class="closeRitual">X</div>
-                <div class="ritualBody">
-                    <div class="ritualName"></div>
-                    <div class="ritualKeywords"></div>
-                    <div class="ritualCostFull"></div>
-                    <div class="ritualCastTimeFull"></div>
-                    <div class="ritualDurationFull"></div>
-                    <div class="ritualEffect"></div>
-                    <div class="ritualEnhancements"></div>
-                    <div class="ritualAugments"></div>
-                    <div class="ritualResist"></div>
-                    <div class="ritualNotes"></div>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-        const sel = div.querySelector('.ritualSelector');
-        populateRitualSelector(sel);
-        sel.addEventListener('change', () => updateRitualInfo(div, sel.value));
-        const showImg = div.querySelector('.showRitualDetails');
-        const detailsDiv = div.querySelector('.ritualDetails');
-        showImg.addEventListener('click', () => detailsDiv.style.display = 'block');
-        const close = div.querySelector('.closeRitual');
-        close.addEventListener('click', () => detailsDiv.style.display = 'none');
-    }
-}
-
-function updateRitualInfo(container, name) {
-    const ability = findAbilityByName(name);
-    if (!ability) return;
-    container.querySelector('.ritualCost').textContent = ability.details['Cost'] || 'N/A';
-    container.querySelector('.ritualCastTime').textContent = ability.details['Cast time'] || 'N/A';
-    container.querySelector('.ritualDuration').textContent = ability.details['Duration'] || 'N/A';
-    // Full details
-    container.querySelector('.ritualName').textContent = ability.name;
-    container.querySelector('.ritualKeywords').textContent = ability.details['Keywords'] || '';
-    container.querySelector('.ritualCostFull').textContent = 'Cost: ' + (ability.details['Cost'] || 'N/A');
-    container.querySelector('.ritualCastTimeFull').textContent = 'Cast Time: ' + (ability.details['Cast time'] || 'N/A');
-    container.querySelector('.ritualDurationFull').textContent = 'Duration: ' + (ability.details['Duration'] || 'N/A');
-    container.querySelector('.ritualEffect').textContent = ability.details['Effect'] || '';
-    container.querySelector('.ritualEnhancements').textContent = 'Enhancements: ' + (ability.details['Enhancements'] || 'N/A');
-    container.querySelector('.ritualAugments').textContent = 'Augments: ' + (ability.details['Augments'] || 'N/A');
-    container.querySelector('.ritualResist').textContent = 'Resist/Counter: ' + (ability.details['Resist/Counter'] || 'N/A');
-    container.querySelector('.ritualNotes').textContent = ability.details['Notes'] || '';
-}
-function findAbilityByName(name) {
-    for (let arr of abilitiesData.values()) {
-        for (let a of arr) {
-            if (a.name === name) return a;
-        }
-    }
-    return null;
+    rebuildDynamicSelectors({
+        containerSelector: '.trickWrapper',
+        itemPrefix: 'tricks',
+        itemClass: 'trickAbility',
+        selectorClass: 'trickSelector',
+        extraOffset: 1,
+        populateFunction: () => updateAbilitySelectors('trick'),
+        abilityType: 'trick'
+    }, tricksAmount);
 }
 // ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
@@ -505,7 +409,7 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('click', e => {
     const t = e.target;
-    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus, #ritualPlus, #ritualMinus')) {
+    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
         const type = t.id.includes('talent') ? 'talent' : 'tricks';
         let value = type === 'talent' ? talentAmount : tricksAmount;
         const min = type === 'talent' ? 1 : 1;
@@ -522,13 +426,6 @@ document.addEventListener('click', e => {
             updateTrickTables();
         }
         calculateAbilities();
-        if (t.id === 'ritualsPlus') {
-            ritualAmount += 1;
-            updateRitualTables();
-        } else if (t.id === 'ritualsMinus' && ritualAmount > 1) {
-            ritualAmount -= 1;
-            updateRitualTables();   
-        }
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
@@ -688,19 +585,6 @@ function populateAbilityInfo(selectId, abilities, type) {
         div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
         div.innerHTML = processWithTooltips(processedValue);
         desc.appendChild(div);
-    });
-}
-
-function populateRitualSelector(sel) {
-    sel.innerHTML = '<option value="">Select Ritual</option>';
-    const selectedTricks = [...document.querySelectorAll('.trickSelector')].map(s => s.value).filter(v => v);
-    const qualified = Array.from(abilitiesData.values()).flat().filter(a => a.type === 'ritual' && selectedTricks.includes(a.details['Trick'] || ''));
-    qualified.sort((a, b) => a.name.localeCompare(b.name));
-    qualified.forEach(a => {
-        const opt = document.createElement('option');
-        opt.value = a.name;
-        opt.textContent = a.name;
-        sel.appendChild(opt);
     });
 }
 function populateProficiencyInfo(selectId, type) {
@@ -897,5 +781,4 @@ window.addEventListener('load', () => {
     });
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
-    updateRitualTables();
 });

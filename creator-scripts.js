@@ -525,7 +525,7 @@ function getQualifiedAbilities(type) {
     Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
         const sel = document.getElementById(id);
         if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
-            result.push(abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
+            result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
         }
     });
     return result;

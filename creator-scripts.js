@@ -698,12 +698,6 @@ function updateSkillsForMod(subId) {
 function updateAllSkillModsAndPassives() {
     Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
 }
-function updateProficiencySelectors(type, rank) {
-    for (let i = 1; i <= 5; i++) {
-        const el = document.getElementById(type + 'ProfSelector' + i);
-        if (el) el.hidden = i > rank;
-    }
-}
 function updateGearLoad(i) {
     const select = document.getElementById('gear' + i + 'Select');
     if (!select) return;

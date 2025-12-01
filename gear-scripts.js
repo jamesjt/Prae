@@ -7,6 +7,28 @@ let allOptions = [];
 let nonPackOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [] }));
 
+function populateGearSelector(selectEl, options, isStowed = false) {
+    const placeholder = isStowed ? 'Stowed Slot' : 'Ready Slot';
+    selectEl.innerHTML = `<option value="emptyStowedGearSlot">${placeholder}</option>`;
+    const grouped = {};
+    options.forEach(g => {
+        if (!grouped[g.category]) grouped[g.category] = [];
+        grouped[g.category].push(g);
+    });
+    Object.keys(grouped).sort().forEach(cat => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = `-- ${cat} --`;
+        grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g.name;
+            opt.textContent = g.name;
+            opt.dataset.load = g.baseLoad || g.load || 0;
+            optgroup.appendChild(opt);
+        });
+        selectEl.appendChild(optgroup);
+    });
+}
+
 function generateGearEntries() {
     allOptions = gearData;
     nonPackOptions = gearData.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
@@ -22,9 +44,7 @@ function generateGearEntries() {
         let detailsHtml = '';
 
         entry.innerHTML = `
-            <select id="gear${i}Select" class="gearSelector">
-                <option value="emptyStowedGearSlot">Ready Slot</option>
-            </select>
+            <select id="gear${i}Select" class="gearSelector"></select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
             ${detailsHtml}
@@ -34,23 +54,7 @@ function generateGearEntries() {
 
         // Populate selector
         const sel = document.getElementById(`gear${i}Select`);
-        const grouped = {};
-        allOptions.forEach(g => {
-            if (!grouped[g.category]) grouped[g.category] = [];
-            grouped[g.category].push(g);
-        });
-        Object.keys(grouped).sort().forEach(cat => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `-- ${cat} --`;
-            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-                const opt = document.createElement('option');
-                opt.value = g.name;
-                opt.textContent = g.name;
-                opt.dataset.load = g.baseLoad || g.load || 0;
-                optgroup.appendChild(opt);
-            });
-            sel.appendChild(optgroup);
-        });
+        populateGearSelector(sel, allOptions, false);
 
         // On change: update load + conditionally add details icon
         sel.addEventListener('change', () => {
@@ -138,9 +142,7 @@ function renderStowed(i) {
         let detailsHtml = '';
 
         entry.innerHTML = `
-            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector">
-                <option value="emptyStowedGearSlot">Stowed Slot</option>
-            </select>
+            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector"></select>
             <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
             <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
             ${detailsHtml}
@@ -149,24 +151,7 @@ function renderStowed(i) {
         container.appendChild(entry);
 
         const sel = entry.querySelector('select');
-        const grouped = {};
-        nonPackOptions.forEach(g => {
-            if (!grouped[g.category]) grouped[g.category] = [];
-            grouped[g.category].push(g);
-        });
-
-        Object.keys(grouped).sort().forEach(cat => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `-- ${cat} --`;  // ← Fixed! Was "poking"
-            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-                const opt = document.createElement('option');
-                opt.value = g.name;
-                opt.textContent = g.name;
-                opt.dataset.load = g.baseLoad || g.load || 0;
-                optgroup.appendChild(opt);
-            });
-            sel.appendChild(optgroup);
-        });
+        populateGearSelector(sel, nonPackOptions, true);
 
         // Restore saved selection and add details if needed
         if (s.gear) {

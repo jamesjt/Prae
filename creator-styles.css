@@ -548,6 +548,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitewmoke;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
+.gearEntry input {width:30px;color:whitesmoke;border:none;}
+.gearEntry input:hover {color:black;background-color:white;}
 .gearName{width:90%;}
 .gearSelector{width:130px;border:none; background-color: var(--gearList);color:whitesmoke;}
 .gearAmtInputField{width: 30px;border: none;background-color:var(--gearList);color: whitesmoke;margin-left:15px;}
@@ -563,9 +565,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearLoad.overloaded { color: red !important; }
 .stowed-container{padding-left:10px;background-color:var(--gearStowed);border:1px inset black;}
 .stowed-container select{background-color:var(--gearStowed);}
-.stowed-container input{background-color:var(--gearStowed);border:none;width:30px;color:whitesmoke;margin-left:5px;}
+.stowed-container input{background-color:var(--gearStowed);margin-left:5px;}
 .contents-container {padding-left:10px;background-color:var(--gearLiquids);border:1px inset black;}}
-.contents-container input {background-color:var(--gearLiquids);border:none;width:30px;color:whitesmoke;margin-left:5px;}
+.contents-container input {background-color:var(--gearLiquids);margin-left:5px;}
 .contents-container select {background-color:var(--gearLiquids);}
 .stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
@@ -873,7 +875,7 @@ a.internalLink{
 .gearDetails {
     width: 12px;
     height: 11px;
-    border:1px solid #333;
+    border:1px solid #775824;
     margin:4px 0px 0px 6px;
     font-size: 8px;
     line-height: 16px;

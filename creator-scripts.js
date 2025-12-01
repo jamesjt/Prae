@@ -136,7 +136,6 @@ async function loadAllData() {
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         populateRoleSelector();
-        updateWayOptions();
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
 
         // Dispatch event to signal data is ready
@@ -433,17 +432,57 @@ document.addEventListener('click', e => {
 function populateRoleSelector() {
     const sel = document.getElementById('roleSelector');
     sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
-    waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
+    buildWayGroups();
+}
+function buildWayGroups() {
+    const sel = document.getElementById('roleSelector');
+    // Preserve current selection
+    const currentValue = sel.value;
+    // Clear existing optgroups/options after placeholder
+    while (sel.options.length > 1) {
+        sel.remove(1);
+    }
+    // Filter available and unavailable
+    const available = [];
+    const unavailable = [];
+    waysData.forEach(way => {
+        const qualified = way.reqSkill === 'Any'
+            ? Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 2)
+            : parseInt(document.getElementById(way.skillId)?.value || 0) > 2;
+        (qualified ? available : unavailable).push(way);
+    });
+    // Sort alphabetically
+    available.sort((a, b) => a.name.localeCompare(b.name));
+    unavailable.sort((a, b) => a.name.localeCompare(b.name));
+    // Add available group
+    if (available.length > 0) {
+        const availGroup = document.createElement('optgroup');
+        availGroup.label = 'Available Ways';
+        available.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            availGroup.appendChild(opt);
+        });
+        sel.appendChild(availGroup);
+    }
+    // Add unavailable group
+    if (unavailable.length > 0) {
+        const unavailGroup = document.createElement('optgroup');
+        unavailGroup.label = 'Unavailable Ways';
+        unavailable.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            unavailGroup.appendChild(opt);
+        });
+        sel.appendChild(unavailGroup);
+    }
+    // Restore selection if still valid
+    sel.value = currentValue;
 }
 function updateWayOptions() {
-    const sel = document.getElementById('roleSelector');
-    waysData.forEach(way => {
-        let qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
-            : document.getElementById(way.skillId)?.value > 1;
-        const opt = sel.querySelector(`option[value="${way.name}"]`);
-        if (opt) opt.disabled = !qualified;
-    });
+    buildWayGroups();
 }
 function updateAbilitySelectors(type) {
     const qualified = getQualifiedAbilities(type);

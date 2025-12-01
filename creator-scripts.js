@@ -402,24 +402,6 @@ document.addEventListener('change', e => {
         return;
     }
 
-    // Gear/Stowed Amounts/Selects (combined)
-    if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"]')) {
-        if (t.matches('[id$="Select"]')) handleReadySelectChange(t.id.match(/gear(\d+)Select/)[1]);
-        const match = t.id.match(/(gear|stowed-(\d+)-(\d+))-(Amt|amt|select)/);
-        if (match) {
-            const [,, readyI, stowedJ] = match;
-            if (/Amt|amt/.test(t.id)) clamp(t, 1);
-            if (stowedJ) {
-                updateStowedLoad(readyI || readyI, stowedJ);
-                updateReadyLoad(readyI || readyI);
-            } else {
-                updateReadyLoad(readyI || readyI);
-            }
-            calculateLoad();
-        }
-        return;
-    }
-
     // Proficiency Selectors
     if (t.matches('[id$="ProfSelector"]')) {
         const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
@@ -698,21 +680,10 @@ function updateSkillsForMod(subId) {
 function updateAllSkillModsAndPassives() {
     Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
 }
-function updateGearLoad(i) {
-    const select = document.getElementById('gear' + i + 'Select');
-    if (!select) return;
-    const selectedOption = select.options[select.selectedIndex];
-    const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
-    const amtInput = document.getElementById('gear' + i + 'Amt');
-    const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
-    if (amtInput) amtInput.value = qty; // Enforce clamp
-    const totalLoad = baseLoad * qty;
-    const loadDiv = document.getElementById('gear' + i + 'Load');
-    if (loadDiv) {
-        const formattedLoad = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-        loadDiv.textContent = totalLoad > 0 ? formattedLoad : '';
-        // Color red if qty >1 AND baseLoad >1
-        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
     }
 }
 

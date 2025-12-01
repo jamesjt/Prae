@@ -26,6 +26,8 @@ const ATTRIBUTE_GROUPS = {
 };
 
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
+let talentAmount = 1;
+let tricksAmount = 1;
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
@@ -249,15 +251,12 @@ function updateProficiencySelectors(type, rank) {
 }
 
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
-function rebuildDynamicSelectors(config) {
+function rebuildDynamicSelectors(config, amount) {
     const {
-        amountInputId, containerSelector, itemPrefix, itemClass, selectorClass,
+        containerSelector, itemPrefix, itemClass, selectorClass,
         descriptionSuffix = 'Description', extraOffset = 0, populateFunction, abilityType
     } = config;
-    const amountEl = document.getElementById(amountInputId);
-    if (!amountEl) return;
-    const currentAmount = Math.max(0, parseInt(amountEl.textContent) || 0); // Clamp to 0+
-    amountEl.textContent = currentAmount; // Update to reflect clamped value
+    const currentAmount = Math.max(0, parseInt(amount) || 0);
     const totalSlots = currentAmount + extraOffset;
     const container = document.querySelector(containerSelector);
     if (!container) return;
@@ -297,18 +296,16 @@ function rebuildDynamicSelectors(config) {
 }
 function updateTalentTables() {
     rebuildDynamicSelectors({
-        amountInputId: 'talentAmount',
         containerSelector: '.talentWrapper',
         itemPrefix: 'talent',
         itemClass: 'talentAbility',
         selectorClass: 'talentSelector',
         populateFunction: () => updateAbilitySelectors('talent'),
         abilityType: 'talent'
-    });
+    }, talentAmount);
 }
 function updateTrickTables() {
     rebuildDynamicSelectors({
-        amountInputId: 'tricksAmount',
         containerSelector: '.trickWrapper',
         itemPrefix: 'tricks',
         itemClass: 'trickAbility',
@@ -316,7 +313,7 @@ function updateTrickTables() {
         extraOffset: 1,
         populateFunction: () => updateAbilitySelectors('trick'),
         abilityType: 'trick'
-    });
+    }, tricksAmount);
 }
 // ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
@@ -333,7 +330,7 @@ document.addEventListener('change', e => {
 
     // Skill Ranks
     if (t.matches('select[id$="SkillRank"]')) {
-        updateSkillModAndPassive(t.id);
+        updateSingleSkillModAndPassive(t.id);
         updateWayOptions();
         calculateSkillPoints();
         const type = t.id.replace('SkillRank', '').toLowerCase();
@@ -415,16 +412,20 @@ document.addEventListener('click', e => {
     const t = e.target;
     if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
         const type = t.id.includes('talent') ? 'talent' : 'tricks';
-        const amountEl = document.getElementById(type + 'Amount');
-        let value = parseInt(amountEl.textContent) || 0;
+        let value = type === 'talent' ? talentAmount : tricksAmount;
         const min = type === 'talent' ? 1 : 1;
         if (t.id.includes('Plus')) {
             value += 1;
         } else if (t.id.includes('Minus') && value > min) {
             value -= 1;
         }
-        amountEl.textContent = value;
-        (type === 'talent' ? updateTalentTables : updateTrickTables)();
+        if (type === 'talent') {
+            talentAmount = value;
+            updateTalentTables();
+        } else {
+            tricksAmount = value;
+            updateTrickTables();
+        }
         calculateAbilities();
     }
 });
@@ -612,8 +613,8 @@ function calculateSkillPoints() {
 }
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const tExtra = parseInt(document.getElementById('talentAmount').textContent) || 0;
-    const trExtra = parseInt(document.getElementById('tricksAmount').textContent) || 0;
+    const tExtra = talentAmount;
+    const trExtra = tricksAmount;
     document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
     const remaining = level + 1 - Math.max(0, tExtra + trExtra);
     document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
@@ -656,7 +657,7 @@ function updateAttributeGroup(group) {
     el.classList.toggle('hidden', rem === 0);
     group.subIds.forEach(id => updateSkillsForMod(id));
 }
-function updateSkillModAndPassive(skillId) {
+function updateSingleSkillModAndPassive(skillId) {
     const sel = document.getElementById(skillId);
     if (!sel) return;
     const rank = parseInt(sel.value) || 0;
@@ -674,11 +675,11 @@ function updateSkillModAndPassive(skillId) {
 }
 function updateSkillsForMod(subId) {
     Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {
-        if (modId === subId) updateSkillModAndPassive(skillId);
+        if (modId === subId) updateSingleSkillModAndPassive(skillId);
     });
 }
 function updateAllSkillModsAndPassives() {
-    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSkillModAndPassive(skillId));
+    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSingleSkillModAndPassive(skillId));
 }
 function updateProficiencySelectors(type, rank) {
     for (let i = 1; i <= 5; i++) {
@@ -734,9 +735,6 @@ window.addEventListener('load', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    // Set initial amounts
-    document.getElementById('talentAmount').textContent = '1';
-    document.getElementById('tricksAmount').textContent = '1';
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
 });

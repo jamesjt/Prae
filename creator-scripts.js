@@ -698,17 +698,15 @@ function updateProficiencySelectors(type, rank) {
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
-
     for (let i = 1; i <= MAX_READY_SLOTS; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
-
+        entry.id = `gear${i}Entry`;
         // Pure UI construction — behavior is handled elsewhere (e.g. GearManager)
         let detailsHtml = '';
-
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
-                <option value="emptyStowedGearSlot">Ready Slot</option>
+                <option value="">Ready Slot</option>
             </select>
             <input
                 type="number"
@@ -717,11 +715,11 @@ function generateGearEntries() {
                 min="1"
                 value="1"
             />
+            <div id="gear${i}Details" class="gearDetails"></div>
+            <span id="gear${i}Load" class="gearLoad">0</span>
             ${detailsHtml}
         `;
-
         container.appendChild(entry);
-
         // Populate selector from allOptions (unchanged from your current file)
         const sel = document.getElementById(`gear${i}Select`);
         const grouped = {};
@@ -729,7 +727,6 @@ function generateGearEntries() {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
-
         Object.keys(grouped).sort().forEach(cat => {
             const optgroup = document.createElement('optgroup');
             optgroup.label = `-- ${cat} --`;
@@ -746,7 +743,6 @@ function generateGearEntries() {
         });
     }
 }
-
 
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')

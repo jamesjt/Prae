@@ -26,34 +26,48 @@ class GearSlot {
         this.readyGearName = "";
         this.readyAmount = 1;
 
-        // List of: { name, amount, stowedIndex, selectEl, amountEl }
+        // List of: { name, amount, stowedIndex, selectEl, amountEl, detailsEl }
         this.stowed = [];
 
         this.currentLoad = 0;
 
         // DOM references (assigned in bindDom)
+        this.entryEl = null;
         this.readySelectEl = null;
         this.readyAmountEl = null;
+        this.detailsEl = null;
+        this.loadEl = null;
     }
 
     /************************************************************
      * Bind DOM elements for this slot:
+     * - entry: gearXEntry
      * - ready selector: gearXSelect
-     * - ready amount: gearX-Amt
+     * - ready amount: gearXAmt
+     * - details: gearXDetails
+     * - load: gearXLoad
      * - stowed selectors: stowed-X-Y-select
-     * - stowed amounts:   stowed-X-Y-amt
+     * - stowed amounts: stowed-X-Y-amt
+     * - stowed details: stowed-X-Y-details
      ************************************************************/
     bindDom() {
+        this.entryEl = $(`gear${this.index}Entry`);
         const readySelId = `gear${this.index}Select`;
-        const readyAmtId = `gear${this.index}-Amt`;
+        const readyAmtId = `gear${this.index}Amt`;
+        const detailsId = `gear${this.index}Details`;
+        const loadId = `gear${this.index}Load`;
 
         this.readySelectEl = $(readySelId);
         this.readyAmountEl = $(readyAmtId);
+        this.detailsEl = $(detailsId);
+        this.loadEl = $(loadId);
 
         if (this.readySelectEl) {
             this.readySelectEl.addEventListener("change", () => {
                 this.readyGearName = this.readySelectEl.value;
                 this.assignTooltip(this.readySelectEl, this.readyGearName);
+                this.populateReadyDetails();
+                this.manageStowedSlots();  // New: Handle dynamic stowed for packs
                 this.updateLoad();
                 GearManager.setCurrentSlot(this.index);
             });
@@ -63,12 +77,13 @@ class GearSlot {
             this.readyAmountEl.addEventListener("change", () => {
                 const v = parseInt(this.readyAmountEl.value) || 1;
                 this.readyAmount = Math.max(1, v);
+                this.readyAmountEl.value = this.readyAmount;  // Clamp display
                 this.updateLoad();
                 GearManager.setCurrentSlot(this.index);
             });
         }
 
-        // Bind existing stowed entries if present
+        // Bind existing stowed entries if present (for reloads or pre-existing)
         this.bindExistingStowed();
     }
 
@@ -77,17 +92,18 @@ class GearSlot {
      ************************************************************/
     bindExistingStowed() {
         const prefix = `stowed-${this.index}-`;
-        const all = document.querySelectorAll(`[id^="stowed-${this.index}-"]`);
+        const all = document.querySelectorAll(`[id^="${prefix}"]`);
 
-        // Map like: stowed-2-1-select, stowed-2-1-amt
         const stowedMap = new Map();
 
         all.forEach(el => {
-            const match = el.id.match(/^stowed-(\d+)-(\d+)-(select|amt)$/);
+            const match = el.id.match(/^stowed-(\d+)-(\d+)-(select|amt|details)$/);
             if (!match) return;
 
-            const [, slotIndex, stowedIndex, type] = match;
+            const [, slotIndex, stowedIndexStr, type] = match;
             if (parseInt(slotIndex) !== this.index) return;
+
+            const stowedIndex = parseInt(stowedIndexStr);
 
             if (!stowedMap.has(stowedIndex)) {
                 stowedMap.set(stowedIndex, { stowedIndex });
@@ -96,34 +112,121 @@ class GearSlot {
             const entry = stowedMap.get(stowedIndex);
             if (type === "select") entry.selectEl = el;
             if (type === "amt") entry.amountEl = el;
+            if (type === "details") entry.detailsEl = el;
         });
 
-        // Hook them up
-        stowedMap.forEach((entry, index) => {
-            const stowedIndex = parseInt(index);
+        stowedMap.forEach((entry) => {
             const name = entry.selectEl ? entry.selectEl.value : "";
             const amt = entry.amountEl ? Math.max(1, parseInt(entry.amountEl.value) || 1) : 1;
 
             this.stowed.push({
                 name,
                 amount: amt,
-                stowedIndex,
+                stowedIndex: entry.stowedIndex,
                 selectEl: entry.selectEl,
-                amountEl: entry.amountEl
+                amountEl: entry.amountEl,
+                detailsEl: entry.detailsEl
             });
 
             if (entry.selectEl) {
                 entry.selectEl.addEventListener("change", () => {
-                    this.updateStowedName(stowedIndex, entry.selectEl.value);
+                    this.updateStowedName(entry.stowedIndex, entry.selectEl.value);
                 });
             }
             if (entry.amountEl) {
                 entry.amountEl.addEventListener("change", () => {
                     const v = parseInt(entry.amountEl.value) || 1;
-                    this.updateStowedAmount(stowedIndex, Math.max(1, v));
+                    this.updateStowedAmount(entry.stowedIndex, Math.max(1, v));
                 });
             }
         });
+    }
+
+    /************************************************************
+     * New: Dynamically add/remove stowed slots if ready gear is a pack
+     ************************************************************/
+    manageStowedSlots() {
+        const item = this.getItem(this.readyGearName);
+        const targetSlots = (item && item.category.toLowerCase() === 'packs') ? (item.slots || 0) : 0;
+
+        while (this.stowed.length > targetSlots) {
+            this.removeStowed();
+        }
+
+        while (this.stowed.length < targetSlots) {
+            this.addStowed();
+        }
+    }
+
+    /************************************************************
+     * New: Add a new stowed entry (DOM + binding)
+     ************************************************************/
+    addStowed() {
+        const stowedIndex = this.stowed.length + 1;
+        const stowedEntry = document.createElement('div');
+        stowedEntry.className = 'stowedEntry';
+        stowedEntry.id = `stowed-${this.index}-${stowedIndex}-entry`;
+        stowedEntry.innerHTML = `
+            <select id="stowed-${this.index}-${stowedIndex}-select" class="stowedSelector">
+                <option value="">Stowed Item</option>
+            </select>
+            <input type="number" id="stowed-${this.index}-${stowedIndex}-amt" class="stowedAmt" min="1" value="1" />
+            <div id="stowed-${this.index}-${stowedIndex}-details" class="stowedDetails"></div>
+        `;
+        if (this.entryEl) this.entryEl.appendChild(stowedEntry);
+
+        const selectEl = $(`stowed-${this.index}-${stowedIndex}-select`);
+        const amountEl = $(`stowed-${this.index}-${stowedIndex}-amt`);
+        const detailsEl = $(`stowed-${this.index}-${stowedIndex}-details`);
+
+        // Populate stowed select with nonPackOptions (grouped)
+        const grouped = {};
+        nonPackOptions.forEach(g => {
+            if (!grouped[g.category]) grouped[g.category] = [];
+            grouped[g.category].push(g);
+        });
+        Object.keys(grouped).sort().forEach(cat => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = `-- ${cat} --`;
+            grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.load || 0;
+                optgroup.appendChild(opt);
+            });
+            selectEl.appendChild(optgroup);
+        });
+
+        // Bind listeners
+        selectEl.addEventListener('change', () => {
+            this.updateStowedName(stowedIndex, selectEl.value);
+        });
+        amountEl.addEventListener('change', () => {
+            const v = Math.max(1, parseInt(amountEl.value) || 1);
+            amountEl.value = v;
+            this.updateStowedAmount(stowedIndex, v);
+        });
+
+        // Push to stowed array
+        this.stowed.push({
+            name: '',
+            amount: 1,
+            stowedIndex,
+            selectEl,
+            amountEl,
+            detailsEl
+        });
+    }
+
+    /************************************************************
+     * New: Remove the last stowed entry (DOM + array)
+     ************************************************************/
+    removeStowed() {
+        const st = this.stowed.pop();
+        if (!st) return;
+        const stowedEntry = $(`stowed-${this.index}-${st.stowedIndex}-entry`);
+        if (stowedEntry) stowedEntry.remove();
     }
 
     /************************************************************
@@ -143,6 +246,7 @@ class GearSlot {
 
         st.name = newName;
         this.assignTooltip(st.selectEl, newName);
+        this.populateStowedDetails(stowedIndex);
         this.updateLoad();
         GearManager.setCurrentSlot(this.index);
     }
@@ -160,12 +264,46 @@ class GearSlot {
     }
 
     /************************************************************
+     * New: Populate details for ready gear
+     ************************************************************/
+    populateReadyDetails() {
+        if (!this.detailsEl) return;
+        const details = this.getItemDetails(this.readyGearName);
+        this.detailsEl.innerHTML = details ? processWithTooltips(details) : '';
+    }
+
+    /************************************************************
+     * New: Populate details for a stowed item
+     ************************************************************/
+    populateStowedDetails(stowedIndex) {
+        const st = this.stowed.find(s => s.stowedIndex === stowedIndex);
+        if (!st || !st.detailsEl) return;
+        const details = this.getItemDetails(st.name);
+        st.detailsEl.innerHTML = details ? processWithTooltips(details) : '';
+    }
+
+    /************************************************************
+     * Utility: Get item from global gearData
+     ************************************************************/
+    getItem(name) {
+        if (!name || name === '') return null;
+        return gearData.find(g => g.name === name);
+    }
+
+    /************************************************************
      * Utility: retrieve gear load from global gearData
      ************************************************************/
     getItemLoad(name) {
-        if (!name) return 0;
-        const item = gearData.find(g => g.name === name);
-        return item?.load ?? 0;
+        const item = this.getItem(name);
+        return item ? (item.baseLoad || item.load || 0) : 0;
+    }
+
+    /************************************************************
+     * Utility: retrieve gear details from global gearData
+     ************************************************************/
+    getItemDetails(name) {
+        const item = this.getItem(name);
+        return item ? (item.details || '') : '';
     }
 
     /************************************************************
@@ -181,6 +319,8 @@ class GearSlot {
 
         this.currentLoad = readyLoad + stowedLoad;
 
+        if (this.loadEl) this.loadEl.textContent = this.currentLoad;  // New: Update per-slot display
+
         // Notify manager
         GearManager.onSlotLoadUpdated(this);
     }
@@ -190,7 +330,7 @@ class GearSlot {
  * GearManager: orchestrates all gear slot behavior
  ************************************************************/
 class GearManager {
-    static slots = [];
+    static slots = {};  // Use object for easier access
     static currentSlotIndex = 1;
 
     /************************************************************
@@ -205,10 +345,8 @@ class GearManager {
 
         // Initialize UI
         this.updateTotalLoadDisplay();
+        this.updateTotalUsedLoad();  // New
         this.updateCurrentLoadDisplay(0);
-
-        // Hook global change listener
-        document.addEventListener("change", (e) => this.routeEvent(e));
     }
 
     /************************************************************
@@ -221,7 +359,7 @@ class GearManager {
     }
 
     /************************************************************
-     * Update per-slot load display
+     * Update per-slot load display (for the current slot)
      ************************************************************/
     static updateCurrentLoadDisplay(value) {
         const el = $("currentLoadValue");
@@ -229,7 +367,16 @@ class GearManager {
     }
 
     /************************************************************
-     * Update total load display (right-side value)
+     * New: Update total used load (sum across all slots)
+     ************************************************************/
+    static updateTotalUsedLoad() {
+        const sum = Object.values(this.slots).reduce((s, slot) => s + (slot?.currentLoad || 0), 0);
+        const el = $("usedLoadValue");
+        if (el) el.textContent = sum;
+    }
+
+    /************************************************************
+     * Update max total load display
      ************************************************************/
     static updateTotalLoadDisplay() {
         const el = $("totalLoadValue");
@@ -244,6 +391,7 @@ class GearManager {
         if (slot.index === this.currentSlotIndex) {
             this.updateCurrentLoadDisplay(slot.currentLoad);
         }
+        this.updateTotalUsedLoad();  // Always update total
     }
 
     /************************************************************
@@ -260,16 +408,19 @@ class GearManager {
             this.setCurrentSlot(idx);
             this.slots[idx].readyGearName = e.target.value;
             this.slots[idx].assignTooltip(e.target, e.target.value);
+            this.slots[idx].populateReadyDetails();
+            this.slots[idx].manageStowedSlots();
             this.slots[idx].updateLoad();
             return;
         }
 
         // Ready amount
-        m = id.match(/^gear(\d+)-Amt$/);
+        m = id.match(/^gear(\d+)Amt$/);  // Note: No '-' in ID per your code
         if (m) {
             const idx = parseInt(m[1]);
             this.setCurrentSlot(idx);
             const amt = Math.max(1, parseInt(e.target.value) || 1);
+            e.target.value = amt;
             this.slots[idx].readyAmount = amt;
             this.slots[idx].updateLoad();
             return;
@@ -295,6 +446,7 @@ class GearManager {
             const stIdx = parseInt(m[2]);
             this.setCurrentSlot(slotIdx);
             const amt = Math.max(1, parseInt(e.target.value) || 1);
+            e.target.value = amt;
             this.slots[slotIdx].updateStowedAmount(stIdx, amt);
             return;
         }

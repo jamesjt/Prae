@@ -1,5 +1,3 @@
-let allData = [];
-
 // Count leading dashes
 function getIndentLevel(text) {
     if (!text) return 0;

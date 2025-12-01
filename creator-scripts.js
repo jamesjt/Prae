@@ -22,7 +22,6 @@ const ATTRIBUTE_GROUPS = {
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
-let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
 let talentAmount = 1;
 let tricksAmount = 1;
 const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';

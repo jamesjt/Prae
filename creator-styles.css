@@ -20,7 +20,15 @@
   --bodyColor0:#5F1817;
   --bodyColor1:#7B1C19;
   --bodyColor2:#A34A47;
-  --bddyColor3:#B07C71;
+  --bodyColor3:#B07C71;
+  --mindColor0:#1A305C;
+  --mindColor1:#24497F;
+  --mindColor2:#5E7BA0;
+  --mindColor3:#9BAABF;
+  --spiritColor0:#281957;
+  --spiritColor1:#3A2780;
+  --spiritColor2:#7A6EB0;
+  --spiritColor3:#797781;
 }
 .charInfoHover{
   position:relative;

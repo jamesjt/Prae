@@ -284,7 +284,7 @@ function renderContents(i) {
         container.appendChild(entry);
 
         const sel = entry.querySelector('select');
-        populateGearSelector(sel, liquidsOptions, 'Contents Slot');
+        populateGearSelector(sel, liquidsOptions, 'Select Liquid');
 
         // Restore saved selection and add details if needed
         if (s.gear) {

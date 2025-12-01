@@ -15,8 +15,8 @@
 
 :root{
   --gearList: #372f24;
-  --gearStowed:;
-  --gearLiquids:;
+  --gearStowed:#353230;
+  --gearLiquids:#384143;
   --bodyColor0:#5F1817;
   --bodyColor1:#7B1C19;
   --bodyColor2:#A34A47;
@@ -574,12 +574,12 @@ Stormwater Slate Sea (#5F6F72;)
 .gearEntryHead{width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
-.stowed-container{padding-left:10px;background-color:#7C6A59;border:1px inset black;}
-.stowed-container select{background-color:#7C6A59;}
-.stowed-container input{background-color:#7C6A59;border:none;width:30px;color:whitesmoke;margin-left:5px;}
-.contents-container{padding-left:10px;background-color:#5F6F72;border:1px inset black;}}
-.contents-container input{background-color:#5F6F72;border:none;width:30px;color:whitesmoke;margin-left:5px;}
-.contents-container select{background-color:#5F6F72;}
+.stowed-container{padding-left:10px;background-color:var(--gearStowed);border:1px inset black;}
+.stowed-container select{background-color::var(--gearStowed);}
+.stowed-container input{background-color::var(--gearStowed);border:none;width:30px;color:whitesmoke;margin-left:5px;}
+.contents-container {padding-left:10px;background-color::var(--gearLiquids);border:1px inset black;}}
+.contents-container input {background-color:var(--gearLiquids);border:none;width:30px;color:whitesmoke;margin-left:5px;}
+.contents-container select {background-color:var(--gearLiquids);}
 .stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
 #coinsGold{border-color:#d29a38}

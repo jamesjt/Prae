@@ -249,6 +249,7 @@ function renderStowed(i) {
         updateStowedLoad(i, stowedIndex);
     });
 }
+
 function renderContents(i) {
     let container = document.getElementById(`contents-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
@@ -354,6 +355,7 @@ function renderContents(i) {
         updateContentsLoad(i, contentsIndex);
     });
 }
+
 // Update single stowed load
 function updateStowedLoad(readyI, stowedJ) {
     const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
@@ -405,7 +407,11 @@ function updateReadyLoad(i) {
     const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        if (item?.category === 'Packs' || item?.category === 'Containers') loadDiv.style.color = total > (item.loadLimit || 0) ? 'red' : '';
+        if (item?.loadLimit != null && total > item.loadLimit) {
+            loadDiv.style.color = 'red';
+        } else {
+            loadDiv.style.color = '';
+        }
     }
 }
 // Updated calculateLoad (loop over state, no hard numbers beyond max)

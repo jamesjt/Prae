@@ -337,7 +337,14 @@ document.addEventListener('change', e => {
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         // Refresh existing ability descriptions
-        document.querySelectorAll('.ta...(truncated 2510 characters)...ector
+        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
+            if (sel.value) {
+                const abilityType = sel.className.replace('Selector', '');
+                populateAbilityInfo(sel.id, getQualifiedAbilities(abilityType), abilityType);
+            }
+        });
+    }
+
     if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
         return;

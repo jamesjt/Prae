@@ -152,44 +152,43 @@ async function loadAllData() {
 }
 
 // Helper: Generic CSV parser (optimized with reduce)
-// Helper: Generic CSV parser (optimized with reduce)
 function parseCsvByCategories(headers, rows) {
     const dataByCategory = {};
-    const groupMap = headers.reduce((map, h, idx) => {
-        if (!h.includes(' ')) return map; // Skip single-word headers
-        const groupKey = h.replace(/[^ ]+$/, '').trim() + ' '; // Everything up to last word + space
-        if (!map[groupKey]) map[groupKey] = [];
-        map[groupKey].push({ header: h, idx });
+    const prefixMap = headers.reduce((map, h, idx) => {
+        const parts = h.split(' ');
+        if (parts.length < 2) return map;
+        const prefix = parts[0] + ' ';
+        map[prefix] = map[prefix] || [];
+        map[prefix].push({ header: h, idx });
         return map;
     }, {});
 
-    for (const [groupKey, entries] of Object.entries(groupMap)) {
-        if (entries.length < 2) continue; // Need at least name + one prop
+    for (const [prefix, entries] of Object.entries(prefixMap)) {
+        if (entries.length < 2) continue;
+        const categoryKey = prefix.trim().toLowerCase();
+        dataByCategory[categoryKey] = [];
 
-        // Find main (Name) header
-        const nameEntry = entries.find(e => e.header.endsWith(' Name'));
-        if (!nameEntry) continue;
-
-        const mainIdx = nameEntry.idx;
-        const related = entries.filter(e => e !== nameEntry).map(e => ({
-            suffix: e.header.replace(groupKey, '').trim(),
-            idx: e.idx
-        }));
-
-        // Determine category and subCategory
-        const groupParts = groupKey.trim().split(' ');
-        const categoryKey = groupParts[0].toLowerCase();
-        const subCategory = groupParts.slice(1).join(' ').toLowerCase();
-
-        if (!dataByCategory[categoryKey]) dataByCategory[categoryKey] = [];
+        const configs = entries.map(({ header }) => {
+            const subCategory = header.replace(prefix, '').trim();
+            const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
+            const related = headers.reduce((acc, hh, idx) => {
+                if (hh.startsWith(camelPrefix) && hh !== header) {
+                    acc.push({ suffix: hh.replace(camelPrefix, '').trim(), idx });
+                }
+                return acc;
+            }, []);
+            return { mainIdx: headers.indexOf(header), subCategory, related };
+        });
 
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
-            const name = row[mainIdx]?.trim();
-            if (!name) continue;
-            const item = { name, category: subCategory };
-            parseItemProps(item, related, row);
-            dataByCategory[categoryKey].push(item);
+            configs.forEach(config => {
+                const name = row[config.mainIdx]?.trim();
+                if (!name) return;
+                const item = { name, category: config.subCategory };
+                parseItemProps(item, config.related, row);
+                dataByCategory[categoryKey].push(item);
+            });
         }
 
         dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));

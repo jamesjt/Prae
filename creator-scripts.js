@@ -586,15 +586,6 @@ function populateAbilityInfo(selectId, abilities, type) {
         div.innerHTML = processWithTooltips(processedValue);
         desc.appendChild(div);
     });
-    // Add ritual for specific tricks
-    const ritualSkills = ['lore', 'tinkering', 'deception', 'insight', 'awareness', 'survival'];
-    if (type === 'trick' && ritualSkills.includes(ability.skill) && ability.details.trickManaUse) {
-        const ritualName = ability.details.trickManaUse.trim();
-        const ritualDiv = document.createElement('div');
-        ritualDiv.className = 'trickRitual';
-        ritualDiv.innerHTML = `Ritual: <span data-tip="ritual:${ritualName}">${ritualName}</span>`;
-        desc.appendChild(ritualDiv);
-    }
 }
 function populateProficiencyInfo(selectId, type) {
     const value = document.getElementById(selectId)?.value;

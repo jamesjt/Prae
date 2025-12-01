@@ -445,8 +445,8 @@ function buildWayGroups() {
     const unavailable = [];
     waysData.forEach(way => {
         const qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 2)
-            : parseInt(document.getElementById(way.skillId)?.value || 0) > 2;
+            ? Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 1)
+            : parseInt(document.getElementById(way.skillId)?.value || 0) > 1;
         (qualified ? available : unavailable).push(way);
     });
     // Sort alphabetically

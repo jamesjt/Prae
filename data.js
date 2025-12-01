@@ -157,6 +157,60 @@ function parseChar(rows) {
             if (rule && detail) hoverRules.push({ rule, detail });
         }
     }
+
+    // Special handling for gear to merge split subcategories
+    dataByCategory.gear = [];
+    const subMap = {
+        'Adventuring': { nameHeader: 'Gear Adventuring', propPrefix: 'GearAdventuring ' },
+        'Liquids': { nameHeader: 'Gear Liquids', propPrefix: 'GearLiquids ' },
+        'Containers': { nameHeader: 'Gear Containers', propPrefix: 'GearContainers ' },
+        'Packs': { nameHeader: 'Gear Packs', propPrefix: 'GearPacks ' },
+        'Weapons': { nameHeader: 'Gear Weapons', propPrefix: 'GearWeapons ' },
+        'Armor': { nameHeader: 'Gear Armor', propPrefix: 'GearArmor ' },
+    };
+    for (const [sub, { nameHeader, propPrefix }] of Object.entries(subMap)) {
+        const nameIdx = headers.indexOf(nameHeader);
+        if (nameIdx === -1) continue;
+        const props = [];
+        headers.forEach((h, idx) => {
+            if (h.startsWith(propPrefix)) {
+                let key = h.replace(propPrefix, '').trim().toLowerCase();
+                props.push({ key, idx });
+            }
+        });
+        for (let r = 1; r < rows.length; r++) {
+            const name = rows[r][nameIdx]?.trim();
+            if (name) {
+                const item = { name, category: sub };
+                props.forEach(({ key, idx }) => {
+                    item[key] = rows[r][idx]?.trim();
+                });
+                dataByCategory.gear.push(item);
+            }
+        }
+    }
+
+    // Special handling for proficiencies to parse name:details and set category
+    dataByCategory.proficiencies = [];
+    const profTypes = ['Strike', 'Blast', 'Invoke'];
+    profTypes.forEach(type => {
+        const header = `proficiencies ${type}`;
+        const idx = headers.indexOf(header);
+        if (idx === -1) return;
+        for (let r = 1; r < rows.length; r++) {
+            const value = rows[r][idx]?.trim();
+            if (value) {
+                const [name, ...detailsParts] = value.split(':');
+                const details = detailsParts.join(':').trim();
+                dataByCategory.proficiencies.push({
+                    name: name.trim(),
+                    details,
+                    category: type.toLowerCase()
+                });
+            }
+        }
+    });
+
     // Return all parsed parts
     return { dataByCategory, hoverRules };
 }

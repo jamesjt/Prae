@@ -32,7 +32,7 @@
   cursor:alias;
 }
 
-.amountButton{color:whitesmoke;background-color: black;}
+.amountButton{color:whitesmoke;background-color: black;border:none;}
 
 .tippy-box[data-theme~='ruleTip'] {
   max-width: 650px;  /* Match charDetails */

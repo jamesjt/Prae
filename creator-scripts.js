@@ -28,7 +28,6 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
 let talentAmount = 1;
 let tricksAmount = 1;
-let gearSlots = 5; // Initial gear slots
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
@@ -410,17 +409,10 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('click', e => {
     const t = e.target;
-    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus, #gearPlus, #gearMinus')) {
-        let type, min = 1;
-        if (t.id.includes('talent')) {
-            type = 'talent';
-        } else if (t.id.includes('tricks')) {
-            type = 'tricks';
-        } else if (t.id.includes('gear')) {
-            type = 'gear';
-            min = 1; // Adjust min for gear if needed
-        }
-        let value = type === 'talent' ? talentAmount : type === 'tricks' ? tricksAmount : gearSlots;
+    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
+        const type = t.id.includes('talent') ? 'talent' : 'tricks';
+        let value = type === 'talent' ? talentAmount : tricksAmount;
+        const min = type === 'talent' ? 1 : 1;
         if (t.id.includes('Plus')) {
             value += 1;
         } else if (t.id.includes('Minus') && value > min) {
@@ -429,14 +421,11 @@ document.addEventListener('click', e => {
         if (type === 'talent') {
             talentAmount = value;
             updateTalentTables();
-        } else if (type === 'tricks') {
+        } else {
             tricksAmount = value;
             updateTrickTables();
-        } else if (type === 'gear') {
-            gearSlots = value;
-            rebuildGearSelectors();
         }
-        if (type !== 'gear') calculateAbilities();
+        calculateAbilities();
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
@@ -759,43 +748,6 @@ function updateGearLoad(i) {
         loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
 }
-// New: Rebuild gear slots
-function rebuildGearSelectors() {
-    const container = document.getElementById('gearEntries');
-    if (!container) return;
-    // Save current values
-    const saved = {};
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById('gear' + i + 'Select');
-        const amt = document.getElementById('gear' + i + 'Amt');
-        if (sel) saved[i] = { select: sel.value, amt: amt ? amt.value : 1 };
-    }
-    // Clear dynamic slots
-    container.innerHTML = '';
-    // Build slots
-    for (let i = 1; i <= gearSlots; i++) {
-        const entry = document.createElement('div');
-        entry.className = 'gearEntry';
-        entry.innerHTML = `
-            <select id="gear${i}Select" class="gearSelector"></select>
-            <input id="gear${i}Amt" type="number" min="1" value="1">
-            <div id="gear${i}Load"></div>
-        `;
-        container.appendChild(entry);
-    }
-    // Assume populateGearSelectors() to fill options (from gear-scripts.js or add)
-    populateGearSelectors(); // Placeholder; implement if needed
-    // Restore values and update loads
-    for (let i = 1; i <= gearSlots; i++) {
-        const sel = document.getElementById('gear' + i + 'Select');
-        const amt = document.getElementById('gear' + i + 'Amt');
-        if (sel && saved[i]) {
-            sel.value = saved[i].select || '';
-            if (amt) amt.value = saved[i].amt || 1;
-        }
-        updateGearLoad(i);
-    }
-}
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')
   .draggable({
@@ -829,5 +781,4 @@ window.addEventListener('load', () => {
     });
     updateTalentTables(); // Initial build for talents
     updateTrickTables(); // Initial build for tricks
-    rebuildGearSelectors(); // Initial build for gear
 });

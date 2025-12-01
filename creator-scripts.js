@@ -438,10 +438,8 @@ function buildWayGroups() {
     const sel = document.getElementById('roleSelector');
     // Preserve current selection
     const currentValue = sel.value;
-    // Clear existing optgroups/options after placeholder
-    while (sel.options.length > 1) {
-        sel.remove(1);
-    }
+    // Fully reset to placeholder
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
     // Filter available and unavailable
     const available = [];
     const unavailable = [];

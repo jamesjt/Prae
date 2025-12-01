@@ -7,6 +7,7 @@ let allOptions = [];
 let nonPackOptions = [];
 let liquidsOptions = [];
 let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [], contents: [] }));
+let gearSlots = 5; // Dynamic gear slots
 
 function populateGearSelector(selectEl, options, placeholder) {
     selectEl.innerHTML = `<option value="emptyStowedGearSlot">${placeholder}</option>`;
@@ -29,7 +30,7 @@ function populateGearSelector(selectEl, options, placeholder) {
     });
 }
 
-function generateGearEntries() {
+function rebuildGearSelectors() {
     allOptions = gearData.filter(g => g.category.toLowerCase() !== 'liquids');
     nonPackOptions = allOptions.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
     liquidsOptions = gearData.filter(g => g.category.toLowerCase() === 'liquids');
@@ -37,7 +38,15 @@ function generateGearEntries() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
 
-    for (let i = 1; i <= MAX_READY_SLOTS; i++) {
+    // Save current state
+    const saved = {};
+    for (let i = 1; i <= 20; i++) {
+        const sel = document.getElementById(`gear${i}Select`);
+        const amt = document.getElementById(`gear${i}Amt`);
+        if (sel) saved[i] = { select: sel.value, amt: amt ? amt.value : 1 };
+    }
+
+    for (let i = 1; i <= gearSlots; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
 
@@ -57,6 +66,13 @@ function generateGearEntries() {
         const sel = document.getElementById(`gear${i}Select`);
         populateGearSelector(sel, allOptions, 'Ready Slot');
 
+        // Restore saved if available
+        if (saved[i]) {
+            sel.value = saved[i].select || '';
+            const amtInput = document.getElementById(`gear${i}Amt`);
+            amtInput.value = saved[i].amt || 1;
+        }
+
         // On change: update load + conditionally add details icon
         sel.addEventListener('change', () => {
             handleReadySelectChange(i);  // This now handles EVERYTHING: details, packs, state, stowed rendering, and loads
@@ -71,6 +87,8 @@ function generateGearEntries() {
             updateReadyLoad(i);
             calculateLoad();
         });
+
+        updateReadyLoad(i);
     }
 
     calculateLoad();
@@ -450,6 +468,6 @@ document.addEventListener('change', e => {
 
 // Init gear after data is loaded (replaces window.load)
 window.addEventListener('dataLoaded', () => {
-    generateGearEntries();
+    rebuildGearSelectors();
     calculateLoad();
 });

@@ -1,4 +1,3 @@
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv';
 let allData = [];
 
 // Count leading dashes
@@ -6,28 +5,6 @@ function getIndentLevel(text) {
     if (!text) return 0;
     const match = text.match(/^-+/);
     return match ? match[0].length : 0;
-}
-
-// Organize data
-function organizeData(rows) {
-    try {
-        const organized = {};
-        let currentHeader = '';
-        rows.forEach(row => {
-            if (!row.Sections.startsWith('-')) {
-                currentHeader = row.Sections;
-                organized[currentHeader] = { subitems: [], details: row.Details };
-            } else {
-                const name = row.Sections.replace(/^-/, '').trim();
-                if (currentHeader && name) {
-                    organized[currentHeader].subitems.push({ name, details: row.Details });
-                }
-            }
-        });
-        return organized;
-    } catch (error) {
-        throw error;
-    }
 }
 
 // Render sidebar
@@ -149,35 +126,9 @@ document.querySelectorAll('.nav-list a').forEach(link => {
 });
 
 // Load Prae data
-fetch(CSV_URL)
-    .then(r => { if (!r.ok) throw Error(r.status); return r.text(); })
-    .then(text => {
-        const parsed = Papa.parse(text, {
-            header: false,
-            skipEmptyLines: true,
-            dynamicTyping: false,
-            delimitersToGuess: [',']
-        });
-        if (parsed.errors.length > 0) {
-            console.error('PapaParse errors:', parsed.errors);
-            throw new Error('Error parsing CSV');
-        }
-        const rows = parsed.data;
-        const headers = (rows[0] || []).map(h => h.trim());
-        let sectionsIndex = headers.findIndex(h => h.toLowerCase() === 'sections');
-        if (sectionsIndex === -1) sectionsIndex = 1;
-        let detailsIndex = headers.findIndex(h => h.toLowerCase().includes('detail') || h.toLowerCase() === 'c');
-        if (detailsIndex === -1) detailsIndex = 2;
-
-        const dataRows = rows.slice(1).map(values => {
-            while (values.length <= Math.max(sectionsIndex, detailsIndex)) values.push('');
-            return {
-                Sections: values[sectionsIndex]?.trim() || '',
-                Details: values[detailsIndex] || 'WIP'
-            };
-        }).filter(r => r.Sections);
-
-        allData = organizeData(dataRows);
+loadData()
+    .then(data => {
+        allData = data;
         renderSidebar(allData);
         renderSections(allData);
     })

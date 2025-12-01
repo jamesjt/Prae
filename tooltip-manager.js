@@ -31,6 +31,7 @@ class TooltipManager {
     if (key.startsWith("skill:")) return TooltipManager.skill(key);
     if (key.startsWith("ability:")) return TooltipManager.ability(key);
     if (key.startsWith("gear:")) return TooltipManager.gear(key);
+    if (key.startsWith("expr:")) return TooltipManager.expr(key);
 
     return `(Unknown tooltip key: ${key})`;
   }
@@ -52,5 +53,10 @@ class TooltipManager {
         <div>${item.details}</div> 
         Load: ${item.load ?? 0}<br>
       </div>`;
+  }
+
+  static expr(key) {
+    const expr = key.replace("expr:", "");
+    return `|${expr}|`;
   }
 }

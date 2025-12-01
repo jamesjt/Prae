@@ -576,8 +576,11 @@ function populateAbilityInfo(selectId, abilities, type) {
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
         let processedValue = ability.details[key];
-        // Replace |expr| with evaluated value
-        processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
+        // Replace |expr| with spanned value
+        processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => {
+            const computed = evaluateExpr(expr);
+            return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
+        });
         const div = document.createElement('div');
         div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
         div.innerHTML = processWithTooltips(processedValue);
@@ -604,7 +607,10 @@ function populateRoleInfo(e) {
         const propKey = Object.keys(way.props).find(k => k.toLowerCase().includes(key));
         let val = propKey ? way.props[propKey] : '';
         if (val) {
-            val = val.replace(/\|([^|]+)\|/g, (match, expr) => evaluateExpr(expr));
+            val = val.replace(/\|([^|]+)\|/g, (match, expr) => {
+                const computed = evaluateExpr(expr);
+                return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
+            });
             const div = document.createElement('div');
             div.className = 'talent' + key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '');
             div.innerHTML = processWithTooltips(val);

@@ -749,6 +749,12 @@ function updateProficiencySelectors(type, rank) {
         if (el) el.hidden = i > rank;
     }
 }
+/************************************************************
+ * CLEANED GEAR UI SECTION (Phase 2)
+ * ---------------------------------
+ * This version contains ONLY UI creation for ready slots.
+ * All logic is now handled by GearManager + GearSlot.
+ ************************************************************/
 
 function generateGearEntries() {
     const container = document.getElementById('gearEntries');
@@ -758,9 +764,7 @@ function generateGearEntries() {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
 
-        // Pure UI construction — behavior is handled elsewhere (e.g. GearManager)
-        let detailsHtml = '';
-
+        // Pure UI construction — GearManager handles all logic
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector">
                 <option value="emptyStowedGearSlot">Ready Slot</option>
@@ -772,33 +776,44 @@ function generateGearEntries() {
                 min="1"
                 value="1"
             />
-            ${detailsHtml}
         `;
 
         container.appendChild(entry);
 
-        // Populate selector from allOptions (unchanged from your current file)
+        // Populate selector with categories
         const sel = document.getElementById(`gear${i}Select`);
         const grouped = {};
+
         allOptions.forEach(g => {
             if (!grouped[g.category]) grouped[g.category] = [];
             grouped[g.category].push(g);
         });
 
-        Object.keys(grouped).sort().forEach(cat => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `-- ${cat} --`;
-            grouped[cat]
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(g => {
-                    const opt = document.createElement('option');
-                    opt.value = g.name;
-                    opt.textContent = g.name;
-                    opt.dataset.load = g.baseLoad || g.load || 0;
-                    optgroup.appendChild(opt);
-                });
-            sel.appendChild(optgroup);
-        });
+        Object.keys(grouped)
+            .sort()
+            .forEach(cat => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = `-- ${cat} --`;
+
+                grouped[cat]
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g.name;
+                        opt.textContent = g.name;
+
+                        // Keep load info ONLY as data for GearManager (not used here)
+                        opt.dataset.load = g.baseLoad || g.load || 0;
+
+                        optgroup.appendChild(opt);
+                    });
+
+                sel.appendChild(optgroup);
+            });
+
+        // IMPORTANT:
+        // Do NOT add event listeners here.
+        // GearManager.init() binds and manages all slot/stowed behavior.
     }
 }
 

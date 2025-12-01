@@ -573,13 +573,13 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .contents-container select {background-color:var(--gearLiquids);}
 .contents-container input {background-color:var(--gearLiquids);margin-left:5px;}
 .stowedGear{}
-.gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
+.gearCoinsContainer{display:flex; justify-content: center;align-items: center;font-size: 10px}
 #coinsGold{border-color:#d29a38}
 #coinsTok{border-color: teal}
 #coinsSilver{border-color: silver;}
 #coinsCopper{border-color: #CD7F32}
 .gearCoinsLabel{font-size:14px}
-.gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: black;margin-left: 10px;border-radius: 4px;}
+.gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: black;margin-left: 12px;border-radius: 4px;}
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex; border-}
 #totalLoadDisplay{font-size:14px;margin-left:5px;}

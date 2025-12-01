@@ -1,10 +1,10 @@
 // data.js
 // URLs for all CSVs (centralized here—add more as needed)
 const CSV_URLS = {
-    main: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv',
+    rulebook: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv',
     abilities: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv',
     ways: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv',
-    char: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv'
+    rules: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv'
 };
 // Globals (keep as-is for now; populated here)
 let allData = {}; // Main sections data
@@ -156,17 +156,17 @@ function parseChar(rows) {
 // Main load function (loads all in parallel)
 async function loadAllData() {
     try {
-        const [mainRows, abilitiesRows, waysRows, charRows] = await Promise.all([
-            fetchAndParseCsv(CSV_URLS.main),
+        const [rulebookRows, abilitiesRows, waysRows, rulesRows] = await Promise.all([
+            fetchAndParseCsv(CSV_URLS.rulebook),
             fetchAndParseCsv(CSV_URLS.abilities),
             fetchAndParseCsv(CSV_URLS.ways),
-            fetchAndParseCsv(CSV_URLS.char)
+            fetchAndParseCsv(CSV_URLS.rules)
         ]);
         // Parse each
-        allData = parseRulebook(mainRows);
+        allData = parseRulebook(rulebookRows);
         abilitiesData = parseAbilities(abilitiesRows);
         waysData = parseWays(waysRows);
-        const { dataByCategory, hoverRules } = parseChar(charRows);
+        const { dataByCategory, hoverRules } = parseChar(rulesRows);
         gearData = dataByCategory.gear || [];
         const proficiencies = dataByCategory.proficiencies || [];
         profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');

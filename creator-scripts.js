@@ -57,7 +57,7 @@ async function loadAllData() {
                     const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
                     currentAbility = { type, name: value || `(Unnamed ${type})`, skill, details: {} };
                 } else if (currentAbility && key && key.includes(' ')) {
-                    const detailKey = key.split(' ').slice(2).join(' ');
+                    const detailKey = key.split(' ').slice(2).join(' ').trim().toLowerCase(); // Normalize key
                     currentAbility.details[detailKey] = value;
                 }
             }
@@ -588,8 +588,8 @@ function populateAbilityInfo(selectId, abilities, type) {
     });
     // Add ritual for specific tricks
     const ritualSkills = ['lore', 'tinkering', 'deception', 'insight', 'awareness', 'survival'];
-    if (type === 'trick' && ritualSkills.includes(ability.skill) && ability.details.trickManaUse) {
-        const ritualName = ability.details.trickManaUse.trim();
+    if (type === 'trick' && ritualSkills.includes(ability.skill) && ability.details.trickmanaUse) { // Note: lowercased key
+        const ritualName = ability.details.trickmanaUse.trim();
         const ritualDiv = document.createElement('div');
         ritualDiv.className = 'trickManaUse';
         ritualDiv.innerHTML = `Ritual: <span data-tip="ritual:${ritualName}">${ritualName}</span>`;

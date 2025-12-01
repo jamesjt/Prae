@@ -1,7 +1,4 @@
 // creator-scripts.js
-const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
-const CHAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
-const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
 
 const SKILL_ID_MAP = {
     'Athletics': 'athleticsSkillRank', 'Force': 'forceSkillRank', 'Acrobatics': 'acrobaticsSkillRank', 'Sneak': 'sneakSkillRank',
@@ -28,17 +25,28 @@ const ATTRIBUTE_GROUPS = {
 let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
 let talentAmount = 1;
 let tricksAmount = 1;
+const WAYS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv';
+const CHAR_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv';
+const ABILITIES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv';
+
+// Helper to fetch CSV text with error handling
+async function fetchCsv(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        const gid = new URL(url).searchParams.get('gid') || 'unknown';
+        throw new Error(`Fetch failed for gid=${gid}: ${response.status}`);
+    }
+    return response.text();
+}
 
 // ———————————————————————— DATA LOADING ————————————————————————
-
 async function loadAllData() {
     try {
         const [abilitiesRes, waysRes, charRes] = await Promise.all([
-            fetch(ABILITIES_CSV_URL).then(r => { if (!r.ok) throw new Error(`Abilities fetch failed: ${r.status}`); return r.text(); }),
-            fetch(WAYS_CSV_URL).then(r => { if (!r.ok) throw new Error(`Ways fetch failed: ${r.status}`); return r.text(); }),
-            fetch(CHAR_CSV_URL).then(r => { if (!r.ok) throw new Error(`Char fetch failed: ${r.status}`); return r.text(); })
+            fetchCsv(ABILITIES_CSV_URL),
+            fetchCsv(WAYS_CSV_URL),
+            fetchCsv(CHAR_CSV_URL)
         ]);
-
         // Parse Abilities
         const abilitiesParsed = Papa.parse(abilitiesRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (abilitiesParsed.errors.length) throw new Error('Abilities parse error');
@@ -67,7 +75,6 @@ async function loadAllData() {
             if (!abilitiesData.has(skill)) abilitiesData.set(skill, []);
             abilitiesData.get(skill).push(ability);
         }
-
         // Parse Ways
         const waysParsed = Papa.parse(waysRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (waysParsed.errors.length) throw new Error('Ways parse error');
@@ -95,15 +102,12 @@ async function loadAllData() {
                 }
             }
         }
-
         // Parse Char/PROF
         const charParsed = Papa.parse(charRes, { header: false, skipEmptyLines: true, dynamicTyping: false });
         if (charParsed.errors.length) throw new Error('Char parse error');
         const charRows = charParsed.data;
         const headers = charRows[0].map(h => h.trim());
-
         const dataByCategory = parseCsvByCategories(headers, charRows);
-
         // Parse hoverRules specially
         const hoverIdx = headers.indexOf('hoverRules');
         const detailsIdx = headers.indexOf('hoverRules Details');
@@ -116,28 +120,22 @@ async function loadAllData() {
                 }
             }
         }
-
         // For debugging
         console.log('Parsed Data:', dataByCategory);
         console.log('Hover Rules Data:', hoverRulesData);
-
         // Assign for gear (now global for gear-scripts.js to access)
         gearData = dataByCategory.gear || [];
-
         // Assign for proficiencies
         const proficiencies = dataByCategory.proficiencies || [];
         profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
-
         // Post-parsing init (e.g., populate selectors, etc.)
         TooltipManager.init();
-
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
         populateRoleSelector();
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-
         // Dispatch event to signal data is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));
     } catch (err) {
@@ -146,7 +144,6 @@ async function loadAllData() {
         document.getElementById('content-sections').innerHTML = '<div class="no-results">Error loading data: ' + err.message + '</div>';
     }
 }
-
 // Helper: Generic CSV parser (optimized with reduce)
 function parseCsvByCategories(headers, rows) {
     const dataByCategory = {};
@@ -158,12 +155,10 @@ function parseCsvByCategories(headers, rows) {
         map[prefix].push({ header: h, idx });
         return map;
     }, {});
-
     for (const [prefix, entries] of Object.entries(prefixMap)) {
         if (entries.length < 2) continue;
         const categoryKey = prefix.trim().toLowerCase();
         dataByCategory[categoryKey] = [];
-
         const configs = entries.map(({ header }) => {
             const subCategory = header.replace(prefix, '').trim();
             const camelPrefix = prefix.replace(' ', '') + subCategory.replace(/\s+/g, '');
@@ -175,7 +170,6 @@ function parseCsvByCategories(headers, rows) {
             }, []);
             return { mainIdx: headers.indexOf(header), subCategory, related };
         });
-
         for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
             configs.forEach(config => {
@@ -186,19 +180,15 @@ function parseCsvByCategories(headers, rows) {
                 dataByCategory[categoryKey].push(item);
             });
         }
-
         dataByCategory[categoryKey].sort((a, b) => a.name.localeCompare(b.name));
     }
-
     return dataByCategory;
 }
-
 // Helper: Parse item properties with dynamic type conversion
 function parseItemProps(item, related, row) {
     related.forEach(rel => {
         let val = row[rel.idx]?.trim();
         if (!val) return;
-
         const suffixLower = rel.suffix.toLowerCase();
         // Pattern-based conversion
         if (suffixLower.includes('load') || suffixLower.includes('slots') || suffixLower.includes('used') || suffixLower.includes('cost')) {
@@ -207,11 +197,9 @@ function parseItemProps(item, related, row) {
             val = parseInt(val) || 0;
         }
         // Else: Keep as string (e.g., 'details')
-
         item[rel.suffix.toLowerCase()] = val;
     });
 }
-
 function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
     const saved = {};
@@ -219,7 +207,7 @@ function populateProficiencySelectors(type) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
             saved[i] = sel.value;
-            sel.innerHTML = '<option value="">Select Proficiency</option>' + 
+            sel.innerHTML = '<option value="">Select Proficiency</option>' +
                 profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
         }
     }
@@ -239,16 +227,14 @@ function populateProficiencySelectors(type) {
         }
     }
 }
-
 // Update updateProficiencySelectors to call population after visibility
 function updateProficiencySelectors(type, rank) {
     for (let i = 1; i <= 5; i++) {
         const el = document.getElementById(type + 'ProfSelector' + i);
         if (el) el.hidden = i > rank;
     }
-    populateProficiencySelectors(type);  // Add this
+    populateProficiencySelectors(type); // Add this
 }
-
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config, amount) {
     const {

@@ -78,6 +78,18 @@ function handleReadySelectChange(i) {
     const sel = document.getElementById(`gear${i}Select`);
     const newGearName = sel.value;
     const item = allOptions.find(g => g.name === newGearName);
+    const entry = sel.closest('.gearEntry');
+    // Remove previous type classes
+    entry.classList.forEach(cls => {
+        if (cls.startsWith('gear') && cls !== 'gearEntry') {
+            entry.classList.remove(cls);
+        }
+    });
+    // Add new type class if item selected
+    if (item && item.category) {
+        const typeClass = 'gear' + item.category;
+        entry.classList.add(typeClass);
+    }
     // === 1. Remove old details icon (if any) ===
     const oldDetails = document.getElementById(`gear${i}Details`);
     if (oldDetails) oldDetails.remove();
@@ -88,7 +100,7 @@ function handleReadySelectChange(i) {
         detailsDiv.className = 'gearDetails';
         detailsDiv.textContent = 'i';
         detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-        sel.closest('.gearEntry').appendChild(detailsDiv);
+        entry.appendChild(detailsDiv);
     }
     // === 3. Handle pack logic (this was broken) ===
     const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Packs';
@@ -165,6 +177,11 @@ function renderStowed(i) {
                 detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
                 entry.appendChild(detailsDiv);
             }
+            // Add type class for stowed item
+            if (item && item.category) {
+                const typeClass = 'gear' + item.category;
+                entry.classList.add(typeClass);
+            }
         }
 
         // On change
@@ -184,6 +201,18 @@ function renderStowed(i) {
                 detailsDiv.textContent = 'i';
                 detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
                 entry.appendChild(detailsDiv);
+            }
+
+            // Remove previous type classes
+            entry.classList.forEach(cls => {
+                if (cls.startsWith('gear') && cls !== 'gearEntry' && cls !== 'gearStowed') {
+                    entry.classList.remove(cls);
+                }
+            });
+            // Add new type class if item selected
+            if (item && item.category) {
+                const typeClass = 'gear' + item.category;
+                entry.classList.add(typeClass);
             }
 
             readyState[i-1].stowed[j].gear = selectedName;

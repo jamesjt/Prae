@@ -139,8 +139,7 @@ async function loadAllData() {
 
         updateAbilitySelectors('trick');
         updateAbilitySelectors('talent');
-        populateRoleSelector();
-        updateWayOptions();
+        populateWayOptions();
         generateGearEntries();
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     } catch (err) {
@@ -341,7 +340,7 @@ document.addEventListener('change', e => {
     // Skill Ranks
     if (t.matches('select[id$="SkillRank"]')) {
         updateSkillModAndPassive(t.id);
-        updateWayOptions();
+        populateWayOptions();
         calculateSkillPoints();
         const type = t.id.replace('SkillRank', '').toLowerCase();
         if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
@@ -454,19 +453,44 @@ document.addEventListener('click', e => {
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
-function populateRoleSelector() {
+ffunction populateWayOptions() {
     const sel = document.getElementById('roleSelector');
-    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
-    waysData.forEach(w => sel.innerHTML += `<option value="${w.name}">${w.name}</option>`);
-}
-function updateWayOptions() {
-    const sel = document.getElementById('roleSelector');
-    waysData.forEach(way => {
-        let qualified = way.reqSkill === 'Any'
-            ? Object.values(SKILL_ID_MAP).some(id => document.getElementById(id)?.value > 1)
-            : document.getElementById(way.skillId)?.value > 1;
-        const opt = sel.querySelector(`option[value="${way.name}"]`);
-        if (opt) opt.disabled = !qualified;
+    if (!sel) return;
+    sel.innerHTML = '';
+
+    const opt = document.createElement('option');
+    opt.value = 'wayEmpty';
+    opt.textContent = 'Select Way';
+    sel.appendChild(opt);
+
+    // Group for Selectable Ways
+    const selectableGroup = document.createElement('optgroup');
+    selectableGroup.label = 'Selectable Ways';
+    sel.appendChild(selectableGroup);
+
+    // Group for Unavailable Ways
+    const unavailableGroup = document.createElement('optgroup');
+    unavailableGroup.label = 'Unavailable Ways';
+    sel.appendChild(unavailableGroup);
+
+    waysData.forEach((way, col) => {
+        if (includeRow[col] !== 'TRUE') return;
+
+        const name = way.name || '(Unnamed)';
+        const attack = way.attack || '';
+        const skillId = SKILL_ID_MAP[attack];
+        const rank = skillId ? parseInt(document.getElementById(skillId)?.value || 0) : 0;
+
+        const wayOpt = document.createElement('option');
+        wayOpt.value = name;
+        wayOpt.textContent = name;
+
+        if (rank >= 3) {
+            selectableGroup.appendChild(wayOpt);
+        } else {
+            wayOpt.disabled = true;
+            unavailableGroup.appendChild(wayOpt);
+        }
     });
 }
 function updateAbilitySelectors(type) {

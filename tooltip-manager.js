@@ -14,10 +14,11 @@ class TooltipManager {
         content: html,
         allowHTML: true,
         theme: "ruleTip",
-        maxWidth: 350,
         placement: "top",
-        animation: "shift-away-subtle",
+        animation: "fade",
         interactive: true,
+        trigger: "focus",
+        delay: [50,50],
       });
 
       TooltipManager.instances.set(el, instance);

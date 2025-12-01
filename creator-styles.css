@@ -545,7 +545,7 @@ Dead Olive Canvas (#5E6156)
 Stormwater Slate Sea (#5F6F72)
 */
 .gearListContainer{
-    background-color: #5E6156
+    background-color: #5E6156;
     width:240px;
 }
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitewmoke;}

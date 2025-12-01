@@ -453,15 +453,15 @@ document.addEventListener('click', e => {
     }
 });
 // ———————————————————————— CORE FUNCTIONS ————————————————————————
-function populateWayOptions() {
+ffunction populateWayOptions() {
     const sel = document.getElementById('roleSelector');
     if (!sel) return;
     sel.innerHTML = '';
 
-    const defaultOpt = document.createElement('option');
-    defaultOpt.value = 'wayEmpty';
-    defaultOpt.textContent = 'Select Way';
-    sel.appendChild(defaultOpt);
+    const opt = document.createElement('option');
+    opt.value = 'wayEmpty';
+    opt.textContent = 'Select Way';
+    sel.appendChild(opt);
 
     // Group for Selectable Ways
     const selectableGroup = document.createElement('optgroup');
@@ -478,22 +478,14 @@ function populateWayOptions() {
 
         const name = way.name || '(Unnamed)';
         const attack = way.attack || '';
-        const reqSkill = way.reqSkill || '';  // Assuming this exists in waysData from parsing
         const skillId = SKILL_ID_MAP[attack];
         const rank = skillId ? parseInt(document.getElementById(skillId)?.value || 0) : 0;
-
-        let qualified;
-        if (reqSkill === 'Any') {
-            qualified = Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 1);
-        } else {
-            qualified = rank > 1;
-        }
 
         const wayOpt = document.createElement('option');
         wayOpt.value = name;
         wayOpt.textContent = name;
 
-        if (qualified) {
+        if (rank >= 3) {
             selectableGroup.appendChild(wayOpt);
         } else {
             wayOpt.disabled = true;

@@ -126,15 +126,15 @@ document.querySelectorAll('.nav-list a').forEach(link => {
 });
 
 // Load Prae data
-loadData()
-    .then(data => {
-        allData = data;
-        renderSidebar(allData);
-        renderSections(allData);
-    })
-    .catch(err => {
-        document.getElementById('content-sections').innerHTML = '<div class="no-results">Error loading data</div>';
-        document.getElementById('sidebar-content').innerHTML = '<div class="no-results">Error loading sidebar</div>';
-    });
+// script.js (excerpt)
+
+// Remove your loadData() call and .then chain
+// Instead, listen for event
+window.addEventListener('dataLoaded', () => {
+    renderSidebar(allData);
+    renderSections(allData);
+});
+
+// Rest unchanged
 
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));

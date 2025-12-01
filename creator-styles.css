@@ -545,6 +545,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearListContainer{
     background-color: var(--gearList);
     width:240px;
+    border-radius: 8px;
+    padding:2px;
 }
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitewmoke;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}

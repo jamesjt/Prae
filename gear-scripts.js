@@ -1,7 +1,6 @@
 // gear-scripts.js
 
 // Add near top constants
-const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
 
 let allOptions = [];
 let nonPackOptions = [];
@@ -16,7 +15,7 @@ function populateGearSelector(selectEl, options, placeholder) {
         if (!grouped[g.category]) grouped[g.category] = [];
         grouped[g.category].push(g);
     });
-    Object.keys(grouped).sort().forEach(cat => {
+    Object.keys(grouped).forEach(cat => {
         const optgroup = document.createElement('optgroup');
         optgroup.label = `-- ${cat} --`;
         grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {

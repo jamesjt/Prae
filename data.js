@@ -1,5 +1,4 @@
 // data.js
-
 // URLs for all CSVs (centralized here—add more as needed)
 const CSV_URLS = {
     main: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv',
@@ -7,7 +6,6 @@ const CSV_URLS = {
     ways: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv',
     char: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv'
 };
-
 // Globals (keep as-is for now; populated here)
 let allData = {}; // Main sections data
 let abilitiesData = new Map();
@@ -15,7 +13,6 @@ let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
 let hoverRulesData = [];
-
 // Generic fetch + parse function
 async function fetchAndParseCsv(url, customParser = null) {
     try {
@@ -44,12 +41,11 @@ async function fetchAndParseCsv(url, customParser = null) {
         throw err; // Re-throw for callers
     }
 }
-
 // Parser for main CSV (your original organizeRows logic)
-function parseMain(rows) {
-    const dataRows = rows.map(values => ({
-        Sections: values[0]?.trim() || '', // Assuming first column is Sections
-        Details: values[1] || 'WIP' // Second is Details
+function parseRulebook(rows) {
+    const dataRows = rows.slice(1).map(values => ({  // Skip header row
+        Sections: values[1]?.trim() || '',  // Adjusted index for Sections
+        Details: values[2] || 'WIP'  // Adjusted index for Details
     })).filter(r => r.Sections);
     const organized = {};
     let currentHeader = '';
@@ -58,7 +54,7 @@ function parseMain(rows) {
             currentHeader = row.Sections;
             organized[currentHeader] = { subitems: [], details: row.Details };
         } else {
-            const name = row.Sections.replace(/^-/, '').trim();
+            const name = row.Sections.replace(/^-+\s*/, '').trim();
             if (currentHeader && name) {
                 organized[currentHeader].subitems.push({ name, details: row.Details });
             }
@@ -66,7 +62,6 @@ function parseMain(rows) {
     });
     return organized;
 }
-
 // Parser for abilities CSV (moved from creator-scripts.js)
 function parseAbilities(rows) {
     const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
@@ -96,7 +91,6 @@ function parseAbilities(rows) {
     });
     return abilitiesMap;
 }
-
 // Parser for ways CSV (moved from creator-scripts.js)
 function parseWays(rows) {
     const includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
@@ -125,7 +119,6 @@ function parseWays(rows) {
     }
     return parsedWays;
 }
-
 // Parser for char CSV (moved from creator-scripts.js)
 function parseChar(rows) {
     const headers = rows[0].map(h => h.trim());
@@ -160,7 +153,6 @@ function parseChar(rows) {
     // Return all parsed parts
     return { dataByCategory, hoverRules };
 }
-
 // Main load function (loads all in parallel)
 async function loadAllData() {
     try {
@@ -170,9 +162,8 @@ async function loadAllData() {
             fetchAndParseCsv(CSV_URLS.ways),
             fetchAndParseCsv(CSV_URLS.char)
         ]);
-
         // Parse each
-        allData = parseMain(mainRows);
+        allData = parseRulebook(mainRows);
         abilitiesData = parseAbilities(abilitiesRows);
         waysData = parseWays(waysRows);
         const { dataByCategory, hoverRules } = parseChar(charRows);
@@ -182,13 +173,11 @@ async function loadAllData() {
         profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
         hoverRulesData = hoverRules;
-
         // Dispatch event—everything is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));
     } catch (err) {
         // Global error handling (already in fetchAndParseCsv)
     }
 }
-
 // Call on load
 loadAllData();

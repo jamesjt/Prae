@@ -14,8 +14,8 @@
 
 
 :root{
-  --gearList: #372f24;
-  --gearStowed:#353230;
+  --gearStowed: #372f24;
+  --gearList:#353230;
   --gearLiquids:#384143;
   --bodyColor0:#5F1817;
   --bodyColor1:#7B1C19;
@@ -560,6 +560,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     width: 40px;
     font-size: 14px;
 }
+.gearLoadHead{margin-right:10px;}
 .gearEntryHead{width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
@@ -576,7 +577,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #coinsSilver{border-color: silver;}
 #coinsCopper{border-color: #CD7F32}
 .gearCoinsLabel{font-size:14px}
-.gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: var(--gearList);margin-left: 10px;border-radius: 4px;}
+.gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: black;margin-left: 10px;border-radius: 4px;}
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex; border-}
 #totalLoadDisplay{font-size:14px;margin-left:5px;}

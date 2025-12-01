@@ -567,8 +567,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .stowed-container select{background-color:var(--gearStowed);}
 .stowed-container input{background-color:var(--gearStowed);margin-left:5px;}
 .contents-container {padding-left:10px;background-color:var(--gearLiquids);border:1px inset black;}}
-.contents-container input {background-color:var(--gearLiquids);margin-left:5px;}
 .contents-container select {background-color:var(--gearLiquids);}
+.contents-container input {background-color:var(--gearLiquids);margin-left:5px;}
 .stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
 #coinsGold{border-color:#d29a38}

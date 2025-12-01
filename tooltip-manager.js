@@ -18,8 +18,6 @@ class TooltipManager {
         placement: "top",
         animation: "shift-away-subtle",
         interactive: true,
-        trigger: 'mouseenter click', // Allow hover and click
-        hideOnClick: false, // Persist on click
       });
 
       TooltipManager.instances.set(el, instance);
@@ -34,7 +32,6 @@ class TooltipManager {
     if (key.startsWith("ability:")) return TooltipManager.ability(key);
     if (key.startsWith("gear:")) return TooltipManager.gear(key);
     if (key.startsWith("expr:")) return TooltipManager.expr(key);
-    if (key.startsWith("ritual:")) return TooltipManager.ritual(key);
 
     return `(Unknown tooltip key: ${key})`;
   }
@@ -61,27 +58,5 @@ class TooltipManager {
   static expr(key) {
     const expr = key.replace("expr:", "");
     return `|${expr}|`;
-  }
-
-  static ritual(key) {
-    const name = key.replace("ritual:", "");
-    // Find ritual ability (assume global abilitiesData)
-    let ritual = null;
-    for (const [skill, abilities] of abilitiesData) {
-      ritual = abilities.find(a => a.type === 'ritual' && a.name === name);
-      if (ritual) break;
-    }
-    if (!ritual) return `(Ritual not found: ${name})`;
-
-    // Build HTML similar to other tooltips
-    let html = `<div class="tip-ritual"><strong>${ritual.name}</strong><br>`;
-    const order = ['keywords', 'cost', 'cast time', 'duration', 'effect', 'enhancements', 'augments', 'resist', 'notes'];
-    order.forEach(k => {
-      if (ritual.details[k]) {
-        html += `<div class="ritual-${k.replace(/\s/g, '')}">${ritual.details[k]}</div>`;
-      }
-    });
-    html += '</div>';
-    return html;
   }
 }

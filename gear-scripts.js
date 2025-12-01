@@ -288,8 +288,8 @@ document.addEventListener('change', e => {
     }
 });
 
-// Init gear after main load (assumes creator-scripts.js loads first and gearData is global)
-window.addEventListener('load', () => {
+// Init gear after data is loaded (replaces window.load)
+window.addEventListener('dataLoaded', () => {
     generateGearEntries();
-    calculateLoad(); // Initial total (will be 0 until data loads)
+    calculateLoad();
 });

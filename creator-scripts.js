@@ -25,7 +25,7 @@ const ATTRIBUTE_GROUPS = {
     spirit:   { priorityId: 'spiritPriority', pointsId: 'spiritAttributePoints', primaryValueId: 'spiritValue', subIds: ['vigorValue', 'faithValue', 'empathyValue'] }
 };
 
-let waysData = [], profData = { strike: [], blast: [], invoke: [] }, abilitiesData = new Map(), hoverRulesData = [];
+let waysData = [], profData = { strike: [], blast: [], invoke: [] }, gearData, abilitiesData = new Map(), hoverRulesData = [];
 
 // ———————————————————————— DATA LOADING ————————————————————————
 
@@ -136,6 +136,9 @@ async function loadAllData() {
         populateRoleSelector();
         updateWayOptions();
         ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
+
+        // Dispatch event to signal data is ready
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
     } catch (err) {
         console.error('Data load error:', err);
         // UI feedback, e.g.:
@@ -393,7 +396,7 @@ document.addEventListener('change', e => {
         return;
     }
 
-    // Way Selector
+    // Way selector
     if (t.matches('#roleSelector')) {
         populateRoleInfo(e);
         return;

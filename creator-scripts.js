@@ -380,6 +380,61 @@ document.addEventListener('change', e => {
                 spirit: document.getElementById('spiritPriority')
             };
             const changedAttr = t.id.replace('Priority', '').toLowerCase();
+            const newPri = t.value;// creator-scripts.js
+document.addEventListener('change', e => {
+    const t = e.target;
+    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
+
+    // Talent/Trick Selectors (combined)
+    if (t.matches('.talentSelector, .trickSelector')) {
+        const type = t.className.replace('Selector', '');
+        populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
+        calculateAbilities();
+        return;
+    }
+
+    // Skill Ranks
+    if (t.matches('select[id$="SkillRank"]')) {
+        updateSkillModAndPassive(t.id);
+        updateWayOptions();
+        calculateSkillPoints();
+        const type = t.id.replace('SkillRank', '').toLowerCase();
+        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
+        // Refresh existing ability descriptions
+        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
+            if (sel.value && sel.value !== `${sel.className.replace('Selector', '')}Empty`) {
+                const abType = sel.className.replace('Selector', '');
+                populateAbilityInfo(sel.id, getQualifiedAbilities(abType), abType);
+            }
+        });
+        // Refresh way talent if selected
+        const roleSel = document.getElementById('roleSelector');
+        if (roleSel && roleSel.value !== 'wayEmpty') {
+            populateRoleInfo({ target: roleSel });
+        }
+        // Refresh proficiency descriptions if applicable
+        if (['strike', 'blast', 'invoke'].includes(type)) {
+            for (let i = 1; i <= 5; i++) {
+                const sel = document.getElementById(type + 'ProfSelector' + i);
+                if (sel && !sel.hidden && sel.value) {
+                    populateProficiencyInfo(sel.id, type);
+                }
+            }
+        }
+        return;
+    }
+
+    // Priorities, Level, Sub-attributes (combined attribute-related)
+    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
+        if (t.matches('#bodyPriority, #mindPriority, #spiritPriority')) {
+            const priorities = {
+                body: document.getElementById('bodyPriority'),
+                mind: document.getElementById('mindPriority'),
+                spirit: document.getElementById('spiritPriority')
+            };
+            const changedAttr = t.id.replace('Priority', '').toLowerCase();
             const newPri = t.value;
             const priorityUnassigned = 'priorityUnassigned';
             if (newPri !== priorityUnassigned) {

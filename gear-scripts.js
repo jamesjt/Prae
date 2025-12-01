@@ -9,7 +9,7 @@ let gearSlots = 5; // Dynamic gear slots
 let readyState = Array(gearSlots).fill(null).map(() => ({ gear: '', amt: 1, stowed: [], contents: [] }));
 
 function populateGearSelector(selectEl, options, placeholder) {
-    selectEl.innerHTML = `<option value="emptyStowedGearSlot">Ready Slot</option>`;
+    selectEl.innerHTML = `<option value="emptyStowedGearSlot">${placeholder}</option>`;
     const grouped = {};
     options.forEach(g => {
         if (!grouped[g.category]) grouped[g.category] = [];
@@ -211,7 +211,7 @@ function renderStowed(i) {
         container.appendChild(entry);
 
         const sel = entry.querySelector('select');
-        populateGearSelector(sel, nonPackOptions, 'Stowed Slot');
+        populateGearSelector(sel, nonPackOptions, 'Stowed slot');
 
         // Restore saved selection and add details if needed
         if (s.gear) {

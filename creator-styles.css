@@ -534,24 +534,24 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 
 /* gear colors 
-warm graphite: #6F6A63
-slate: #5C5650
-soft umber: #847E76
-leather? rgba(89, 72, 54, 1) - Old stowed
-dark leather: #5E4634
-Muted Saddle Brown (#7C6A59)
-Weathered Leather Gray-Brown (#6F655D)
-Dead Olive Canvas (#5E6156)
-Stormwater Slate Sea (#5F6F72)
+warm graphite: #6F6A63;
+slate: #5C5650;
+soft umber: #847E76;
+leather? rgba(89, 72, 54, 1); - Old stowed
+dark leather: #5E4634;
+Muted Saddle Brown (#7C6A59;)
+Weathered Leather Gray-Brown (#6F655D;)
+Dead Olive Canvas (#5E6156;)
+Stormwater Slate Sea (#5F6F72;)
 */
 .gearListContainer{
-    background-color: #5E6156;
+    background-color: #6F6A63;
     width:240px;
 }
 .gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitewmoke;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearName{width:90%;}
-.gearSelector{width:130px;border:1px solid rgba(89, 72, 54, 1); background-color: #5E6156;color:whitesmoke;}
+.gearSelector{width:130px;border:none; background-color: #6F6A63;color:whitesmoke;}
 .gearAmtInputField{width: 30px;border: none;background-color:#6F6A63;color: whitesmoke;margin-left:15px;}
 .gearAmtInputField:hover{background-color: white;color:black;}
 .gearLoad{display: flex;
@@ -563,12 +563,12 @@ Stormwater Slate Sea (#5F6F72)
 .gearEntryHead{width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
-.stowed-container{padding-left:10px;background-color:#6F655D;}
+.stowed-container{padding-left:10px;background-color:#7C6A59;}
+.stowed-container select{background-color:#7C6A59;}
+.stowed-container input{background-color:#7C6A59;border:none;width:30px;color:whitesmoke;margin-left:5px;}
 .contents-container{padding-left:10px;background-color:#5F6F72;}
-.stowed-container input{background-color:#5E6156;border:none;width:30px;color:whitesmoke;margin-left:5px;}
-.contents-container input{background-color:#6F655D;border:none;width:30px;color:whitesmoke;margin-left:5px;}
-.stowed-container select{background-color:#5E6156;;border:1px solid #6F655D;}
-.contents-container select{background-color:#5E6156;;border:1px solid #6F6A63;}
+.contents-container input{background-color:#5F6F72;border:none;width:30px;color:whitesmoke;margin-left:5px;}
+.contents-container select{background-color:#5F6F72;}
 .stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;}
 #coinsGold{border-color:#d29a38}

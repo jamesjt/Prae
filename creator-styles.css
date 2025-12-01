@@ -531,7 +531,21 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .blastProfSelector {border:1px solid #1A305C; color:whitesmoke; background-color: #9BAABF;}
 .invokeProfSelector {border:1px solid #281957; color:whitesmoke;background-color: #797781;}
 
-
+select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, gray 50%),
+    linear-gradient(135deg, gray 50%, transparent 50%),
+    linear-gradient(to right, #ccc, #ccc);
+  background-position:
+    calc(100% - 20px) calc(1em + 2px),
+    calc(100% - 15px) calc(1em + 2px),
+    calc(100% - 2.5em) 0.5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1px 1.5em;
+  background-repeat: no-repeat;
+}
 
 /* gear colors 
 warm graphite: #6F6A63;
@@ -563,10 +577,10 @@ Stormwater Slate Sea (#5F6F72;)
 .gearEntryHead{width:125px;padding-left:5px;}
 .gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
-.stowed-container{padding-left:10px;background-color:#7C6A59;}
+.stowed-container{padding-left:10px;background-color:#7C6A59;border:1px inset black;}
 .stowed-container select{background-color:#7C6A59;}
 .stowed-container input{background-color:#7C6A59;border:none;width:30px;color:whitesmoke;margin-left:5px;}
-.contents-container{padding-left:10px;background-color:#5F6F72;}
+.contents-container{padding-left:10px;background-color:#5F6F72;border:1px inset black;}}
 .contents-container input{background-color:#5F6F72;border:none;width:30px;color:whitesmoke;margin-left:5px;}
 .contents-container select{background-color:#5F6F72;}
 .stowedGear{}

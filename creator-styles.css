@@ -33,6 +33,7 @@
 }
 
 .amountButton{color:whitesmoke;background-color: black;border:none;}
+.amountButton:hover{color:black;background-color: whitesmoke;}
 
 .tippy-box[data-theme~='ruleTip'] {
   max-width: 650px;  /* Match charDetails */
@@ -563,8 +564,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     font-size: 14px;
 }
 .gearLoadHead{margin-right:10px;}
-.gearEntryHead{width:125px;padding-left:5px;}
-.gearAmtHead{width: 45px;margin-left: 5px;padding-left:5px;}
+.gearEntryHead{padding-left:5px;}
+.gearAmtHead{width: 45px;margin-left: 65px;padding-left:5px;}
 .gearLoad.overloaded { color: red !important; }
 .stowed-container{padding-left:10px;background-color:var(--gearStowed);border:1px inset black;}
 .stowed-container select{background-color:var(--gearStowed);}
@@ -921,10 +922,7 @@ a.internalLink{
     justify-content: center;
 }
 
-.amountRow label {
-    min-width: 80px;
-    text-align: center;
-}
+.amountRow label {text-align: center;}
 
 .amountRow input[type="number"] {
     width: 70px;

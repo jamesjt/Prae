@@ -1,5 +1,8 @@
 // gear-scripts.js
 
+// Add near top constants
+const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
+
 let allOptions = [];
 let nonPackOptions = [];
 let liquidsOptions = [];
@@ -35,13 +38,11 @@ function rebuildGearSelectors() {
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
 
-    // Save current state
-    const saved = {};
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById(`gear${i}Select`);
-        const amt = document.getElementById(`gear${i}Amt`);
-        if (sel) saved[i] = { select: sel.value, amt: amt ? amt.value : 1 };
-    }
+    // Save old readyState
+    const oldReadyState = [...readyState];
+
+    // Resize readyState
+    readyState = Array(gearSlots).fill(null).map((_, idx) => oldReadyState[idx] || { gear: '', amt: 1, stowed: [], contents: [] });
 
     for (let i = 1; i <= gearSlots; i++) {
         const entry = document.createElement('div');
@@ -63,12 +64,30 @@ function rebuildGearSelectors() {
         const sel = document.getElementById(`gear${i}Select`);
         populateGearSelector(sel, allOptions, 'Ready Slot');
 
-        // Restore saved if available
-        if (saved[i]) {
-            sel.value = saved[i].select || '';
-            const amtInput = document.getElementById(`gear${i}Amt`);
-            amtInput.value = saved[i].amt || 1;
+        // Restore from readyState
+        sel.value = readyState[i-1].gear || '';
+        const amtInput = document.getElementById(`gear${i}Amt`);
+        amtInput.value = readyState[i-1].amt || 1;
+
+        // If has details, add icon
+        const item = allOptions.find(g => g.name === readyState[i-1].gear);
+        if (item?.details?.trim()) {
+            const detailsDiv = document.createElement('div');
+            detailsDiv.id = `gear${i}Details`;
+            detailsDiv.className = 'gearDetails';
+            detailsDiv.textContent = 'i';
+            detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
+            entry.appendChild(detailsDiv);
         }
+
+        // Add type class
+        if (item && item.category) {
+            entry.classList.add('gear' + item.category);
+        }
+
+        // Render stowed/contents if applicable
+        if (readyState[i-1].stowed.length > 0) renderStowed(i);
+        if (readyState[i-1].contents.length > 0) renderContents(i);
 
         // On change: update load + conditionally add details icon
         sel.addEventListener('change', () => {
@@ -76,14 +95,14 @@ function rebuildGearSelectors() {
         });
 
         // Amount input
-        const amtInput = document.getElementById(`gear${i}Amt`);
-        amtInput.addEventListener('input', function () {
+        const amtInputListener = function () {
             const val = Math.max(1, parseInt(this.value) || 1);
             this.value = val;
             readyState[i - 1].amt = val;
             updateReadyLoad(i);
             calculateLoad();
-        });
+        };
+        amtInput.addEventListener('input', amtInputListener);
 
         updateReadyLoad(i);
     }

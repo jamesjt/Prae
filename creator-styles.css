@@ -576,7 +576,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #coinsSilver{border-color: silver;}
 #coinsCopper{border-color: #CD7F32}
 .gearCoinsLabel{font-size:14px}
-.gearCoins{width: 25px !important;border-width: 1px !important; border-style: solid!important; background-color: var(--gearList);margin-left: 10px;}
+.gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: var(--gearList);margin-left: 10px;border-radius: 4px;}
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex; border-}
 #totalLoadDisplay{font-size:14px;margin-left:5px;}
@@ -919,6 +919,7 @@ a.internalLink{
 
 .amountRow label {
     min-width: 80px;
+    text-align: center;
 }
 
 .amountRow input[type="number"] {

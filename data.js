@@ -123,8 +123,6 @@ function parseWays(rows) {
 function parseChar(rows) {
     const headers = rows[0].map(h => h.trim());
     const dataByCategory = {};
-    // Your original parseCsvByCategories logic here (I assumed it's defined elsewhere; inline it if needed)
-    // For brevity, I'll placeholder it—replace with your full logic
     const prefixMap = headers.reduce((map, h, idx) => {
         const parts = h.split(' ');
         if (parts.length < 2) return map;
@@ -135,9 +133,18 @@ function parseChar(rows) {
     }, {});
     for (const [prefix, entries] of Object.entries(prefixMap)) {
         if (entries.length < 2) continue;
-        const categoryKey = prefix.trim().toLowerCase();
+        const categoryKey = prefix.trim().toLowerCase().replace(' ', '');
         dataByCategory[categoryKey] = [];
-        // ... (continue with your full parsing logic for categories like gear, proficiencies)
+        for (let r = 1; r < rows.length; r++) {
+            let item = {};
+            entries.forEach(({header, idx}) => {
+                let key = header.replace(prefix, '').trim().toLowerCase();
+                item[key] = rows[r][idx]?.trim();
+            });
+            if (item.name) {
+                dataByCategory[categoryKey].push(item);
+            }
+        }
     }
     // Extract hoverRules specially
     const hoverIdx = headers.indexOf('hoverRules');

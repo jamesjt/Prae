@@ -176,9 +176,9 @@ async function loadAllData() {
         const { dataByCategory, hoverRules } = parseChar(rulesRows);
         gearData = dataByCategory.gear || [];
         const proficiencies = dataByCategory.proficiencies || [];
-        profData.strike = proficiencies.filter(g => g.category.toLowerCase() === 'strike');
-        profData.blast = proficiencies.filter(g => g.category.toLowerCase() === 'blast');
-        profData.invoke = proficiencies.filter(g => g.category.toLowerCase() === 'invoke');
+        profData.strike = proficiencies.filter(g => g.category?.toLowerCase() === 'strike');
+        profData.blast = proficiencies.filter(g => g.category?.toLowerCase() === 'blast');
+        profData.invoke = proficiencies.filter(g => g.category?.toLowerCase() === 'invoke');
         hoverRulesData = hoverRules;
         // Dispatch event—everything is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));

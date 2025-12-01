@@ -30,9 +30,9 @@ function populateGearSelector(selectEl, options, placeholder) {
 }
 
 function rebuildGearSelectors() {
-    allOptions = gearData.filter(g => g.category.toLowerCase() !== 'liquids');
-    nonPackOptions = allOptions.filter(g => g.category.toLowerCase() !== 'packs');  // Case-insensitive exclude
-    liquidsOptions = gearData.filter(g => g.category.toLowerCase() === 'liquids');
+    allOptions = gearData.filter(g => g.category?.toLowerCase() ?? '' !== 'liquids');
+    nonPackOptions = allOptions.filter(g => g.category?.toLowerCase() ?? '' !== 'packs');  // Case-insensitive exclude
+    liquidsOptions = gearData.filter(g => g.category?.toLowerCase() === 'liquids');
 
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';

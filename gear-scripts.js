@@ -1,13 +1,10 @@
 // gear-scripts.js
 
-// Add near top constants
-const MAX_READY_SLOTS = 5;  // Change this to adjust ready slots globally
-
 let allOptions = [];
 let nonPackOptions = [];
 let liquidsOptions = [];
-let readyState = Array(MAX_READY_SLOTS).fill(null).map(() => ({ gear: '', amt: 1, stowed: [], contents: [] }));
 let gearSlots = 5; // Dynamic gear slots
+let readyState = Array(gearSlots).fill(null).map(() => ({ gear: '', amt: 1, stowed: [], contents: [] }));
 
 function populateGearSelector(selectEl, options, placeholder) {
     selectEl.innerHTML = `<option value="emptyStowedGearSlot">${placeholder}</option>`;
@@ -463,6 +460,19 @@ document.addEventListener('change', e => {
             calculateLoad();
         }
         return;
+    }
+});
+
+// Plus/Minus for gear slots
+document.addEventListener('click', e => {
+    const t = e.target;
+    if (t.matches('#gearPlus, #gearMinus')) {
+        if (t.id === 'gearPlus') {
+            gearSlots += 1;
+        } else if (t.id === 'gearMinus' && gearSlots > 1) {
+            gearSlots -= 1;
+        }
+        rebuildGearSelectors();
     }
 });
 

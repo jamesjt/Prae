@@ -119,97 +119,78 @@ function parseWays(rows) {
     }
     return parsedWays;
 }
-// Parser for char CSV (moved from creator-scripts.js)
-function parseChar(rows) {
-    const headers = rows[0].map(h => h.trim());
-    const dataByCategory = {};
-    const prefixMap = headers.reduce((map, h, idx) => {
-        const parts = h.split(' ');
-        if (parts.length < 2) return map;
-        const prefix = parts[0] + ' ';
-        map[prefix] = map[prefix] || [];
-        map[prefix].push({ header: h, idx });
-        return map;
-    }, {});
-    for (const [prefix, entries] of Object.entries(prefixMap)) {
-        if (entries.length < 2) continue;
-        const categoryKey = prefix.trim().toLowerCase().replace(' ', '');
-        dataByCategory[categoryKey] = [];
-        for (let r = 1; r < rows.length; r++) {
-            let item = {};
-            entries.forEach(({header, idx}) => {
-                let key = header.replace(prefix, '').trim().toLowerCase();
-                item[key] = rows[r][idx]?.trim();
-            });
-            if (item.name) {
-                dataByCategory[categoryKey].push(item);
-            }
-        }
-    }
-    // Extract hoverRules specially
-    const hoverIdx = headers.indexOf('hoverRules');
-    const detailsIdx = headers.indexOf('hoverRules Details');
-    const hoverRules = [];
-    if (hoverIdx !== -1 && detailsIdx !== -1) {
-        for (let r = 1; r < rows.length; r++) {
-            const rule = rows[r][hoverIdx]?.trim();
-            const detail = rows[r][detailsIdx]?.trim();
-            if (rule && detail) hoverRules.push({ rule, detail });
-        }
-    }
-
-    // Special handling for gear to merge split subcategories
-    dataByCategory.gear = [];
-    const subMap = {
-        'Adventuring': { nameHeader: 'Gear Adventuring', propPrefix: 'GearAdventuring ' },
-        'Liquids': { nameHeader: 'Gear Liquids', propPrefix: 'GearLiquids ' },
-        'Containers': { nameHeader: 'Gear Containers', propPrefix: 'GearContainers ' },
-        'Packs': { nameHeader: 'Gear Packs', propPrefix: 'GearPacks ' },
-        'Weapons': { nameHeader: 'Gear Weapons', propPrefix: 'GearWeapons ' },
-        'Armor': { nameHeader: 'Gear Armor', propPrefix: 'GearArmor ' },
-    };
-    for (const [sub, { nameHeader, propPrefix }] of Object.entries(subMap)) {
-        const nameIdx = headers.indexOf(nameHeader);
-        if (nameIdx === -1) continue;
-        const props = [];
-        headers.forEach((h, idx) => {
-            if (h.startsWith(propPrefix)) {
-                let key = h.replace(propPrefix, '').trim().toLowerCase();
-                props.push({ key, idx });
-            }
-        });
-        for (let r = 1; r < rows.length; r++) {
-            const name = rows[r][nameIdx]?.trim();
-            if (name) {
-                const item = { name, category: sub };
-                props.forEach(({ key, idx }) => {
+// Parser for rules CSV (renamed from parseChar for clarity)
+function parseRules(rows) {
+    const headers = rows[0].map(h => h.trim().toLowerCase()); // Normalize to lower for matching
+    const catIdx = headers.indexOf('datacategory');
+    if (catIdx === -1) {
+        console.warn('No dataCategory column found; falling back to legacy parsing.');
+        // Legacy prefixMap logic (kept for backward compat)
+        const prefixMap = headers.reduce((map, h, idx) => {
+            const parts = h.split(' ');
+            if (parts.length < 2) return map;
+            const prefix = parts[0] + ' ';
+            map[prefix] = map[prefix] || [];
+            map[prefix].push({ header: h, idx });
+            return map;
+        }, {});
+        const dataByCategory = {};
+        for (const [prefix, entries] of Object.entries(prefixMap)) {
+            if (entries.length < 2) continue;
+            const categoryKey = prefix.trim().toLowerCase().replace(' ', '');
+            dataByCategory[categoryKey] = [];
+            for (let r = 1; r < rows.length; r++) {
+                let item = {};
+                entries.forEach(({header, idx}) => {
+                    let key = header.replace(prefix, '').trim().toLowerCase();
                     item[key] = rows[r][idx]?.trim();
                 });
-                dataByCategory.gear.push(item);
+                if (item.name) {
+                    dataByCategory[categoryKey].push(item);
+                }
             }
+        }
+        // Legacy hoverRules
+        const hoverIdx = headers.indexOf('hoverrules');
+        const detailsIdx = headers.indexOf('hoverrulesdetails');
+        const hoverRules = [];
+        if (hoverIdx !== -1 && detailsIdx !== -1) {
+            for (let r = 1; r < rows.length; r++) {
+                const rule = rows[r][hoverIdx]?.trim();
+                const detail = rows[r][detailsIdx]?.trim();
+                if (rule && detail) hoverRules.push({ rule, detail });
+            }
+        }
+        return { dataByCategory, hoverRules };
+    }
+
+    // Generalized parsing by dataCategory
+    const dataByCategory = {};
+    for (let r = 1; r < rows.length; r++) {
+        const category = rows[r][catIdx]?.trim().toLowerCase();
+        if (!category) continue;
+        if (!dataByCategory[category]) dataByCategory[category] = [];
+
+        const item = {};
+        headers.forEach((h, idx) => {
+            const value = rows[r][idx]?.trim();
+            if (value && h.startsWith(category)) {
+                const key = h.replace(category, '').toLowerCase(); // Strip prefix, e.g., 'gearname' -> 'name'
+                item[key] = value;
+            }
+        });
+
+        if (Object.keys(item).length > 0) { // Only add if has props (no strict 'name' check)
+            if (category === 'gear' && item.type) item.category = item.type; // Normalize 'type' to 'category' for downstream compat
+            dataByCategory[category].push(item);
         }
     }
 
-    // Special handling for proficiencies to parse name:details and set category
-    dataByCategory.proficiencies = [];
-    const profTypes = ['Strike', 'Blast', 'Invoke'];
-    profTypes.forEach(type => {
-        const header = `proficiencies ${type}`;
-        const idx = headers.indexOf(header);
-        if (idx === -1) return;
-        for (let r = 1; r < rows.length; r++) {
-            const value = rows[r][idx]?.trim();
-            if (value) {
-                const [name, ...detailsParts] = value.split(':');
-                const details = detailsParts.join(':').trim();
-                dataByCategory.proficiencies.push({
-                    name: name.trim(),
-                    details,
-                    category: type.toLowerCase()
-                });
-            }
-        }
-    });
+    // Special mapping for hoverRules (if category='rules')
+    const hoverRules = dataByCategory.rules?.map(item => ({
+        rule: item.rule || item.name || '', // Flexible key mapping
+        detail: item.details || ''
+    })).filter(r => r.rule && r.detail) || [];
 
     // Return all parsed parts
     return { dataByCategory, hoverRules };
@@ -227,9 +208,9 @@ async function loadAllData() {
         allData = parseRulebook(rulebookRows);
         abilitiesData = parseAbilities(abilitiesRows);
         waysData = parseWays(waysRows);
-        const { dataByCategory, hoverRules } = parseChar(rulesRows);
+        const { dataByCategory, hoverRules } = parseRules(rulesRows);
         gearData = dataByCategory.gear || [];
-        const proficiencies = dataByCategory.proficiencies || [];
+        const proficiencies = dataByCategory.prof || []; // Assume 'prof' category
         profData.strike = proficiencies.filter(g => g.category?.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category?.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category?.toLowerCase() === 'invoke');

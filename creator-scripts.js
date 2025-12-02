@@ -207,7 +207,7 @@ function populateProficiencySelectors(type) {
         if (sel) {
             saved[i] = sel.value;
             sel.innerHTML = '<option value="">Select Proficiency</option>' +
-                profs.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+                profs.map(p => `<option value="${p.name}">${p.shortdetails}</option>`).join('');
         }
     }
     for (let i = 1; i <= 5; i++) {

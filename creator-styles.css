@@ -155,33 +155,14 @@
 #mindStatsWrapper {background-color: var(--mindColor0);margin-bottom: 5px;width: 100%;}
 #spiritStatsWrapper {background-color: var(--spiritColor0);width: 100%;}
 
-#bodyPriority {}
 .att-desc-font{font-size: 8px}
 
-.attributeSelect{
-    margin-top: 15px;
-}
+.attributeSelect{margin-top: 15px;border:none;}
+.attributeSelect:hover{background-color:white;color:white;}
 
-#bodyPriority{
-    background-color: var(--bodyColor0);
-    border:none;
-    color:var(--bodyColor0);
-}
-#mindPriority{
-    background-color: var(--mindColor0);
-    border:none;
-    color:var(--mindColor0);
-}
-#spiritPriority{
-    background-color: var(--spiritColor0);
-    border:none;
-    color:var(--spiritColor0);
-}
-
-#bodyPriority:hover, #mindPriority:hover,#spiritPriority:hover{
-    background-color: white;
-    color:black;
-}
+#bodyPriority{background-color: var(--bodyColor0);color:var(--bodyColor0);}
+#mindPriority{background-color: var(--mindColor0);color:var(--mindColor0);}
+#spiritPriority{background-color: var(--spiritColor0);color:var(--spiritColor0);}
 
 select:has(> option[value="priorityUnassigned"]:checked)  {
     border-radius: 2px;

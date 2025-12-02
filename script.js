@@ -130,9 +130,6 @@ function processTextForTooltips(text) {
     return ph;
   };
 
-  // Expr: |expr|
-  text = text.replace(/\|([^|]+)\|/g, (_, match) => addPlaceholder('expr', match));
-
   // Rules
   hoverRulesData.sort((a, b) => b.rule.length - a.rule.length).forEach(r => {
     const regex = new RegExp(`\\b${escapeRegExp(r.rule)}\\b`, 'gi');

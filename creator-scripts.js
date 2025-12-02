@@ -104,26 +104,18 @@ function rebuildDynamicSelectors(config, amount) {
     }
     calculateAbilities();
 }
-function updateTalentTables() {
+function updateAbilityTables(type) {
+    const isTalent = type === 'talent';
+    const amount = isTalent ? talentAmount : tricksAmount;
     rebuildDynamicSelectors({
-        containerSelector: '.talentWrapper',
-        itemPrefix: 'talent',
-        itemClass: 'talentAbility',
-        selectorClass: 'talentSelector',
-        populateFunction: () => updateAbilitySelectors('talent'),
-        abilityType: 'talent'
-    }, talentAmount);
-}
-function updateTrickTables() {
-    rebuildDynamicSelectors({
-        containerSelector: '.trickWrapper',
-        itemPrefix: 'tricks',
-        itemClass: 'trickAbility',
-        selectorClass: 'trickSelector',
-        extraOffset: 1,
-        populateFunction: () => updateAbilitySelectors('trick'),
-        abilityType: 'trick'
-    }, tricksAmount);
+        containerSelector: isTalent ? '.talentWrapper' : '.trickWrapper',
+        itemPrefix: isTalent ? 'talent' : 'tricks',
+        itemClass: isTalent ? 'talentAbility' : 'trickAbility',
+        selectorClass: isTalent ? 'talentSelector' : 'trickSelector',
+        extraOffset: isTalent ? 0 : 1,
+        populateFunction: () => updateAbilitySelectors(type),
+        abilityType: type
+    }, amount);
 }
 // ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
@@ -221,9 +213,9 @@ document.addEventListener('change', e => {
 document.addEventListener('click', e => {
     const t = e.target;
     if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
-        const type = t.id.includes('talent') ? 'talent' : 'tricks';
+        const type = t.id.includes('talent') ? 'talent' : 'trick';
         let value = type === 'talent' ? talentAmount : tricksAmount;
-        const min = type === 'talent' ? 1 : 1;
+        const min = 1;
         if (t.id.includes('Plus')) {
             value += 1;
         } else if (t.id.includes('Minus') && value > min) {
@@ -231,11 +223,10 @@ document.addEventListener('click', e => {
         }
         if (type === 'talent') {
             talentAmount = value;
-            updateTalentTables();
         } else {
             tricksAmount = value;
-            updateTrickTables();
         }
+        updateAbilityTables(type);
         calculateAbilities();
     }
 });
@@ -631,7 +622,6 @@ window.addEventListener('dataLoaded', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTalentTables();
     updateTrickTables();
     // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
 });

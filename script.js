@@ -142,13 +142,6 @@ function processTextForTooltips(text) {
     text = text.replace(regex, match => addPlaceholder('gear', match));
   });
 
-  // Skills
-  const skills = Object.keys(SKILL_ID_MAP);
-  skills.sort((a, b) => b.length - a.length).forEach(s => {
-    const regex = new RegExp(`\\b${escapeRegExp(s)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('skill', match));
-  });
-
   // Abilities
   const abilityNames = [];
   abilitiesData.forEach(abs => {

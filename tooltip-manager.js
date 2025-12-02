@@ -74,7 +74,8 @@ class TooltipManager {
       let abilityOptions = {
         ...baseOptions,
         trigger: 'manual',
-        hideOnClick: false
+        hideOnClick: false,
+        maxWidth: 700
       };
       if (meta?.type === 'ritual') {
         abilityOptions.arrow = false;

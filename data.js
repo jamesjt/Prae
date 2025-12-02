@@ -56,8 +56,10 @@ function parseRulebook(rows) {
         } else {
             const name = row.Sections.replace(/^_+\s*/, '').trim();
             let details = row.Details;
-            if (details.startsWith(name + ' ') || details.startsWith(name + ': ')) {
-                details = details.replace(name + ' ', '').replace(name + ': ', '');
+            if (details.startsWith(name + ' ')) {
+                details = details.substring(name.length + 1).trim();
+            } else if (details.startsWith(name + ': ')) {
+                details = details.substring(name.length + 2).trim();
             }
             if (currentHeader && name) {
                 organized[currentHeader].subitems.push({ name, details });

@@ -16,8 +16,10 @@ class TooltipManager {
         theme: "ruleTip",
         maxWidth: 350,
         placement: "top",
-        animation: "shift-away-subtle",
+        animation: "fade",
         interactive: true,
+        delay: [200, 0],
+        duration: [200, 0]
       });
 
       TooltipManager.instances.set(el, instance);

@@ -140,7 +140,7 @@ class TooltipManager {
     }
     if (!ability) return `(Missing ability: ${name})`;
     const typeLower = ability.type.toLowerCase();
-    const outerClass = typeLower === 'ritual' ? `tip-ability-${typeLower} draggable` : `tip-ability-${typeLower}`;
+    const outerClass = `tip-ability-${typeLower}`;
     let html = `
       <div class="${outerClass}">
     `;

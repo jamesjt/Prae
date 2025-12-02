@@ -609,8 +609,6 @@ interact('.draggable')
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('dataLoaded', () => {
     TooltipManager.init();
-    updateAbilitySelectors('trick');
-    updateAbilitySelectors('talent');
     populateRoleSelector();
     ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     calculateSkillPoints();
@@ -622,6 +620,7 @@ window.addEventListener('dataLoaded', () => {
         const sel = document.getElementById(t + 'SkillRank');
         if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
     });
-    updateTrickTables();
+    updateAbilityTables('talent');
+    updateAbilityTables('trick');
     // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
 });

@@ -372,15 +372,28 @@ function processWithTooltips(text) {
         processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
 
     });
-    // Collect unique ability names
-    const abilityNames = new Set();
+    // Collect ability matchers: map from matchName (full or base) to fullName for data-tip
+    const abilityMatchers = new Map();
     abilitiesData.forEach(abilities => {
-        abilities.forEach(ability => abilityNames.add(ability.name));
+        abilities.forEach(ability => {
+            const fullName = ability.name;
+            const capitalizedSkill = ability.skill.charAt(0).toUpperCase() + ability.skill.slice(1);
+            const suffix = ` (${capitalizedSkill})`;
+            abilityMatchers.set(fullName, fullName);
+            if (fullName.endsWith(suffix)) {
+                const baseName = fullName.slice(0, -suffix.length);
+                if (!abilityMatchers.has(baseName)) { // Avoid conflicts; first wins
+                    abilityMatchers.set(baseName, fullName);
+                }
+            }
+        });
     });
-    // Wrap ability names
-    abilityNames.forEach(name => {
-        const regex = new RegExp(`\\b${escapeRegExp(name)}\\b`, 'gi');
-        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${name}">$&</span>`);
+    // Sort by length descending to replace longer phrases first
+    const sortedMatchers = Array.from(abilityMatchers.entries()).sort((a, b) => b[0].length - a[0].length);
+    // Wrap ability names/base names
+    sortedMatchers.forEach(([matchName, fullName]) => {
+        const regex = new RegExp(`\\b${escapeRegExp(matchName)}\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${fullName}">$&</span>`);
     });
     return processed;
 }

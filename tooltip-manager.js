@@ -96,9 +96,8 @@ class TooltipManager {
     }
     if (!ability) return `(Missing ability: ${name})`;
     let html = `
-      <div class="tip-ability">
-        <strong>${ability.name}</strong><br>
-        <div>${TooltipManager.capitalize(ability.type)}</div>
+      <div class="tip-ability-${ability.type.toLowerCase()}">
+        <div class="tip-name">${ability.name}</div>
     `;
     const order = ['description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
@@ -107,7 +106,7 @@ class TooltipManager {
       return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
       let value = ability.details[key];
-      html += `<div class="tip-${key.toLowerCase()}">${key}: ${value}</div>`;
+      html += `<div class="tip-${key.toLowerCase()}-${ability.type.toLowerCase()}">${key}: ${value}</div>`;
     });
     html += `</div>`;
     return html;

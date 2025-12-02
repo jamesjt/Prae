@@ -8,11 +8,19 @@ class TooltipManager {
       if (!el || TooltipManager.instances.has(el)) return;
 
       const key = el.getAttribute("data-tip");
-      const html = TooltipManager.resolve(key);
+      let html = TooltipManager.resolve(key);
 
-      const options = TooltipManager.getOptions(key);
+      let meta = null;
+      let content;
+      if (typeof html === 'object' && html.content && html.meta) {
+        ({ content, meta } = html);
+      } else {
+        content = html;
+      }
 
-      const instance = tippy(el, options);
+      const options = TooltipManager.getOptions(key, meta);
+
+      const instance = tippy(el, { ...options, content });
 
       if (key.startsWith("ability:")) {
         let pinned = false;
@@ -43,9 +51,8 @@ class TooltipManager {
     });
   }
 
-  static getOptions(key) {
+  static getOptions(key, meta = null) {
     const baseOptions = {
-      content: TooltipManager.resolve(key), // Resolved earlier, but for completeness
       allowHTML: true,
       theme: "ruleTip",
       maxWidth: 350,
@@ -57,11 +64,25 @@ class TooltipManager {
     };
 
     if (key.startsWith("ability:")) {
-      return {
+      let abilityOptions = {
         ...baseOptions,
         trigger: 'manual',
         hideOnClick: false
       };
+      if (meta?.type === 'ritual') {
+        abilityOptions.arrow = false;
+        abilityOptions.popperOptions = {
+          modifiers: [
+            {
+              name: 'flip',
+              options: {
+                fallbackPlacements: ['bottom', 'left', 'right']
+              }
+            }
+          ]
+        };
+      }
+      return abilityOptions;
     } else if (key.startsWith("expr:")) {
       return { ...baseOptions, interactive: false }; // Example: Could add delay: [100, 0] in future
     } else if (key.startsWith("gear:")) {
@@ -114,10 +135,11 @@ class TooltipManager {
       if (ability) break;
     }
     if (!ability) return `(Missing ability: ${name})`;
-    let html = `
-      <div class="tip-ability-${ability.type.toLowerCase()}">
-    `;
     const typeLower = ability.type.toLowerCase();
+    const outerClass = typeLower === 'ritual' ? `tip-ability-${typeLower} draggable` : `tip-ability-${typeLower}`;
+    let html = `
+      <div class="${outerClass}">
+    `;
     const order = ['name', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
       const ia = order.indexOf(a.toLowerCase());
@@ -132,7 +154,7 @@ class TooltipManager {
       }
     });
     html += `</div>`;
-    return html;
+    return { content: html, meta: { type: typeLower } };
   }
 
   static prof(key) {

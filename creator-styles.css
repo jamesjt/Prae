@@ -32,7 +32,7 @@
   --trickColor:rgba(114,133,126,1);
   --talentColor:rgba(88,89,96,1);
 }
-.charInfoHover{
+.detailsHoverPopoverDraggable{
   position:relative;
   top:4px;
   height:16px;
@@ -760,4 +760,13 @@ a.internalLink{
     text-align: center;
     border: 2px solid #555;
     border-radius: 6px;
+}
+.detailsHoverPopoverDraggable{
+  position:relative;
+  top:4px;
+  height:16px;
+  width:16px;
+  background-color:white;
+  border-radius: 3px;
+  cursor:alias;
 }

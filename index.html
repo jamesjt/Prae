@@ -53,8 +53,8 @@
                     <select id="roleSelector">
                       <option value="">Way</option>
                     </select>
-                    <img id="showCheckList" class="charInfoHover" src="images/details.png">
-                    <div id="checkList" class="charDetails draggable">
+                    <img id="showCheckList" class="detailsHoverPopoverDraggable" src="images/details.png" data-tip="static:checkList">
+                    <div id="checkList" class="charDetails">
                       <div id="hideCheckList" class="closeRitual">X</div>
                       Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
                       Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
@@ -122,8 +122,8 @@
                       </div>
                     </div>
 
-                    <img id="showCharDesc" class="charInfoHover" src="images/details.png">
-                    <div id="charDesc" class="charDetails draggable">
+                    <img id="showCharDesc" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:charrDesc">
+                    <div id="charDesc" class="charDetails">
                       <div id="hideCharDesc" class="closeRitual">-</div>
                       Height <input id="charHeight" type="text">
                       Build <input id="charBuild" type="text">
@@ -133,22 +133,22 @@
                       <br/>
                       <textarea id="charDescription" placeholder="Describe yourself here..."></textarea>
                     </div>
-                    <img id="showCharStory" class="charInfoHover" src="images/details.png">
-                    <div id="charStory" class="charDetails draggable">
+                    <img id="showCharStory" class="detailsHoverPopoverDraggable" src="images/details.png" data-tip="static:charStory">
+                    <div id="charStory" class="charDetails">
                       <div id="hideCharStory" class="closeRitual">-</div>
                       Birth Place <input id="birthPlace" type="text">
                       <textarea id="childhoodStory" placeholder="Story of your childhood..."></textarea>
                       <textarea id="trainingStory" placeholder="Story of your Training and how you came to your way..."></textarea>
                       <textarea id="journalStory" placeholder="Journal..."></textarea>
                     </div>
-                    <img id="showCharPersonality" class="charInfoHover" src="images/details.png">
-                    <div id="charPersonality" class="charDetails draggable">
+                    <img id="showCharPersonality" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:charPersonality">
+                    <div id="charPersonality" class="charDetails">
                       <div id="hideCharPersonality" class="closeRitual">-</div>
                       Current Goal in Life <input id="charPurpose" type="text">
                       Values...will be flushed out with world.
                     </div>
-                    <img id="showNotes" class="charInfoHover" src="images/details.png">
-                    <div id="notes" class="charDetails draggable">
+                    <img id="showNotes" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:notes">
+                    <div id="notes" class="charDetails">
                       <div id="hideNotes" class="closeRitual">-</div>
                       <br/>
                       <textarea id="notes1" class="pcNotes" placeholder="Notes 1..."></textarea>
@@ -932,33 +932,6 @@
                     </div>
                   </div>
                 <!--
-                <div id='ritualList'>
-                  <div id="ritual1" class="ritualListing">
-                    <select id="ritual1Select" class="ritualSelector">
-                      <option value="0"></option>
-                    </select>
-                    <div id="ritual1SelectShortCost" class="filledField ritualCost">Cost</div>
-                    <div id="ritual1SelectShortCastTime" class="filledField ritualCastTime">Cast Time</div>
-                    <div id="ritual1SelectShortDuration" class="filledField ritualDuration">Duration</div>
-                    <img id="showritual1Details" class="showRitualDetails" onclick="showDesc('ritual1Details');" src="imgs/details2.png">
-                    <div id="ritual1Details" class="draggable ritualDetails">
-                      <div id="hideritual1Details" class="closeRitual" onclick="hideDesc('ritual1Details');">X</div>
-                      <div class="ritualBody">
-                        <div class="mentalExploit ritualDescLine" id="ritual1SelectName"></div>
-                        <div id="ritual1SelectKeywords" class="ritualDescLine"></div>
-                        <div id="ritual1SelectCost" class="ritualDescLine"></div>
-                        <div id="ritual1SelectCastTime" class="ritualDescLine"></div>
-                        <div id="ritual1SelectDuration" class="ritualDescLine"></div>
-                        <div id="ritual1SelectEffect" class="ritualDescLine"></div>
-                        <div id="ritual1SelectEnhancements" class="ritualDescLine"></div>
-                        <div id="ritual1SelectAugments" class="ritualDescLine"></div>
-                        <div id="ritual1SelectResist" class="ritualDescLine"></div>
-                        <div id="ritual1SelectNotes" class="ritualNotes ritualDescLine"></div>
-                      </div>
-                    </div>
-                  </div>  
-                </div>
-
                 End of column 3  --> 
                 </div> 
               </div> <!-- End Row Wrapper -->

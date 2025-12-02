@@ -30,7 +30,7 @@
   --spiritColor2:#73699b;
   --spiritColor3:#595569;
   --trickColor:#16534c;
-  --talentColor:#6f521f;
+  --talentColor:#332945;
 }
 .charInfoHover{
   position:relative;
@@ -40,6 +40,18 @@
   background-color:white;
   border-radius: 3px;
   cursor:alias;
+}
+.hoverRule::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  width: 25px;   /* corner size */
+  height: 25px;
+
+  border-bottom: 4px solid #d29a38;
+  border-right:  4px solid #d29a38;
 }
 
 .amountButton{color:whitesmoke;background-color: rgba(0, 0, 0, 0.0);border:none;border-radius: 8px}

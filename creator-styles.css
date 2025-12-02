@@ -526,7 +526,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     margin-left: 20px;
     color: whitesmoke;}
 
-.subAttinputField input:hover{
+.subAttInputField:hover{
     background-color: white !important;
     color:black !important;
 }

@@ -25,16 +25,20 @@ const ATTRIBUTE_GROUPS = {
 let talentAmount = 1;
 let tricksAmount = 1;
 
-function updateProficiencySelectors(type, rank) {
+function populateProficiencySelectors(type) {
     const profs = profData[type] || [];
     const saved = {};
     for (let i = 1; i <= 5; i++) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
-            sel.hidden = i > rank;
             saved[i] = sel.value;
             sel.innerHTML = '<option value="">Select Proficiency</option>' +
                 profs.map(p => `<option value="${p.name}">${p.shortdetails}</option>`).join('');
+        }
+    }
+    for (let i = 1; i <= 5; i++) {
+        const sel = document.getElementById(type + 'ProfSelector' + i);
+        if (sel) {
             if (saved[i] && Array.from(sel.options).some(opt => opt.value === saved[i])) {
                 sel.value = saved[i];
             }
@@ -47,6 +51,14 @@ function updateProficiencySelectors(type, rank) {
             }
         }
     }
+}
+// Update updateProficiencySelectors to call population after visibility
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
+    }
+    populateProficiencySelectors(type); // Add this
 }
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config, amount) {
@@ -601,7 +613,7 @@ interact('.draggable')
 window.addEventListener('dataLoaded', () => {
     TooltipManager.init();
     populateRoleSelector();
-    ['strike', 'blast', 'invoke'].forEach(type => updateProficiencySelectors(type, 0));
+    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     calculateSkillPoints();
     calculateAbilities();
     calculateAttributeValues();

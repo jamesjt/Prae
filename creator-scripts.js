@@ -409,6 +409,7 @@ function populateAbilityInfo(selectId, abilities, type) {
         const ib = order.indexOf(b.toLowerCase());
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
+        if (key.toLowerCase() === 'name') return; // Skip rendering name
         let processedValue = ability.details[key];
         // Replace |expr| with spanned value
         processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => {
@@ -614,7 +615,6 @@ interact('.draggable')
       }
     }
   });
-
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('dataLoaded', () => {
     TooltipManager.init();

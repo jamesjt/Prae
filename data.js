@@ -199,7 +199,13 @@ function parseRules(rows) {
                         item.rule = item.name;
                     }
                     if (!dataByCategory[prefix]) dataByCategory[prefix] = [];
-                    dataByCategory[prefix].push(item);
+                    if (prefix === 'gear') {
+                        if (item.name && item.name.trim() !== '-' && item.name.match(/\w/)) {
+                            dataByCategory[prefix].push(item);
+                        }
+                    } else {
+                        dataByCategory[prefix].push(item);
+                    }
                 }
             }
         });

@@ -254,7 +254,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #conversionDesc{}
 #paceDesc
 
-.statsValue{font-size:  30px; width:40px;}
+.statsValue{font-size:30px;width:40px;}
 
 
 #maxHpValue {}

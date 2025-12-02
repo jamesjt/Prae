@@ -18,16 +18,16 @@
   --gearList:#353230;
   --gearLiquids:#384143;
   --bodyColor0:#471211;
-  --bodyColor1:#7B1C19;
-  --bodyColor2:#A34A47;
+  --bodyColor1:#691916;
+  --bodyColor2:#934e4b;
   --bodyColor3:#815b53;
-  --mindColor0:#1A305C;
-  --mindColor1:#24497F;
+  --mindColor0:#152647;
+  --mindColor1:#24416d;
   --mindColor2:#5E7BA0;
   --mindColor3:#727c8b;
-  --spiritColor0:#281957;
-  --spiritColor1:#3A2780;
-  --spiritColor2:#7A6EB0;
+  --spiritColor0:#221647;
+  --spiritColor1:#31216d;
+  --spiritColor2:#73699b;
   --spiritColor3:#595569;
 }
 .charInfoHover{
@@ -569,10 +569,10 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearCoins:hover{background-color: white;color:black;}
 #coinInputs{display:flex; border-}
 #totalLoadDisplay{font-size:14px;margin-left:5px;}
-.gearWeapon {padding-left:10px;background-color:var(--bodyColor0);border:1px inset black;}
+.gearWeapon {background-color:var(--bodyColor0);border:1px inset black;}
 .gearWeapon select {background-color:var(--bodyColor0);}
 .gearWeapon input {background-color:var(--bodyColor0);margin-left:5px;}
-.gearArmor {padding-left:10px;background-color:var(--bodyColor0);border:1px inset black;}
+.gearArmor {background-color:var(--bodyColor0);border:1px inset black;}
 .gearArmor select {background-color:var(--bodyColor0);}
 .gearArmor input {background-color:var(--bodyColor0);margin-left:5px;}
 #ritualList {

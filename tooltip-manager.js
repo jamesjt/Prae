@@ -118,15 +118,18 @@ class TooltipManager {
       <div class="tip-ability-${ability.type.toLowerCase()}">
     `;
     const typeLower = ability.type.toLowerCase();
-    html += `<div class="tip-name-${typeLower}">${ability.name}</div>`;
-    const order = ['description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    const order = ['name', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
       const ia = order.indexOf(a.toLowerCase());
       const ib = order.indexOf(b.toLowerCase());
       return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
       let value = ability.details[key];
-      html += `<div class="tip-${key.toLowerCase()}-${typeLower}">${key}: ${value}</div>`;
+      if (key.toLowerCase() === 'name') {
+        html += `<div class="tip-name-${typeLower}">${value}</div>`;
+      } else {
+        html += `<div class="tip-${key.toLowerCase()}-${typeLower}">${key}: ${value}</div>`;
+      }
     });
     html += `</div>`;
     return html;

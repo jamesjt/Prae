@@ -74,6 +74,7 @@ function parseAbilities(rows) {
             const valueCell = rows[r][colIndex + 1]?.trim() || '';
             if (keyCell.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
                 if (currentAbility) {
+                    currentAbility.details['Name'] = currentAbility.name; // Add name to details
                     if (!abilitiesMap.has(skill)) abilitiesMap.set(skill, []);
                     abilitiesMap.get(skill).push(currentAbility);
                 }
@@ -86,6 +87,7 @@ function parseAbilities(rows) {
             }
         }
         if (currentAbility) {
+            currentAbility.details['Name'] = currentAbility.name; // Add name to details
             if (!abilitiesMap.has(skill)) abilitiesMap.set(skill, []);
             abilitiesMap.get(skill).push(currentAbility);
         }

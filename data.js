@@ -54,9 +54,13 @@ function parseRulebook(rows) {
             currentHeader = row.Sections;
             organized[currentHeader] = { subitems: [], details: row.Details };
         } else {
-            const name = row.Sections.replace(/^-+\s*/, '').trim();
+            let name = row.Sections.replace(/^-+\s*/, '').trim();
+            let details = row.Details;
+            if (details.startsWith(name + ' ') || details.startsWith(name + ': ')) {
+                details = details.replace(name + ' ', '').replace(name + ': ', '');
+            }
             if (currentHeader && name) {
-                organized[currentHeader].subitems.push({ name, details: row.Details });
+                organized[currentHeader].subitems.push({ name, details });
             }
         }
     });

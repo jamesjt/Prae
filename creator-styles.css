@@ -357,7 +357,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 .invokeProfSelector, .strikeProfSelector {position:relative;}
 .strikeProfSelector {border:1px solid var(--bodyColor0); color:whitesmoke;background-color: var(--bodyColor3);}
-.blastProfSelector {border:1px solid var(--mindColor0) color:whitesmoke; background-color: var(--mindColor3);}
+.blastProfSelector {border:1px solid var(--mindColor0); color:whitesmoke; background-color: var(--mindColor3);}
 .invokeProfSelector {border:1px solid var(--spiritColor0); color:whitesmoke;background-color: var(--spiritColor3);}
 
 .gearListContainer{

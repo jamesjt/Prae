@@ -585,8 +585,8 @@ function updateGearLoad(i) {
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')
   .draggable({
-    inertia: true,  // Smooth momentum on release
-    autoScroll: true,  // Auto-scroll if dragging near edges
+    inertia: false,  // Smooth momentum on release
+    autoScroll: false,  // Auto-scroll if dragging near edges
     listeners: {
       move: (event) => {
         const target = event.target;

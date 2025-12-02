@@ -239,7 +239,36 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #secondaryAttributeValues {display:flex; }
 .genAtt { width: 50px; text-align:center; text-align:center; border: 1px solid black;}
 
+.statsDesc{
+    font-size: 12px;
+    text-align: center;
+    width:40px;
+}
 
+#maxHPDesc, #marredDesc, #desperateDesc,#deadDesc {}
+#armorDesc{}
+#paceDesc {}
+#guardDesc{}
+#recoveryDesc {}
+#manaDesc{}
+#conversionDesc{}
+#paceDesc
+
+.statsValue{font-size:  30px}
+
+
+#maxHpValue {}
+#marredValue {}
+#desperateValue {}
+#deadValue{}
+#paceValue {}
+#manaValue{}
+#inspiritValue {}
+#recoveryValue {}
+#armorValue{}
+#guardValue{}
+
+#armor {}
 #maxHP {padding-top: 5px;}
 #marred {background-color: #6385BE; color:white;}
 #desperate {background-color:#72639F; color:white;}
@@ -248,144 +277,11 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #initiative {}
 #initialMomentem {}
 #conversion {}
+#recovery {}
+#mana {}
+#conversion {}
+#guard {}
 
-.image {position: relative;display: flex;}
-
-#HP {
-    width: 240px;
-    height: 40px;
-    /* background: url('../imgs/hp2.png') no-repeat center top; */
-    background-size: 100% 100%;
-
-}
-
-#hpImg {position: absolute;}
-
-#maxHPDesc, #marredDesc, #desperateDesc,#deadDesc {
-    width: 60px;
-    text-align:center;
-    font-size: 12px;
-}
-
-
-
-#guard {position: relative;margin-left: 50px;}
-
-#guardValue{
-  position: absolute;
-  text-align:center;
-  top: 5px; 
-  font-size:20px;
-  width: 100%;
-
-}
-
-#armor {
-    width: 45px;
-    padding-left:15px;
-    padding-right: 15px;
-}
-
-#armorValue{
-    position:relative;
-    left: 17px;
-    width: 8px;
-}
-.statsDesc{
-    font-size: 12px;
-    text-align: center;
-    width:40px;
-}
-#armorDesc{}
-#paceDesc {}
-#guardDesc{}
-#recoveryDesc {}
-#manaDesc{}
-#conversionDesc {}
-
-
-#maxHpValue {
-  position: absolute;
-  top: 3px;
-  left: 17px;
-  font-size: 30px;
-}
-
-#marredValue {
-  position: absolute;
-  top: 3px;
-  left: 75px;
-    font-size: 30px;
-}
-
-#desperateValue {
-  position: absolute;
-  top: 3px;
-  left: 133px;
-  font-size: 30px;
-}
-
-#deadValue{
-    position:absolute;
-    top:8px;
-    left: 193px;
-    color:whitesmoke;
-    font-size:20px;
-}
-
-#pace {padding-right: 15px;}
-#paceImg {position:relative;top:10px;}
-
-
-#paceValue {
-    position:relative;
-    left: 8px;
-    color:white;
-    font-size:20px;
-}
-
-#recovery {
-    margin-left: 5px;
-    margin-right: 2px;
-    width: 40px;
-}
-
-#recoveryValue {
-    position:relative;
-    left:14px;
-    width: 8px;
-}
-
-
-#mana {
-    width: 45px;
-    padding-left: 12px;
-    margin-left: 60px;
-}
-
-
-
-#manaValue{
-    position:relative;
-
-    left: -23px;
-    width: 8px;
-}
-
-#conversion {
-    width:45px;
-    padding-right: 10px;
-
-}
-
-#conversionValue {
-    position:relative;
-    left: 16px;
-    color:whitesmoke;
-    font-size: 20px;
-    text-shadow: 0 0 10px black, 0 0 10px black, 0 0 10px black, 0 0 10px black;
-    text-shadow: -1px 0 2px black, 0 1px 2px black, 1px 0 2px black, 0 -1px 2px black;
-}
 
 
 

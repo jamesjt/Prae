@@ -115,6 +115,7 @@ document.addEventListener('change', e => {
         const type = t.className.replace('Selector', '');
         populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
         calculateAbilities();
+        calculateDerivedStats();
         return;
     }
 
@@ -148,6 +149,7 @@ document.addEventListener('change', e => {
                 }
             }
         }
+        calculateDerivedStats();
         return;
     }
 
@@ -617,10 +619,10 @@ window.addEventListener('dataLoaded', () => {
 
 function calculateDerivedStats() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const vit = 6 * level;
-    const marred = 4 * level;
-    const desperate = 2 * level;
-    const dead = -2 * level;
+    let vit = 6 * level;
+    let marred = 4 * level;
+    let desperate = 2 * level;
+    let dead = -2 * level;
 
     const brawn = parseInt(document.getElementById('brawnValue').value) || 0;
     const resolve = parseInt(document.getElementById('resolveValue').value) || 0;
@@ -636,6 +638,19 @@ function calculateDerivedStats() {
     const will = parseInt(document.getElementById('willValue').value) || 0;
     const vigor = parseInt(document.getElementById('vigorValue').value) || 0;
     const inspirit = Math.floor((might + will + vigor) / 3);
+
+    // Check for Tough talent
+    const hasTough = Array.from(document.querySelectorAll('.talentSelector')).some(sel => sel.value === 'Tough');
+    if (hasTough) {
+        const enduranceRank = parseInt(document.getElementById('enduranceSkillRank').value) || 0;
+        const bonus2x = enduranceRank * 2;
+        const bonus4x = enduranceRank * 4;
+        const bonus3x = enduranceRank * 3;
+        desperate += bonus2x;
+        dead -= bonus2x;
+        marred += bonus4x;
+        vit += bonus3x;
+    }
 
     document.getElementById('vitValue').textContent = vit;
     document.getElementById('marredValue').textContent = marred;

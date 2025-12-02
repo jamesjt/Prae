@@ -643,7 +643,7 @@ function calculateDerivedStats() {
     const brawn = parseInt(document.getElementById('brawnValue').value) || 0;
     const resolve = parseInt(document.getElementById('resolveValue').value) || 0;
     const faith = parseInt(document.getElementById('faithValue').value) || 0;
-    const recoveryBonus = Math.floor((brawn + resolve + faith) / 3);
+    const recoveryBonus = 3 + Math.floor((brawn + resolve + faith) / 3);
 
     const agility = parseInt(document.getElementById('agilityValue').value) || 0;
     const wit = parseInt(document.getElementById('witValue').value) || 0;

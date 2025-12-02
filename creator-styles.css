@@ -698,9 +698,10 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     border: none;
     margin-left: 20px;
     color: whitesmoke;}
+
 .subAttinputField:hover{
-    background-color: white;
-    color:black;
+    background-color: white !important;
+    color:black !important;
 }
 
 .charInfo{

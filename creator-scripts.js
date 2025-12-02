@@ -619,10 +619,14 @@ window.addEventListener('dataLoaded', () => {
 
 function calculateDerivedStats() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
-    let vit = 6 * level;
-    let marred = 4 * level;
-    let desperate = 2 * level;
-    let dead = -2 * level;
+    const vitBase = 30;
+    const marredBase = 20;
+    const desperateBase = 10;
+    const deadBase = -10;
+    let vit = vitBase + 6 * (level - 1);
+    let marred = marredBase + 4 * (level - 1);
+    let desperate = desperateBase + 2 * (level - 1);
+    let dead = deadBase - 2 * (level - 1);
 
     const brawn = parseInt(document.getElementById('brawnValue').value) || 0;
     const resolve = parseInt(document.getElementById('resolveValue').value) || 0;
@@ -640,7 +644,7 @@ function calculateDerivedStats() {
     const inspirit = Math.floor((might + will + vigor) / 3);
 
     // Check for Tough talent
-    const hasTough = Array.from(document.querySelectorAll('.talentSelector')).some(sel => sel.value === 'Tough');
+    const hasTough = Array.from(document.querySelectorAll('.talentSelector')).some(sel => sel.value.includes('Tough'));
     if (hasTough) {
         const enduranceRank = parseInt(document.getElementById('enduranceSkillRank').value) || 0;
         const bonus2x = enduranceRank * 2;

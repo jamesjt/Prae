@@ -180,6 +180,7 @@ document.addEventListener('change', e => {
             updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
             updateSkillsForMod(t.id);
         }
+        calculateDerivedStats();
         return;
     }
 
@@ -610,5 +611,39 @@ window.addEventListener('dataLoaded', () => {
     });
     updateAbilityTables('talent');
     updateAbilityTables('trick');
+    calculateDerivedStats();
     // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
 });
+
+function calculateDerivedStats() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const vit = 6 * level;
+    const marred = 4 * level;
+    const desperate = 2 * level;
+    const dead = -2 * level;
+
+    const brawn = parseInt(document.getElementById('brawnValue').value) || 0;
+    const resolve = parseInt(document.getElementById('resolveValue').value) || 0;
+    const faith = parseInt(document.getElementById('faithValue').value) || 0;
+    const recoveryBonus = Math.floor((brawn + resolve + faith) / 3);
+
+    const agility = parseInt(document.getElementById('agilityValue').value) || 0;
+    const wit = parseInt(document.getElementById('witValue').value) || 0;
+    const empathy = parseInt(document.getElementById('empathyValue').value) || 0;
+    const breath = Math.floor((agility + wit + empathy) / 3);
+
+    const might = parseInt(document.getElementById('mightValue').value) || 0;
+    const will = parseInt(document.getElementById('willValue').value) || 0;
+    const vigor = parseInt(document.getElementById('vigorValue').value) || 0;
+    const inspirit = Math.floor((might + will + vigor) / 3);
+
+    document.getElementById('vitValue').textContent = vit;
+    document.getElementById('marredValue').textContent = marred;
+    document.getElementById('desperateValue').textContent = desperate;
+    document.getElementById('deadValue').textContent = dead;
+
+    document.getElementById('recoveryMax').textContent = recoveryBonus;
+    document.getElementById('recoveryValue').textContent = recoveryBonus;
+    document.getElementById('breathValue').textContent = breath;
+    document.getElementById('inspiritValue').textContent = inspirit;
+}

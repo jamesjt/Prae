@@ -585,22 +585,36 @@ function updateGearLoad(i) {
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')
   .draggable({
-    inertia: false,  // Smooth momentum on release
-    autoScroll: false,  // Auto-scroll if dragging near edges
+    inertia: false,
+    autoScroll: false,
     listeners: {
-      move: (event) => {
+      start(event) {
         const target = event.target;
-        // Get current position (stored as data attributes)
-        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-        // Apply transform for movement
+
+        // Read computed transform matrix
+        const style = window.getComputedStyle(target);
+        const matrix = new DOMMatrixReadOnly(style.transform);
+
+        // m41 = translateX, m42 = translateY
+        target.setAttribute('data-x', matrix.m41);
+        target.setAttribute('data-y', matrix.m42);
+      },
+
+      move(event) {
+        const target = event.target;
+
+        // restore from dataset
+        let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        // apply transform and store values
         target.style.transform = `translate(${x}px, ${y}px)`;
-        // Store new position
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
       }
     }
   });
+
 // ———————————————————————— INIT ————————————————————————
 window.addEventListener('dataLoaded', () => {
     TooltipManager.init();

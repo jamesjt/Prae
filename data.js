@@ -164,8 +164,11 @@ function parseRules(rows) {
         return { dataByCategory, hoverRules };
     }
 
-    // Get unique prefixes from headers (e.g., 'rules', 'proficiency', 'gear', 'attribute', 'skill')
-    const prefixes = [...new Set(headers.map(h => h.replace(/name|details|shortdetails|type|elements|load|loadlimit|slots|slottype|extrareadyslots|location|cost|effect|penalty|parent|attribute$/, '')))].filter(p => p && prefixes.includes(p) === false);
+    // Get unique prefixes from headers (categories like 'rules', 'proficiency', 'gear', 'attribute', 'skill')
+    const prefixes = [...new Set(headers.map(h => {
+        const match = h.match(/^([a-z]+)(name|details|shortdetails|type|elements|load|loadlimit|slots|slottype|extrareadyslots|location|cost|effect|penalty|parent|attribute)$/);
+        return match ? match[1] : null;
+    }).filter(p => p))];
 
     // Generalized parsing: for each row, extract items for each prefix if name filled
     const dataByCategory = {};
@@ -174,7 +177,7 @@ function parseRules(rows) {
             const nameIdx = headers.indexOf(prefix + 'name');
             if (nameIdx === -1) return;
             const name = rows[r][nameIdx]?.trim();
-            if (name && name !== '-') {
+            if (name) {
                 const item = {};
                 headers.forEach((h, idx) => {
                     if (h.startsWith(prefix)) {
@@ -186,7 +189,7 @@ function parseRules(rows) {
                     }
                 });
                 if (Object.keys(item).length > 0) {
-                    if (prefix === 'gear' && item.type) item.category = item.type.trim();
+                    if (prefix === 'gear' && item.type) item.category = item.type;
                     if (prefix === 'proficiency') {
                         item.category = item.type?.toLowerCase();
                         item.details = item.shortdetails;

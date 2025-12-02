@@ -372,6 +372,16 @@ function processWithTooltips(text) {
         processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
 
     });
+    // Collect unique ability names
+    const abilityNames = new Set();
+    abilitiesData.forEach(abilities => {
+        abilities.forEach(ability => abilityNames.add(ability.name));
+    });
+    // Wrap ability names
+    abilityNames.forEach(name => {
+        const regex = new RegExp(`\\b${escapeRegExp(name)}\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${name}">$&</span>`);
+    });
     return processed;
 }
 function populateAbilityInfo(selectId, abilities, type) {

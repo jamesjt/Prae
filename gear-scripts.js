@@ -158,12 +158,7 @@ function handleReadySelectChange(i) {
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
-    if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
-        const slots = parseInt(item.slots || 0);
-        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
-        renderStowed(i);
-    }
-    // === 4. Handle container logic ===
+    // === 4. Handle container logic (similar to pack) ===
     const wasContainer = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category.toLowerCase() === 'container';
     const isContainer = item?.category.toLowerCase() === 'container';
     if (wasContainer && !isContainer) {
@@ -171,96 +166,50 @@ function handleReadySelectChange(i) {
         renderContents(i); // This removes the container
     }
     if (isContainer && !wasContainer) {
-        const slots = parseInt(item.slots || 0);
+        const slots = parseInt(item.slottype || 0);
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
-    if (isContainer && wasContainer && readyState[i-1].gear !== newGearName) {
-        const slots = parseInt(item.slots || 0);
-        readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
-        renderContents(i);
-    }
-    // Update state
+    // === 5. Update state and load ===
     readyState[i-1].gear = newGearName;
-    readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
-    // Update load
     updateReadyLoad(i);
     calculateLoad();
 }
 function renderStowed(i) {
-    let container = document.getElementById(`stowed-container-${i}`);
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
-
-    if (readyState[i-1].stowed.length === 0) {
-        if (container) container.remove();
-        return;
-    }
-
-    if (!container) {
-        container = document.createElement('div');
-        container.id = `stowed-container-${i}`;
-        container.className = 'stowed-container';
-        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);
-    }
-    container.innerHTML = '';
-
-    readyState[i-1].stowed.forEach((s, j) => {
-        const stowedIndex = j + 1;
+    let existing = document.getElementById(`stowedContainer-${i}`);
+    if (existing) existing.remove();
+    const state = readyState[i-1];
+    if (state.stowed.length === 0) return;
+    const container = document.createElement('div');
+    container.id = `stowedContainer-${i}`;
+    container.className = 'stowedContainer';
+    for (let j = 0; j < state.stowed.length; j++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
-
-        let detailsHtml = '';
-
         entry.innerHTML = `
-            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector"></select>
-            <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
-            <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
-            ${detailsHtml}
+            <select id="stowed-${i}-${j+1}-select" class="gearSelector gearStowed"></select>
+            <input type="number" id="stowed-${i}-${j+1}-amt" class="gearAmtInputField gearStowed" min="1" value="${state.stowed[j].amt}"/>
+            <div id="stowed-${i}-${j+1}-load" class="gearLoad gearStowed"></div>
         `;
-
         container.appendChild(entry);
-
         const sel = entry.querySelector('select');
-        populateGearSelector(sel, nonPackOptions, 'Stowed slot');
-
-        // Restore saved selection and add details if needed
-        if (s.gear) {
-            sel.value = s.gear;
-            const item = nonPackOptions.find(g => g.name === s.gear);
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-            // Add type class for stowed item
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
-        }
-
-        // On change
+        populateGearSelector(sel, nonPackOptions, 'Stowed Slot');
+        sel.value = state.stowed[j].gear || '';
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
             const item = nonPackOptions.find(g => g.name === selectedName);
-
-            // Remove old details
-            const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
+            // Remove old details icon
+            const oldDetails = document.getElementById(`stowed-${i}-${j+1}-details`);
             if (oldDetails) oldDetails.remove();
-
-            // Add new details only if present
+            // Add details icon only if item has details
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
-                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
+                detailsDiv.id = `stowed-${i}-${j+1}-details`;
                 detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
                 detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
                 entry.appendChild(detailsDiv);
             }
-
             // Remove previous type classes
             entry.classList.forEach(cls => {
                 if (cls.startsWith('gear') && cls !== 'gearEntry' && cls !== 'gearStowed') {
@@ -272,95 +221,55 @@ function renderStowed(i) {
                 const typeClass = 'gear' + item.category;
                 entry.classList.add(typeClass);
             }
-
             readyState[i-1].stowed[j].gear = selectedName;
-            updateStowedLoad(i, stowedIndex);
+            updateStowedLoad(i, j+1);
             updateReadyLoad(i);
             calculateLoad();
         });
-
         const amtInput = entry.querySelector('input');
         amtInput.addEventListener('input', () => {
             const val = Math.max(1, parseInt(amtInput.value) || 1);
             amtInput.value = val;
             readyState[i-1].stowed[j].amt = val;
-            updateStowedLoad(i, stowedIndex);
+            updateStowedLoad(i, j+1);
             updateReadyLoad(i);
             calculateLoad();
         });
-
-        updateStowedLoad(i, stowedIndex);
-    });
+        updateStowedLoad(i, j+1);
+    }
+    const gearEntry = document.getElementById(`gear${i}Select`)?.closest('.gearEntry');
+    if (gearEntry) gearEntry.appendChild(container);
 }
-
 function renderContents(i) {
-    let container = document.getElementById(`contents-container-${i}`);
-    const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
-
-    if (readyState[i-1].contents.length === 0) {
-        if (container) container.remove();
-        return;
-    }
-
-    if (!container) {
-        container = document.createElement('div');
-        container.id = `contents-container-${i}`;
-        container.className = 'contents-container';
-        gearEntry.parentNode.insertBefore(container, gearEntry.nextSibling);
-    }
-    container.innerHTML = '';
-
-    readyState[i-1].contents.forEach((s, j) => {
-        const contentsIndex = j + 1;
+    let existing = document.getElementById(`contentsContainer-${i}`);
+    if (existing) existing.remove();
+    const state = readyState[i-1];
+    if (state.contents.length === 0) return;
+    const container = document.createElement('div');
+    container.id = `contentsContainer-${i}`;
+    container.className = 'contentsContainer';
+    for (let j = 0; j < state.contents.length; j++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearContents';
-
-        let detailsHtml = '';
-
         entry.innerHTML = `
-            <select id="contents-${i}-${contentsIndex}-select" class="gearSelector"></select>
-            <input type="number" id="contents-${i}-${contentsIndex}-amt" min="1" value="${s.amt}"/>
-            <div id="contents-${i}-${contentsIndex}-load" class="gearLoad"></div>
-            ${detailsHtml}
+            <select id="contents-${i}-${j+1}-select" class="gearSelector gearContents"></select>
+            <input type="number" id="contents-${i}-${j+1}-amt" class="gearAmtInputField gearContents" min="1" value="${state.contents[j].amt}"/>
+            <div id="contents-${i}-${j+1}-load" class="gearLoad gearContents"></div>
         `;
-
         container.appendChild(entry);
-
         const sel = entry.querySelector('select');
-        populateGearSelector(sel, liquidsOptions, 'Select Liquid');
-
-        // Restore saved selection and add details if needed
-        if (s.gear) {
-            sel.value = s.gear;
-            const item = liquidsOptions.find(g => g.name === s.gear);
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `contents-${i}-${contentsIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-            // Add type class for contents item
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
-        }
-
-        // On change
+        populateGearSelector(sel, liquidsOptions, 'Contents Slot');
+        sel.value = state.contents[j].gear || '';
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
             const item = liquidsOptions.find(g => g.name === selectedName);
-
-            // Remove old details
-            const oldDetails = document.getElementById(`contents-${i}-${contentsIndex}-details`);
+            // Remove old details icon
+            const oldDetails = document.getElementById(`contents-${i}-${j+1}-details`);
             if (oldDetails) oldDetails.remove();
-
-            // Add new details only if present
+            // Add details icon only if item has details
             if (item?.details?.trim()) {
                 const detailsDiv = document.createElement('div');
-                detailsDiv.id = `contents-${i}-${contentsIndex}-details`;
+                detailsDiv.id = `contents-${i}-${j+1}-details`;
                 detailsDiv.className = 'gearDetails';
                 detailsDiv.textContent = 'i';
                 detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
@@ -380,7 +289,7 @@ function renderContents(i) {
             }
 
             readyState[i-1].contents[j].gear = selectedName;
-            updateContentsLoad(i, contentsIndex);
+            updateContentsLoad(i, j+1);
             updateReadyLoad(i);
             calculateLoad();
         });
@@ -390,42 +299,39 @@ function renderContents(i) {
             const val = Math.max(1, parseInt(amtInput.value) || 1);
             amtInput.value = val;
             readyState[i-1].contents[j].amt = val;
-            updateContentsLoad(i, contentsIndex);
+            updateContentsLoad(i, j+1);
             updateReadyLoad(i);
             calculateLoad();
         });
 
-        updateContentsLoad(i, contentsIndex);
-    });
+        updateContentsLoad(i, j+1);
+    }
+    const gearEntry = document.getElementById(`gear${i}Select`)?.closest('.gearEntry');
+    if (gearEntry) gearEntry.appendChild(container);
 }
-
-// Update single stowed load
+// Generalized sub-load updater (handles both stowed and contents)
+function updateSubLoad(readyI, subJ, subType) {
+    const prefix = subType === 'stowed' ? 'stowed' : 'contents';
+    const sel = document.getElementById(`${prefix}-${readyI}-${subJ}-select`);
+    if (!sel) return;
+    const opt = sel.options[sel.selectedIndex];
+    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
+    const subArray = readyState[readyI-1][subType];
+    const qty = subArray[subJ-1].amt;
+    const total = baseLoad * qty;
+    const loadDiv = document.getElementById(`${prefix}-${readyI}-${subJ}-load`);
+    if (loadDiv) {
+        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
+        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+    }
+}
+// Update single stowed load (wrapper for generalized function)
 function updateStowedLoad(readyI, stowedJ) {
-    const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
-    if (!sel) return;
-    const opt = sel.options[sel.selectedIndex];
-    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
-    const qty = readyState[readyI-1].stowed[stowedJ-1].amt;
-    const total = baseLoad * qty;
-    const loadDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-load`);
-    if (loadDiv) {
-        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
-    }
+    updateSubLoad(readyI, stowedJ, 'stowed');
 }
-// Update single contents load
+// Update single contents load (wrapper for generalized function)
 function updateContentsLoad(readyI, contentsJ) {
-    const sel = document.getElementById(`contents-${readyI}-${contentsJ}-select`);
-    if (!sel) return;
-    const opt = sel.options[sel.selectedIndex];
-    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
-    const qty = readyState[readyI-1].contents[contentsJ-1].amt;
-    const total = baseLoad * qty;
-    const loadDiv = document.getElementById(`contents-${readyI}-${contentsJ}-load`);
-    if (loadDiv) {
-        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
-    }
+    updateSubLoad(readyI, contentsJ, 'contents');
 }
 // Update ready load (for pack: sum stowed + base; for container: sum contents + base; for non-pack: base * amt)
 function updateReadyLoad(i) {

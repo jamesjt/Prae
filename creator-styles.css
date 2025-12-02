@@ -234,8 +234,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 /* Secondary Stats */
 
-.secondaryAttributesWrapper {margin-left: 110px;}
-.secondaryAttributes {border-radius: 8px;display:flex;height:40px;}
+.secondaryAttributesWrapper {}
+.secondaryAttributes {display:flex;height:40px;}
 #secondaryAttributeValues {display:flex; }
 .genAtt { width: 50px; text-align:center; text-align:center; border: 1px solid black;}
 
@@ -267,6 +267,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     font-size: 12px;
 }
 
+
+
 #guard {position: relative;margin-left: 50px;}
 
 #guardValue{
@@ -276,13 +278,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   font-size:20px;
   width: 100%;
 
-}
-
-#guardDesc{
-    width: 40px;
-    text-align:center;
-    font-size: 12px;
-    margin-left: 50px;
 }
 
 #armor {
@@ -296,15 +291,17 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     left: 17px;
     width: 8px;
 }
-
-#armorDesc{
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 2px;
-    padding-left:15px;
-    padding-right: 15px;
+.statsDesc{
+    font-size: 12px;
+    text-align: center;
+    width:40px;
 }
+#armorDesc{}
+#paceDesc {}
+#guardDesc{}
+#recoveryDesc {}
+#manaDesc{}
+#conversionDesc {}
 
 
 #maxHpValue {
@@ -339,12 +336,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #pace {padding-right: 15px;}
 #paceImg {position:relative;top:10px;}
 
-#paceDesc {
-    width: 40px;
-    text-align:center;
-    font-size: 12px; 
-    padding-right:15px;
-}
 
 #paceValue {
     position:relative;
@@ -365,51 +356,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     width: 8px;
 }
 
-#recoveryDesc {
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 2px;
-}
-
-#initiative {width:45px;}
-
-#initiativeValue {
-    position:relative;
-    left: 10px;
-    width: 20px;
-    text-align:center;
-    font-size:20px;
-    text-shadow: 0 0 10px grey, 0 0 10px grey, 0 0 10px grey, 0 0 10px grey;
-}
-
-#initiativeDesc {
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 2px;
-}
-
-#initialMomentum {width: 45px;}
-
-#initialMomentumValue {
-    position:relative;
-    left: 10px;
-    width: 20px;
-    text-align:center;
-    font-size: 20px;
-    color:whitesmoke;
-    text-shadow: 0 0 10px black, 0 0 10px black, 0 0 10px black, 0 0 10px black;
-    text-shadow: -1px 0 2px black, 0 1px 2px black, 1px 0 2px black, 0 -1px 2px black;
-
-}
-
-#initialMomentumDesc {
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 10px;
-}
 
 #mana {
     width: 45px;
@@ -417,12 +363,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     margin-left: 60px;
 }
 
-#manaDesc{
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 60px;
-}
+
 
 #manaValue{
     position:relative;
@@ -446,13 +387,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     text-shadow: -1px 0 2px black, 0 1px 2px black, 1px 0 2px black, 0 -1px 2px black;
 }
 
-#conversionDesc {
-    width:45px;
-    text-align:center;
-    font-size:12px;
-    margin-left: 2px;
-    padding-right: 10px;
-}
+
 
 
 /* Skills */

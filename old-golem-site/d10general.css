@@ -1,0 +1,245 @@
+textarea {resize:none;}
+td {height: 20px;}
+table {border-collapse: separate;}
+table, td, th {border: 1px solid black}
+
+ table.listTable, .listTable td, .listTable th {
+	border: none !important;
+}
+
+
+h1 {font-size: 40px; 
+	margin-bottom:7px; 
+	text-align: center; 
+	margin-top:0; 
+	padding-top: 5px; 
+	font-family: po8;}
+h2 {margin-bottom: 3px; font-family: blackcha; font-variant: small-caps;}
+h3 {font-size: 16px; margin-bottom: 3px; font-family: blackcha;}
+h4 {font-size:14px; margin-bottom: 5px; margin-top: 15px;}
+h5 {margin-bottom: 5px; margin-top: 15px;}
+p {margin-bottom: 0px;}
+a {text-decoration: none;}
+
+@font-face { font-family: wizzta; src: url(../fonts/wizzta.ttf); }
+@font-face { font-family: dragonfly; src: url(../fonts/Dragonfly.ttf); }
+@font-face { font-family: pebbles; src: url(../fonts/pebbles.ttf); }
+@font-face { font-family: moonshadow; src: url(../fonts/moonshadow.ttf); }
+@font-face { font-family: dragonsong; src: url(../fonts/Dragonsong.ttf); }
+@font-face { font-family: mso; src: url(../fonts/MagicSchoolOne.ttf); }
+@font-face { font-family: cosmic; src: url(../fonts/CosmicLove.ttf); }
+@font-face { font-family: chopin; src: url(../fonts/ChopinScript.otf); }
+@font-face { font-family: blackcha; src: url(../fonts/Blackcha.ttf); }
+@font-face { font-family: daniel; src: url(../fonts/Daniela.ttf); }
+@font-face { font-family: gaelic; src: url(../fonts/GAELIC.TTF); }
+@font-face { font-family: adine; src: url(../fonts/AdineKirnberg-Alternate.ttf); }
+@font-face { font-family: po8; src: url(../fonts/PiecesofEight.ttf); }
+
+
+.bold {font-weight: bold;}
+.flex{display:flex; align-items: flex-start;}
+.flexSpace{display:flex; align-items: flex-start; justify-content: space-between;}
+.centerText{text-align: center;}
+.indent40 {padding-left: 40px;}
+.filledField{text-align: center;background-color: #a0a0a0;border-radius: 5px;color: black;border: 1px solid black !important;}
+
+.coreAttributes {float: left;height:306px;width: 125px;}
+.genAtt {color: white;}
+
+.physicalAtt {
+	border-style: solid;
+	border-width: 2px;
+	border-color: #4D0708;
+	background-color: #BD534D;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+}
+
+.mentalAtt {
+	border-style: solid;
+	border-width: 2px;
+	border-color: #082466;
+	background-color: #6385BE;
+}
+
+.socialAtt {
+	border-style: solid;
+	border-width: 2px;
+	border-color: #311530;
+	background-color: #72639F;
+	border-bottom-right-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+
+.mSec {background-color: #5D89A9;}
+.pSec {background-color: #BD534D;}
+.sSec {background-color: #7B4B84;}
+
+.skillList{background-color: black;padding: 1px 1px 2px 1px;border-style: solid;border-width: 1px;border-radius: 8px;}
+
+.bodyColor {background-color: #5F1817; color:white;}
+.mindColor {background-color: #19315C; color:white;}
+.spiritColor{background-color: #281957; color:white;}
+
+.mightSkill, .brawnSkill { background-color: #E06666;}
+.agilitySkill { background-color:  #EA9999;}
+.willSkill, .resolveSkill { background-color: #A4C2F4;}
+.witSkill { background-color: #C9DAF8;}
+.vigorSkill, .faithSkill { background-color: #8E7CC3;}
+.empathySkill { background-color: #B4A7D6;}
+
+.physicalTalent { background-color: #b36b00 !important; color: white; }
+.mentalTalent { background-color: #006666 !important; color: white;}
+.socialTalent { background-color: #8E7CC3 !important; color: white;}
+.physicalNonAtkMan {background-color: #ac3939 !important; color: white;}
+.mentalNonAtkMan {background-color: #004c99 !important; color: white;}
+.socialNonAtkMan {background-color: #7300e6 !important; color: white;}
+.physicalAtkMan {background-color: #5F1817 !important; color: white;}
+.mentalAtkMan {background-color: #204077 !important; color: white;}
+.socialAtkMan {background-color: #4f1f4c !important; color: white;}
+/*.physicalAtkMan {background-color: #800000 !important; color: white;}
+.mentalAtkMan {background-color: #002266 !important; color: white;}
+.socialAtkMan {background-color: #862d59 !important; color: white;}*/
+.physicalExploit {background-color: #cc9900 !important; color: white;}
+.mentalExploit {background-color: #A4C2F4 !important; color: white;}
+.socialExploit {background-color: #B4A7D6 !important; color: white;}
+
+
+.borderNone {border-style:none;}
+
+
+abbr {position: relative; display: inline; border-bottom: 1px dotted black; z-index: 1;}
+abbr::before {
+  position: absolute;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  left: 30%;
+  content: "";
+  border-style: solid;
+  border-width: 9px 12px 0 12px;
+  border-color: black transparent transparent transparent;
+  margin-top:-4px;
+}
+
+abbr:hover:after {visibility: visible;}
+abbr:hover:before {visibility: visible;}
+
+abbr.vigilant::after{content: "Strikes get -1 die, +1 Guard vs Invoke, and +1 Armor against AoE";}
+abbr.boosted::after{content: "+1 die to rolls";}
+abbr.haste::after{content: "+1 Action";}
+abbr.quick::after{content: "+1 Move";}
+abbr.focused::after{content: "+1 Focus";}
+
+
+abbr.breached::after{content: "Strikes +1 die, -1 Guard vs Invoke, and -1 Armor against AoE";}
+abbr.impaired::after{content: "-1 die on rolls";}
+abbr.blind::after{content: "Impairs Strikes and can not use Tricks with Strikes";}
+abbr.dizzy::after{content: "Impaired Blasts and can not use Tricks with Blasts";}
+abbr.gagged::after{content: "Impaired Invokes and can not use Tricks with Invokes";}
+
+/* Durations */
+abbr.short::after {content: "First use or end of creators next turn";}
+abbr.round::after{content: "Until end of creators next turn";}
+abbr.combat::after{content: "Until combat ends or about 2 minutes";}
+abbr.rest::after{content: "Until you take a short rest";}
+abbr.day::after{content: "Until you take a long rest";}
+abbr.chronic::after{content: "No duration end";}
+
+
+abbr.stun::after{content: "Can not act, move, or focus";}
+abbr.restrained::after{content: "-1 Action Action";}
+abbr.slow::after{content: "-1 Move";}
+abbr.dazed::after{content: "-1 Focus and cannot React";}
+
+abbr.burning::after{content: "Take 1 damage at the beginning of your turn for each instance of Burning";}
+abbr.bleeding::after{content: "Take 1 Pure damage for each Action, Move, Focus, or Reaction taken";}
+abbr.vulnerable::after{content:"Increase damage taken by 1 for each instance of damage";}
+abbr.meek::after{content:"Decrease damage dealt by 1 for each instance";}
+abbr.pure::after {content: "Damage that ignores armor";}
+abbr.persistent::after{content:"Damage that also reduces maxmimum HP";}
+abbr.psychic::after {content: "Damage that ignores armor, but can not damage things without a mind";}
+abbr.poisoned::after {content: "While poisoned all damage you take is persistent";}
+
+/* Armor Penalties */
+abbr.lightPen::after {content: "Impairs: Blasts, Sprint, and Swim";}
+abbr.medPen::after {content: " Impairs: \A Ranged Strikes, Jumping, Climbing and Running \A Impairs Twice:; \A Blasts Acrobatics, Dance, Sneaking, Sprint, and Swim \A Acrobatics and Sneak Tricks and Arcana can not be used"; white-space: pre-wrap;}
+/* abbr.heavyPen::after {content: "-1 Pace \A -3 to Blast Rolls \A -2 to hit with Ranged Strikes \A -3 to sprinting and swimming rolls \A -2 to jumping, climbing and jogging rolls \A -4 to all rolls when using the Acrobatics, Dancing or Sneaking skills \A Can not use any abilities from Acrobatics, Dancing or Sneaking skills"; white-space: pre-wrap;} */
+abbr.shieldPen::after {content: "Impairs: Blast";}
+
+/* Fluff Terms */
+abbr.yon::after {content: "Pronounced (Y-oh-n). Series of movements used for Conjurations";}
+
+.abilityFieldset{background-color:rgb(255, 255, 255, 0.7); margin-left:10px; border-radius: 5px;box-shadow:0px 0px 3px 0px black; box-sizing: border-box; position: relative;}
+.abilityLegend{color:white; padding: 4px 0px 4px 5px; border-radius: 4px 4px 0px 0px; font-variant: small-caps; font-size:14px;font-family: blackcha;letter-spacing: 1px;box-sizing: border-box;width:100%;}
+
+.yLegend{position:absolute;left:-23px;word-wrap: break-word;align-items: center;border-radius: 4px 0px 0px 4px;text-align: center;width: 0.7em;color:white;font-variant: small-caps;box-shadow: -2px 0px 3px -2px black;}
+.yDiceLegend{padding:90px 6px 90px 6px;}
+
+.gLegend{background-color:rgb(183,150,141,1);}
+
+.namLegend{background-color:rgb(87, 89, 97,1);}
+.amLegend{background-color: rgba(106, 135, 125, 1);}
+.ritualLegend{background-color:rgb(25, 49, 92, 1);}
+.weaponLegend{background-color:rgb(95, 24, 23)}
+.gearLegend{background-color: rgb(0,0,0, 1);}
+
+.abilityField{padding: 4px;font-size: 13px;}
+
+.abilityFieldLast{border-radius: 0px 0px 4px 4px;}
+.abilityKeywords{font-style: italic;}
+
+.tableField{justify-content: space-between;}
+.blackField{background-color:black; color:white;}
+.gField:nth-child(odd){background-color:rgb(183,150,141,0.3); }
+.gField:nth-child(even){background-color:rgb(183,150,141,0.1); }
+
+.amField:nth-child(odd){background-color:rgb(106, 135, 125, 0.3);}
+.amField:nth-child(even){background-color: rgba(106, 135, 125, 0.1);}
+.namField:nth-child(odd){background-color:rgb(87, 89, 97, 0.3);}
+.namField:nth-child(even){background-color: rgba(87, 89, 97, 0.1);}
+.ritualField{font-variant: normal; letter-spacing: normal; font-family: initial; }
+.ritualField:nth-child(odd){background-color:rgba(25, 49, 92, 0.3);}
+.ritualField:nth-child(even){background-color: rgba(25, 49, 92, 0.1);}
+
+
+.weaponField:nth-child(odd){background-color:rgb(176, 124, 113, 0.3);}
+.weaponField:nth-child(odd){background-color:rgb(176, 124, 113, 0.1);}
+
+
+
+.ritualFull{width:600px !important; margin-left:-30px;}
+
+.chanceTable{margin-left: 40px}
+
+.diceCell{width:60px; text-align: center;}
+.progressionCell{width:90px; text-align: center;}
+.cell90{width:90px;}
+.tableCellLeft{width:50px; padding-left:5px;}
+.tableCellFull{width:100%; padding-left: 5px;}
+.tableCellKit{width:25%; padding-left:5px;}
+
+.tableHeaderLeft{width:30px; padding-left:5px; font-weight: bold;}
+.tableHeaderFull{width:100%; padding-left: 20px; font-weight: bold; text-align: center;}
+.tableFiller{width:55px;}
+
+
+/*old ritual color rgb(49, 116, 130, 1); 
+
+rgb(87, 89, 97)
+rgb(197, 151, 157)
+rgb(86, 54, 53)
+*/
+
+/*.talentLegend{background-color:rgb(168, 105, 32, 1);}*/
+
+.charSheetAbility{
+	width:310px;
+	margin-top:5px;
+}
+
+.abilityOverflow{
+	max-height: 340px;
+	overflow-y: scroll;
+	overflow-x: hide;
+}

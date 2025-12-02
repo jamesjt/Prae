@@ -1,0 +1,278 @@
+body {height: 100%;margin:0px;}
+ul {margin: 10px;}
+abbr::after {
+	border-color: black;
+	border-radius: 8px;
+	border-width: 3px;
+	border-style: solid;
+	display: block;
+	position: absolute;
+	visibility: hidden;
+	text-align: center !important;
+	width: 270px;
+	bottom: 17px;
+  background-color: black;
+  color: white;
+	padding: 5px 8px;
+	border-radius:5px;
+	left:-130px;
+}
+
+
+.topBar{
+	width: 100%;
+	height:50px;
+	background: url(../imgs/golemstudios.png) no-repeat;
+	background-size: contain;
+	background-color:  rgb(62, 64, 72,1);
+	padding-left: 30px;
+	position: absolute;
+	top:0px;
+	width: calc(100% - 230px);
+	box-shadow: -3px 0px 3px 0px;
+	z-index: 10;
+}
+
+
+.wideWrapper {
+	background-color:white;
+	z-index: 1px;
+	width: 100%;
+	margin:0 auto;
+	justify-content: center;
+}
+
+.coreAttTable{width: 130px  !important;}
+.attributeWrapper td{margin: 0px !important; padding: 0px !important;}
+.coreAttributes {margin-right: 15px;}
+.hidden {display:none !important;}
+
+.showButton{
+	display: inline-block;
+	margin-top: 9px;
+	border: none;
+	background: none;	
+	font-family: wizzta;
+	font-size: 20px;
+}
+
+.hide {
+	border: none;
+	border-radius: 9px;
+	line-height: 8px;
+	font-size: 8px;
+	padding:0px 3px 1px 3px;
+	background: none;
+	margin-top:15px;
+	left:20px;
+}
+
+.hideWrapper {position: relative;text-align: center;}
+
+#nav{margin:0 auto;}
+#nav ul{list-style:none;position:relative;}
+
+#nav ul a{
+  display:block;
+  color:#333;
+  font-weight:bold;
+  font-size:12px;
+  text-transform: uppercase;
+  line-height:20px;
+  padding:0 30px;
+  font-family:"HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif
+  color: black;
+}
+
+#nav ul li{
+  position:relative;
+  float:left;
+  margin:0;
+  padding:0
+  border-color: black;
+  border-style: solid;
+  border-width: 0px 0px 5px 0px;
+  display:block;
+}
+#nav ul ul{
+  z-index:1;
+  border:3px solid #666362;
+  display:none;
+  position:absolute;
+  top:10px;
+  left:-10px;
+  background:#fff;
+  padding:0
+}
+
+#nav ul li:hover{background:black; text-decoration:underline;}
+#nav ul li:hover ul{display:block;}
+#nav ul ul li{border:none; float:left; width:200px}
+#nav ul ul a{line-height:120%; padding:10px 15px}
+
+a.nav-active {color:#ccc;}
+
+.d10menu{
+	width:200px;
+	position: absolute;
+	z-index:1;
+	height:100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background-color: rgb(62, 64, 72,1);
+	box-shadow: 0px 0px 3px 0px black;
+	top:0px;
+	right:0px;
+}
+
+.d10menu ul {list-style-type: none;}
+.d10menu ul a {color:rgb(240,240,240);}
+.d10menu ul a:hover {background:white; color:black; border-radius: 7px; padding-left: 2px; border: 1px solid rgb(32, 81, 83); display:block;}
+.d10menu li {position:relative; right:25%; width:200px;}
+.d10menu ul li ul {
+  border-style: none none none dotted;
+  border-color: #43BFC7;
+  border-width: 1px;
+}
+
+.d10menu ul li ul li ul {
+	border-style: none none none dotted; 
+	border-color: #43BFC7; 
+	border-width: 1px;
+}
+
+.d10{
+	font-size: 16px;
+	margin-left:5px;
+	width: calc(100% - 220px);
+	display:flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.section {margin-top: 15px;}
+
+.section:nth-of-type(odd) header {
+	background: url('../imgs/scrollTop3.png') no-repeat center top;
+	background-size: 100% 100%;
+	height:40px;
+	width: 758px;
+	margin-bottom:-8px;
+	margin-left:23px;
+}
+.section:nth-of-type(even) header {
+	background: url('../imgs/scrollTop3.png') no-repeat center top;
+	background-size: 100% 100%;
+	height:40px;
+	width: 758px;
+	margin-bottom:-8px;
+	margin-left:23px;
+}
+
+.section:nth-of-type(odd) footer {
+	background: url('../imgs/scrollTop3.png') no-repeat center top;
+	background-size: 100% 100%;
+	height:40px;
+	width:758px;
+	transform: scaleY(-1);
+	margin-top: -8px;
+	margin-left:23px;
+}
+
+
+.section:nth-of-type(even) footer {
+	background: url('../imgs/scrollTop3.png') no-repeat center top;
+	background-size: 100% 100%;
+	height:40px;
+	width:758px;
+	transform: scaleY(-1);
+	margin-top:-8px;
+	margin-left:23px;
+}
+.section:nth-of-type(odd) article {
+	background: url('../imgs/scrollBackground4.png') center top;
+	background-size: 100% 100%;
+	padding-left:75px;
+	padding-right:75px;
+	padding-bottom: 20px;
+	padding-top: 15px;
+	margin-left: 45px;
+	width: 550px;
+	margin-top:-15px;
+}
+
+.section:nth-of-type(even) article {
+	background: url('../imgs/scrollBackground4.png') no-repeat center top;
+	background-size: 100% 100%;
+	padding-left:75px;
+	padding-right:75px;
+	padding-bottom: 20px;
+	padding-top: 15px;
+	margin-left: 45px;
+	width: 550px;
+	margin-top:-15px;
+}
+
+.divider{	background: url('../imgs/divider4.png') no-repeat center top; width:100%; height: 100px; background-size:contain; margin-bottom:-80px; margin-top:25px;}
+
+a.internalLink{border-bottom: 1px dashed black; color: black;}
+.note {font-size: 12px;}
+.wordNote{text-align: center; width:550px;}
+
+.skillRankInfo {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	margin-left: 4%;
+}
+.skillRankInfo td {padding-right: 30px;}
+.abilityTable tr td {width:500px;}
+
+.abilityColumnLeft {
+	width:260px !important; 
+	background-color:white; 
+	order:1;
+	margin-left:5px;
+	margin-right:20px;
+}
+
+.abilityColumnRight {
+	width:260px !important; 
+	background-color:white;  
+	order:2; 
+	margin-right:5px;
+}
+
+.abilityRow {
+	margin-bottom: 30px;
+	display:flex;
+}
+
+.ritualTable {width: 700px; background-color: white;}
+.chanceTable{}
+.chanceRow{display:flex; text-align: center;}
+
+.chanceEntry{
+	width:45px;
+	border:1px solid black;
+	box-sizing: border-box;
+	height:25px;
+	padding-top:2px;
+}
+
+.progressionEntry{
+	width:70px;
+	border:1px solid black;
+	box-sizing: border-box;
+	font-size: 12px;	
+}
+
+
+.talent{color:white;background-color:#6a877d;}
+.nonAtkMan{color:white;background-color:#369180 !important;}
+.atkMan{color:white;background-color:#0a614e !important;}
+.exploit{color:white; background-color:#666633;}
+
+.handbookAbilityFieldset{
+	width:295px;
+}

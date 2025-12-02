@@ -238,7 +238,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .secondaryAttributes {display:flex;height:40px;}
 #secondaryAttributeValues {display:flex; }
 .genAtt { width: 50px; text-align:center; text-align:center; border: 1px solid black;}
-
+.statsValue{font-size:30px;width:40px;}
 .statsDesc{
     font-size: 12px;
     text-align: center;
@@ -253,8 +253,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #manaDesc{}
 #conversionDesc{}
 #paceDesc
-
-.statsValue{font-size:30px;width:40px;}
 
 
 #maxHpValue {}

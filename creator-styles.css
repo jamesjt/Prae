@@ -558,7 +558,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     border-radius: 8px;
     padding:2px;
 }
-.gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitesmoke;margin-bottom: -4px;width:260pxx;}
+.gearEntryHeader{background-color: black; display: flex;font-size:14px; color:whitesmoke;margin-bottom: -4px;width:260px;}
 .gearEntry {display:flex;margin: 3px; height: 20px;}
 .gearEntry input {width:30px;color:whitesmoke;border:none;}
 .gearEntry input:hover {color:black;background-color:white;}

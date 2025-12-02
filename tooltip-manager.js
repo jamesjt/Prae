@@ -22,6 +22,10 @@ class TooltipManager {
 
       const instance = tippy(el, { ...options, content });
 
+      if (meta?.type === 'ritual') {
+        instance.popper.classList.add('draggable');
+      }
+
       if (key.startsWith("ability:")) {
         let pinned = false;
         el.addEventListener('mouseenter', () => {

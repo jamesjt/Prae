@@ -42,13 +42,16 @@ class TooltipManager {
           }
         });
         el.addEventListener('click', () => {
-          pinned = !pinned;
-          if (pinned) {
-            instance.show();
-          } else {
-            instance.hide();
-          }
+          pinned = true;
+          instance.show();
         });
+        const closeBtn = instance.popper.querySelector('.close-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            pinned = false;
+            instance.hide();
+          });
+        }
       }
 
       TooltipManager.instances.set(el, instance);
@@ -143,6 +146,7 @@ class TooltipManager {
     const outerClass = `tip-ability-${typeLower}`;
     let html = `
       <div class="${outerClass}">
+        <span class="close-btn">X</span>
     `;
     const order = ['name', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {

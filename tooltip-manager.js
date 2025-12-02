@@ -10,7 +10,7 @@ class TooltipManager {
       const key = el.getAttribute("data-tip");
       const html = TooltipManager.resolve(key);
 
-      const instance = tippy(el, {
+      const options = {
         content: html,
         allowHTML: true,
         theme: "ruleTip",
@@ -20,7 +20,39 @@ class TooltipManager {
         interactive: true,
         delay: [200, 0],
         duration: [200, 0]
-      });
+      };
+
+      if (key.startsWith("ability:")) {
+        options.trigger = 'manual';
+        options.hideOnClick = false;
+      }
+
+      const instance = tippy(el, options);
+
+      if (key.startsWith("ability:")) {
+        let pinned = false;
+        el.addEventListener('mouseenter', () => {
+          instance.show();
+        });
+        el.addEventListener('mouseleave', (ev) => {
+          if (!pinned && !instance.popper.contains(ev.relatedTarget)) {
+            instance.hide();
+          }
+        });
+        instance.popper.addEventListener('mouseleave', (ev) => {
+          if (!pinned && !el.contains(ev.relatedTarget)) {
+            instance.hide();
+          }
+        });
+        el.addEventListener('click', () => {
+          pinned = !pinned;
+          if (pinned) {
+            instance.show();
+          } else {
+            instance.hide();
+          }
+        });
+      }
 
       TooltipManager.instances.set(el, instance);
     });

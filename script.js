@@ -174,6 +174,9 @@ function processTextForTooltips(text) {
   return text;
 }
 
+// Expose for reuse in other scripts
+window.processTextForTooltips = processTextForTooltips;
+
 // Navigation between sections
 document.querySelectorAll('.nav-list a').forEach(link => {
     link.addEventListener('click', (e) => {

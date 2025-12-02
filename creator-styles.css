@@ -405,9 +405,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearWeapon {background-color:var(--bodyColor0);border:1px inset black;}
 .gearWeapon select {background-color:var(--bodyColor0);}
 .gearWeapon input {background-color:var(--bodyColor0);margin-left:5px;}
-.gearArmor {background-color:var(--bodyColor0);border:1px inset black;}
-.gearArmor select {background-color:var(--bodyColor0);}
-.gearArmor input {background-color:var(--bodyColor0);margin-left:5px;}
+.gearArmor {background-color:var(--mindColor0);border:1px inset black;}
+.gearArmor select {background-color:var(--mindColor0);}
+.gearArmor input {background-color:var(--mindColor0);margin-left:5px;}
 #ritualList {
   background-color:var(--mindColor3);
   height: 144px;

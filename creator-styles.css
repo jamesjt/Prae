@@ -239,6 +239,8 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #secondaryAttributeValues {display:flex; }
 .genAtt { width: 50px; text-align:center; text-align:center; border: 1px solid black;}
 .statsValue{font-size:30px;width:40px;}
+.statsValue input{font-size:30px;width:40px;color:whitesmoke;background-color:black}
+.statsValue input:hover{background-color:whitesmoke;color:black;}
 .statsDesc{
     font-size: 12px;
     text-align: center;
@@ -252,17 +254,15 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #recoveryDesc {}
 #manaDesc{}
 #conversionDesc{}
-#paceDesc
-
-
-#maxHpValue {}
-#marredValue {}
-#desperateValue {}
+#paceDesc{}
+#maxHpValue{}
+#marredValue{}
+#desperateValue{}
 #deadValue{}
-#paceValue {}
+#paceValue{}
 #manaValue{}
-#inspiritValue {}
-#recoveryValue {}
+#inspiritValue{}
+#recoveryValue{}
 #armorValue{}
 #guardValue{}
 

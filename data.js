@@ -108,6 +108,10 @@ function parseWays(rows) {
                 const key = (row[0] || '').trim().toLowerCase();
                 if (key) props[key] = (row[col] || '').trim();
             });
+            // Clean props to fix common typos like duplicated words with "> between (e.g., from HTML paste errors)
+            for (let k in props) {
+                props[k] = props[k].replace(/(\w+)">(\1)/g, '$1');
+            }
             const nameKey = Object.keys(props).find(k => k.includes('way name'));
             const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
             const name = nameKey ? props[nameKey] : '';

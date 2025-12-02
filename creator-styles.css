@@ -85,13 +85,12 @@
     flex-direction: row;
 }
 
-#column1 {margin-right: 15px;width:410px}
+#column1 {margin-right: 15px;}
 #column3 {margin-left: 15px;}
 
 .statsWrapper { 
   display: flex;
   flex-direction: row;
-  width: 390px;
   border-radius:8px;
 }
 
@@ -151,9 +150,9 @@
 
 /* Attributes */
 
-#bodyStatsWrapper {background-color: var(--bodyColor0);margin-bottom: 5px;width:100%;}
-#mindStatsWrapper {background-color: var(--mindColor0);margin-bottom: 5px;width: 100%;}
-#spiritStatsWrapper {background-color: var(--spiritColor0);width: 100%;}
+#bodyStatsWrapper {background-color: var(--bodyColor0);margin-bottom: 5px;}
+#mindStatsWrapper {background-color: var(--mindColor0);margin-bottom: 5px;}
+#spiritStatsWrapper {background-color: var(--spiritColor0);}
 
 .att-desc-font{font-size: 8px}
 
@@ -467,7 +466,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #skillHeader {
     color: white;
-    margin-left: 150px;
+    margin-left: 140px;
     width: 255px;
 }
 

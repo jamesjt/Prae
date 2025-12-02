@@ -22,7 +22,7 @@ function populateGearSelector(selectEl, options, placeholder) {
             const opt = document.createElement('option');
             opt.value = g.name;
             opt.textContent = g.name;
-            opt.dataset.load = g.baseLoad || g.load || 0;
+            opt.dataset.load = g.load || 0; // No baseLoad in CSV
             optgroup.appendChild(opt);
         });
         selectEl.appendChild(optgroup);
@@ -30,9 +30,9 @@ function populateGearSelector(selectEl, options, placeholder) {
 }
 
 function rebuildGearSelectors() {
-    allOptions = gearData.filter(g => g.category?.toLowerCase() ?? '' !== 'liquids');
-    nonPackOptions = allOptions.filter(g => g.category?.toLowerCase() ?? '' !== 'packs');  // Case-insensitive exclude
-    liquidsOptions = gearData.filter(g => g.category?.toLowerCase() === 'liquids');
+    allOptions = gearData.filter(g => (g.category?.toLowerCase() ?? '') !== 'liquid'); // Adjustable exclusion
+    nonPackOptions = allOptions.filter(g => (g.category?.toLowerCase() ?? '') !== 'pack');  // Case-insensitive exclude
+    liquidsOptions = gearData.filter(g => g.category?.toLowerCase() === 'liquid');
 
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
@@ -137,36 +137,36 @@ function handleReadySelectChange(i) {
         entry.appendChild(detailsDiv);
     }
     // === 3. Handle pack logic ===
-    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Packs';
-    const isPack = item?.category === 'Packs';
+    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category.toLowerCase() === 'pack';
+    const isPack = item?.category.toLowerCase() === 'pack';
     if (wasPack && !isPack) {
         readyState[i-1].stowed = [];
         renderStowed(i); // This removes the container
     }
     if (isPack && !wasPack) {
-        const slots = item.slots || 0;
+        const slots = parseInt(item.slots || 0);
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
     if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
-        const slots = item.slots || 0;
+        const slots = parseInt(item.slots || 0);
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
     // === 4. Handle container logic ===
-    const wasContainer = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category === 'Containers';
-    const isContainer = item?.category === 'Containers';
+    const wasContainer = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category.toLowerCase() === 'container';
+    const isContainer = item?.category.toLowerCase() === 'container';
     if (wasContainer && !isContainer) {
         readyState[i-1].contents = [];
         renderContents(i); // This removes the container
     }
     if (isContainer && !wasContainer) {
-        const slots = item.slots || 0;
+        const slots = parseInt(item.slots || 0);
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
     if (isContainer && wasContainer && readyState[i-1].gear !== newGearName) {
-        const slots = item.slots || 0;
+        const slots = parseInt(item.slots || 0);
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
@@ -423,24 +423,25 @@ function updateReadyLoad(i) {
     const item = allOptions.find(g => g.name === state.gear);
     let total = 0;
     if (item) {
-        const baseLoad = item.baseLoad || item.load || 0;
+        const baseLoad = parseFloat(item.load || 0);
         total += baseLoad * state.amt;
-        if (item?.category === 'Packs') {
+        if (item?.category.toLowerCase() === 'pack') {
             state.stowed.forEach(s => {
                 const sItem = nonPackOptions.find(g => g.name === s.gear);
-                if (sItem) total += (sItem.load || 0) * s.amt;
+                if (sItem) total += (parseFloat(sItem.load || 0)) * s.amt;
             });
-        } else if (item?.category === 'Containers') {
+        } else if (item?.category.toLowerCase() === 'container') {
             state.contents.forEach(s => {
                 const sItem = liquidsOptions.find(g => g.name === s.gear);
-                if (sItem) total += (sItem.load || 0) * s.amt;
+                if (sItem) total += (parseFloat(sItem.load || 0)) * s.amt;
             });
         }
     }
     const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        if (item?.loadlimit != null && total > item.loadlimit) {
+        const loadLimit = parseFloat(item?.loadlimit);
+        if (!isNaN(loadLimit) && total > loadLimit) {
             loadDiv.style.color = 'red';
         } else {
             loadDiv.style.color = '';

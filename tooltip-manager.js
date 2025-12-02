@@ -22,11 +22,11 @@ class TooltipManager {
 
       const instance = tippy(el, { ...options, content });
 
-      if (meta?.type === 'ritual') {
+      if (meta?.type === 'ritual' || meta?.type === 'static') {
         instance.popper.classList.add('draggable');
       }
 
-      if (key.startsWith("ability:")) {
+      if (key.startsWith("ability:") || key.startsWith("static:")) {
         let pinned = false;
         el.addEventListener('mouseenter', () => {
           instance.show();
@@ -70,14 +70,14 @@ class TooltipManager {
       duration: [200, 0]
     };
 
-    if (key.startsWith("ability:")) {
+    if (key.startsWith("ability:") || key.startsWith("static:")) {
       let abilityOptions = {
         ...baseOptions,
         trigger: 'manual',
         hideOnClick: false,
         maxWidth: 700
       };
-      if (meta?.type === 'ritual') {
+      if (meta?.type === 'ritual' || meta?.type === 'static') {
         abilityOptions.arrow = false;
         abilityOptions.popperOptions = {
           modifiers: [
@@ -208,6 +208,16 @@ class TooltipManager {
     if (key.startsWith("prof:")) return TooltipManager.prof(key);
     if (key.startsWith("way:")) return TooltipManager.way(key);
     if (key.startsWith("expr:")) return TooltipManager.expr(key);
+    if (key.startsWith("static:")) {
+      const id = key.replace("static:", "");
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = 'none';
+        return { content: el.innerHTML, meta: { type: 'static' } };
+      } else {
+        return "(Missing static content)";
+      }
+    }
     return `(Unknown tooltip key: ${key})`;
   }
 }

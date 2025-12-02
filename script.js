@@ -118,56 +118,71 @@ function escapeRegExp(string) {
 }
 
 function processTextForTooltips(text) {
-  // Handle |expr| patterns
-  text = text.replace(/\|([^|]+)\|/g, '<span class="hoverExpr" data-tip="expr:$1">$1</span>');
+  // Use placeholders to avoid chained replacements affecting inserted HTML
+  const placeholders = [];
+  let placeholderIndex = 0;
 
-  // Rules from hoverRulesData
+  // Helper to add placeholder for a match
+  const addPlaceholder = (type, match) => {
+    const ph = `{tip:${placeholderIndex}}`;
+    placeholders.push({ ph, html: `<span class="hover${type.charAt(0).toUpperCase() + type.slice(1)}" data-tip="${type}:${match}">${match}</span>` });
+    placeholderIndex++;
+    return ph;
+  };
+
+  // Expr: |expr|
+  text = text.replace(/\|([^|]+)\|/g, (_, match) => addPlaceholder('expr', match));
+
+  // Rules
   hoverRulesData.sort((a, b) => b.rule.length - a.rule.length).forEach(r => {
     const regex = new RegExp(`\\b${escapeRegExp(r.rule)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="rule:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('rule', match));
   });
 
-  // Gear from gearData
+  // Gear
   gearData.sort((a, b) => b.name.length - a.name.length).forEach(g => {
     const regex = new RegExp(`\\b${escapeRegExp(g.name)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="gear:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('gear', match));
   });
 
-  // Skills from SKILL_ID_MAP
+  // Skills
   const skills = Object.keys(SKILL_ID_MAP);
   skills.sort((a, b) => b.length - a.length).forEach(s => {
     const regex = new RegExp(`\\b${escapeRegExp(s)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="skill:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('skill', match));
   });
 
-  // Abilities from abilitiesData
+  // Abilities
   const abilityNames = [];
   abilitiesData.forEach(abs => {
     abs.forEach(a => abilityNames.push(a.name));
   });
   abilityNames.sort((a, b) => b.length - a.length).forEach(n => {
     const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="ability:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('ability', match));
   });
 
-  // Proficiencies from profData
+  // Proficiencies
   const profNames = [...profData.strike, ...profData.blast, ...profData.invoke].map(p => p.name);
   profNames.sort((a, b) => b.length - a.length).forEach(n => {
     const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="prof:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('prof', match));
   });
 
-  // Ways from waysData
+  // Ways
   const wayNames = waysData.map(w => w.name);
   wayNames.sort((a, b) => b.length - a.length).forEach(n => {
     const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, '<span data-tip="way:$&">$&</span>');
+    text = text.replace(regex, match => addPlaceholder('way', match));
+  });
+
+  // Now replace all placeholders with actual HTML
+  placeholders.forEach(({ ph, html }) => {
+    text = text.replace(ph, html);
   });
 
   return text;
 }
-
-
 
 // Navigation between sections
 document.querySelectorAll('.nav-list a').forEach(link => {
@@ -195,46 +210,6 @@ window.addEventListener('dataLoaded', () => {
     renderSections(allData);
 });
 
-function renderSections(data, term = '') {
-  try {
-    const filtered = term ? filterData(data, term) : data;
-    let html = '';
-    if (Object.keys(filtered).length === 0) {
-      html = '<div class="no-results">No results found.</div>';
-    } else {
-      Object.keys(filtered).forEach(header => {
-        const lines = filtered[header].details.split('\n');
-        const processed = lines.map(line => {
-          const level = getIndentLevel(line);
-          const tipped = processTextForTooltips(line);
-          return `<p class="indent-${level}">${tipped}</p>`;
-        }).join('');
-        html += `
-          <div class="section" id="${header.replace(/\s+/g, '-')}">
-            <h3>${header}</h3>
-            <div class="section-content">${processed}</div>
-          </div>
-        `;
-        filtered[header].subitems.forEach(sub => {
-          const isTraea = sub.name.toLowerCase().includes('traea');
-          const subLines = sub.details.split('\n');
-          const subProcessed = subLines.map(line => {
-            const level = getIndentLevel(line);
-            const tipped = processTextForTooltips(line);
-            return `<p class="indent-${level}">${tipped}</p>`;
-          }).join('');
-          html += `
-            <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">
-              <h3>${sub.name}</h3>
-              <div class="section-content">${subProcessed}</div>
-            </div>
-          `;
-        });
-      });
-    }
-    document.getElementById('content-sections').innerHTML = html;
-  } catch (error) {
-    throw error;
-  }
-}
+// Rest unchanged
+
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));

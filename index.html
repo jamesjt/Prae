@@ -160,27 +160,23 @@
 
                 <div class="secondaryAttributesWrapper">
                   <div class="secondaryAttributes">
-                    <div class="image" id="HP">
-                        <span id="maxHpValue">30</span> <span id="marredValue">20</span> <span id="desperateValue">10</span> <span id="deadValue">-10</span>
-                    </div>
+                    <div class="" id="vitValue">30</div>
+                    <div class="" id="marredValue">20</div>
+                    <div class="" id="desperateValue">10</div>
+                    <div class="" id="deadValue">-10</div>
                     <div id="recovery">
-                      <!-- <img id="recPtsImg" src="imgs/recPts.png" width="40px" height="40px"> -->
-                      <input type="text" id="recoveryValue" value="1">       
+                      <input type="number" id="recoveryValue" value="3" max="3">       
                     </div>
                     <div id="mana">
-                      <!-- <img id="manaImg" src="imgs/mana.png" height="40px"> -->
-                      <input type="text" id="manaValue" value="3">  
+                      <input type="text" id="manaValue" value="3" max="3">  
                     </div> 
-                    <div id="conversion">
-                      <!-- <img id="manaImg" src="imgs/conversion.png" height="40px"> -->
-                      <div id="conversionValue">3</div> 
+                    <div id="inspirit">
+                      <div id="inspiritValue">3</div> 
                     </div> 
-                    <div id="initialMomentum">
-                      <!-- <img id="initialMomentumImg" src="imgs/initialMomentum.png" width="40px">-->
-                      <div id="initialMomentumValue">3</div>
+                    <div id="breath">
+                      <div id="breathValue">3</div>
                     </div>
                     <div class="image" id="guard">
-                     <!--  <img id="guardImg" src="imgs/guardColor.png" width="40px" height="40px">-->
                       <div id="guardValue">7</div>
                     </div>
                     <div id="armor">
@@ -200,7 +196,7 @@
 
                   <div id="secondaryAttributeValues">
                     <div id="maxHPDesc">
-                      Max HP
+                      Vitality
                     </div>
                     <div id="marredDesc">
                       Marred
@@ -214,14 +210,14 @@
                     <div id="recoveryDesc">
                       Recovery
                     </div>
+                    <div id="breathDesc">
+                      Breath
+                    </div>
+                    <div id="inspiritDesc">
+                      Inspirit
+                    </div>
                     <div id="manaDesc">
                       Mana
-                    </div>
-                    <div id="conversionDesc">
-                      Conversion
-                    </div>
-                    <div id="initialMomentumDesc">
-                      Initial M
                     </div>
                     <div id="guardDesc">
                       Guard
@@ -231,9 +227,6 @@
                     </div>            
                     <div id="paceDesc">
                       Pace
-                    </div>
-                    <div id="initiativeDesc">
-                     Init
                     </div>
                   </div>
                 </div> <!-- End Secondary Attributes Wrapper -->
@@ -266,7 +259,7 @@
                               <option value="2">2nd</option>
                               <option value="3">3rd</option>
                         </select>
-                      <div class="attribute bodyColor">
+                      <div class="attribute">
                         Body
                         <div id="bodyValue" class="attValue">
                           0

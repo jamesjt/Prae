@@ -50,16 +50,14 @@ function parseRulebook(rows) {
     const organized = {};
     let currentHeader = '';
     dataRows.forEach(row => {
-        if (!row.Sections.startsWith('-')) {
+        if (!row.Sections.startsWith('_')) {
             currentHeader = row.Sections;
             organized[currentHeader] = { subitems: [], details: row.Details };
         } else {
-            const name = row.Sections.replace(/^-+\s*/, '').trim();
+            const name = row.Sections.replace(/^_+\s*/, '').trim();
             let details = row.Details;
-            if (details.startsWith(name + ' ')) {
-                details = details.substring(name.length + 1).trim();
-            } else if (details.startsWith(name + ': ')) {
-                details = details.substring(name.length + 2).trim();
+            if (details.startsWith(name + ' ') || details.startsWith(name + ': ')) {
+                details = details.replace(name + ' ', '').replace(name + ': ', '');
             }
             if (currentHeader && name) {
                 organized[currentHeader].subitems.push({ name, details });

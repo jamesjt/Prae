@@ -62,7 +62,9 @@ function renderSections(data, term = '') {
                 const lines = filtered[header].details.split('\n');
                 const processed = lines.map(line => {
                     const level = getIndentLevel(line);
-                    return `<p class="indent-${level}">${line}</p>`;
+                    const cleaned = line.replace(/^-+\s*/, '');
+                    const tipped = processTextForTooltips(cleaned);
+                    return `<p class="indent-${level}">${tipped}</p>`;
                 }).join('');
                 html += `
                     <div class="section" id="${header.replace(/\s+/g, '-')}">
@@ -75,7 +77,9 @@ function renderSections(data, term = '') {
                     const subLines = sub.details.split('\n');
                     const subProcessed = subLines.map(line => {
                         const level = getIndentLevel(line);
-                        return `<p class="indent-${level}">${line}</p>`;
+                        const cleaned = line.replace(/^-+\s*/, '');
+                        const tipped = processTextForTooltips(cleaned);
+                        return `<p class="indent-${level}">${tipped}</p>`;
                     }).join('');
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">
@@ -163,7 +167,34 @@ function processTextForTooltips(text) {
   return text;
 }
 
-// Update renderSections to use the processor
+
+
+// Navigation between sections
+document.querySelectorAll('.nav-list a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.getAttribute('data-section');
+        
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.classList.remove('active');
+        });
+        document.getElementById(target)?.classList.add('active');
+        
+        document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+    });
+});
+
+// Load Prae data
+// script.js (excerpt)
+
+// Remove your loadData() call and .then chain
+// Instead, listen for event
+window.addEventListener('dataLoaded', () => {
+    renderSidebar(allData);
+    renderSections(allData);
+});
+
 function renderSections(data, term = '') {
   try {
     const filtered = term ? filterData(data, term) : data;
@@ -206,33 +237,4 @@ function renderSections(data, term = '') {
     throw error;
   }
 }
-
-// Navigation between sections
-document.querySelectorAll('.nav-list a').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = link.getAttribute('data-section');
-        
-        document.querySelectorAll('.content-section').forEach(sec => {
-            sec.classList.remove('active');
-        });
-        document.getElementById(target)?.classList.add('active');
-        
-        document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
-        link.classList.add('active');
-    });
-});
-
-// Load Prae data
-// script.js (excerpt)
-
-// Remove your loadData() call and .then chain
-// Instead, listen for event
-window.addEventListener('dataLoaded', () => {
-    renderSidebar(allData);
-    renderSections(allData);
-});
-
-// Rest unchanged
-
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));

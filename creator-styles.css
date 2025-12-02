@@ -520,12 +520,12 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .trickAbility {margin-top: 10px;}
 .trickSelector {background-color:var(--trickColor)!important;color:white;border:none;padding-left:5px;width:100%;height:25px;font-size: 16px;}
 
-.subAttInputField{    width: 30px;
+.subAttInputField{width: 30px;
     border: none;
     margin-left: 20px;
     color: whitesmoke;}
 
-.subAttinputField:hover{
+.subAttinputField input:hover{
     background-color: white !important;
     color:black !important;
 }

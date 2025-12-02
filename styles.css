@@ -1,6 +1,6 @@
 body {
     background-color: #1a1a1a;
-    color: #e0e0e0;
+    color: #bbb;
     margin: 0;
     line-height: 1.6;
     font-family: Roboto, Helvetica, sans-serif;
@@ -40,8 +40,9 @@ hr {
     overflow-y: auto;
 }
 
+.sidebar-content{padding-top:15px;}
 .sidebar h2 { color: #ffffff; margin-top: 0; font-size: 1.5em; }
-.sidebar-item { padding: 5px; cursor: pointer; color: #e0e0e0; border-radius: 4px;}
+.sidebar-item { padding: 5px; cursor: pointer; color: #bbb; border-radius: 4px;}
 .sidebar-item:hover { background-color: #3a3a3a; }
 .sidebar-item.traea-item { color: #8B6F47; }
 .sidebar-item.section-header { font-weight: bold; display: flex; align-items: center; gap: 10px; }

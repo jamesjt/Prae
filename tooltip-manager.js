@@ -59,7 +59,7 @@ class TooltipManager {
     const name = key.replace("ability:", "");
     let ability = null;
     for (let abs of abilitiesData.values()) {
-      ability = abs.find(a => a.name === name);
+      ability = abs.find(a => a.name.toLowerCase() === name.toLowerCase());
       if (ability) break;
     }
     if (!ability) return `(Missing ability: ${name})`;

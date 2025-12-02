@@ -157,7 +157,7 @@
 
 .att-desc-font{font-size: 8px}
 
-.attributeSelect{margin-top: 15px;border:none;}
+.attributeSelect{margin-top: 15px;border:none;font-size:12px}
 .attributeSelect:hover{background-color:white;color:white;}
 
 #bodyPriority{background-color: var(--bodyColor0);color:var(--bodyColor0);}
@@ -170,22 +170,11 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     background-color: white !important;
 }
 
-.attributeWrapper {
-    width: 65px;
-    height: 136px;
-    padding: 6px;
-    border-radius:  8px 0px 0px 8px;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 .attribute {
     display:flex;
     flex-direction: column;
     align-items: center;
     margin-top: 5px;
-    width:70px;
     margin-bottom: 5px;
     padding-top: 4px;
     padding-bottom:4px;
@@ -209,7 +198,15 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #mindAttributePoints {background-color: var(--mindColor3);}
 #spiritAttributePoints {background-color: var(--spiritColor3);}
 
-
+.attributeWrapper {
+    width: 55px;
+    height: 136px;
+    padding: 6px;
+    border-radius:  8px 0px 0px 8px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
 .bodyAtt {}
 .mmindAtt {}
 .spiritAtt {}

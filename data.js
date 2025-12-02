@@ -182,6 +182,10 @@ function parseRules(rows) {
 
         if (Object.keys(item).length > 0) { // Only add if has props (no strict 'name' check)
             if (category === 'gear' && item.type) item.category = item.type; // Normalize 'type' to 'category' for downstream compat
+            if (category === 'proficiency') {
+                item.category = item.type?.toLowerCase();
+                item.details = item.shortdetails;
+            }
             dataByCategory[category].push(item);
         }
     }
@@ -210,7 +214,7 @@ async function loadAllData() {
         waysData = parseWays(waysRows);
         const { dataByCategory, hoverRules } = parseRules(rulesRows);
         gearData = dataByCategory.gear || [];
-        const proficiencies = dataByCategory.prof || []; // Assume 'prof' category
+        const proficiencies = dataByCategory.proficiency || [];
         profData.strike = proficiencies.filter(g => g.category?.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category?.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category?.toLowerCase() === 'invoke');

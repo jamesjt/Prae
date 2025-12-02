@@ -144,12 +144,12 @@ function handleReadySelectChange(i) {
         renderStowed(i); // This removes the container
     }
     if (isPack && !wasPack) {
-        const slots = item.stowedslots || 0;
+        const slots = item.slots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
     if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
-        const slots = item.stowedslots || 0;
+        const slots = item.slots || 0;
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
@@ -161,12 +161,12 @@ function handleReadySelectChange(i) {
         renderContents(i); // This removes the container
     }
     if (isContainer && !wasContainer) {
-        const slots = item.contentsslots || 0;
+        const slots = item.slots || 0;
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
     if (isContainer && wasContainer && readyState[i-1].gear !== newGearName) {
-        const slots = item.contentsslots || 0;
+        const slots = item.slots || 0;
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
@@ -440,7 +440,7 @@ function updateReadyLoad(i) {
     const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
         loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        if (item?.loadLimit != null && total > item.loadLimit) {
+        if (item?.loadlimit != null && total > item.loadlimit) {
             loadDiv.style.color = 'red';
         } else {
             loadDiv.style.color = '';

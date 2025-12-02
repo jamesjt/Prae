@@ -190,6 +190,78 @@ function parseRules(rows) {
         }
     }
 
+    // Fallback for rows with empty dataCategory but filled category-specific columns
+    const gearNameIdx = headers.indexOf('gearname');
+    const profNameIdx = headers.indexOf('proficiencyname');
+    const rulesNameIdx = headers.indexOf('rulesname');
+    for (let r = 1; r < rows.length; r++) {
+        const category = rows[r][catIdx]?.trim().toLowerCase();
+        if (category) continue; // Already handled in main loop
+
+        let item = {};
+        if (gearNameIdx !== -1 && rows[r][gearNameIdx]?.trim()) {
+            const gearTypeIdx = headers.indexOf('geartype');
+            const gearLoadIdx = headers.indexOf('gearload');
+            const gearDetailsIdx = headers.indexOf('geardetails');
+            const gearLoadLimitIdx = headers.indexOf('gearloadlimit');
+            const gearSlotsIdx = headers.indexOf('gearslots');
+            const gearSlotTypeIdx = headers.indexOf('gearslottype');
+            const gearExtraReadySlotsIdx = headers.indexOf('gearextrareadyslots');
+            const gearLocationIdx = headers.indexOf('gearlocation');
+            const gearCostIdx = headers.indexOf('gearcost');
+            const gearEffectIdx = headers.indexOf('geareffect');
+            const gearPenaltyIdx = headers.indexOf('gearpenalty');
+
+            item = {
+                name: rows[r][gearNameIdx]?.trim() || '',
+                type: (gearTypeIdx !== -1 ? rows[r][gearTypeIdx]?.trim() : '') || '',
+                load: (gearLoadIdx !== -1 ? rows[r][gearLoadIdx]?.trim() : '') || '',
+                details: (gearDetailsIdx !== -1 ? rows[r][gearDetailsIdx]?.trim() : '') || '',
+                loadlimit: (gearLoadLimitIdx !== -1 ? rows[r][gearLoadLimitIdx]?.trim() : '') || '',
+                slots: (gearSlotsIdx !== -1 ? rows[r][gearSlotsIdx]?.trim() : '') || '',
+                slottype: (gearSlotTypeIdx !== -1 ? rows[r][gearSlotTypeIdx]?.trim() : '') || '',
+                extrareadyslots: (gearExtraReadySlotsIdx !== -1 ? rows[r][gearExtraReadySlotsIdx]?.trim() : '') || '',
+                location: (gearLocationIdx !== -1 ? rows[r][gearLocationIdx]?.trim() : '') || '',
+                cost: (gearCostIdx !== -1 ? rows[r][gearCostIdx]?.trim() : '') || '',
+                effect: (gearEffectIdx !== -1 ? rows[r][gearEffectIdx]?.trim() : '') || '',
+                penalty: (gearPenaltyIdx !== -1 ? rows[r][gearPenaltyIdx]?.trim() : '') || ''
+            };
+            if (item.type) item.category = item.type;
+            if (Object.keys(item).length > 0) {
+                if (!dataByCategory.gear) dataByCategory.gear = [];
+                dataByCategory.gear.push(item);
+            }
+        } else if (profNameIdx !== -1 && rows[r][profNameIdx]?.trim()) {
+            const profShortDetailsIdx = headers.indexOf('proficiencyshortdetails');
+            const profTypeIdx = headers.indexOf('proficiencytype');
+            const profElementsIdx = headers.indexOf('proficiencyelements');
+
+            item = {
+                name: rows[r][profNameIdx]?.trim() || '',
+                shortdetails: (profShortDetailsIdx !== -1 ? rows[r][profShortDetailsIdx]?.trim() : '') || '',
+                type: (profTypeIdx !== -1 ? rows[r][profTypeIdx]?.trim() : '') || '',
+                elements: (profElementsIdx !== -1 ? rows[r][profElementsIdx]?.trim() : '') || ''
+            };
+            item.category = item.type?.toLowerCase() || '';
+            item.details = item.shortdetails || '';
+            if (Object.keys(item).length > 0) {
+                if (!dataByCategory.proficiency) dataByCategory.proficiency = [];
+                dataByCategory.proficiency.push(item);
+            }
+        } else if (rulesNameIdx !== -1 && rows[r][rulesNameIdx]?.trim()) {
+            const rulesDetailsIdx = headers.indexOf('rulesdetails');
+
+            item = {
+                rule: rows[r][rulesNameIdx]?.trim() || '',
+                details: (rulesDetailsIdx !== -1 ? rows[r][rulesDetailsIdx]?.trim() : '') || ''
+            };
+            if (Object.keys(item).length > 0) {
+                if (!dataByCategory.rules) dataByCategory.rules = [];
+                dataByCategory.rules.push(item);
+            }
+        }
+    }
+
     // Special mapping for hoverRules (if category='rules')
     const hoverRules = dataByCategory.rules?.map(item => ({
         rule: item.rule || item.name || '', // Flexible key mapping

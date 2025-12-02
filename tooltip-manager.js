@@ -63,7 +63,7 @@ class TooltipManager {
         hideOnClick: false
       };
     } else if (key.startsWith("expr:")) {
-      return { ...baseOptions }; // Example: Could add delay: [100, 0] in future
+      return { ...baseOptions, interactive: false }; // Example: Could add delay: [100, 0] in future
     } else if (key.startsWith("gear:")) {
       return { ...baseOptions }; // Example: Could add maxWidth: 400
     } else if (key.startsWith("rule:")) {

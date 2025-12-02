@@ -29,8 +29,8 @@
   --spiritColor1:#31216d;
   --spiritColor2:#73699b;
   --spiritColor3:#595569;
-  --trickColor:#16534c;
-  --talentColor:#4f3a15;
+  --trickColor:rgba(114,133,126,1);
+  --talentColor:rgba(88,89,96,1);
 }
 .charInfoHover{
   position:relative;

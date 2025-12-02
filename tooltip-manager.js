@@ -53,22 +53,6 @@ class TooltipManager {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  static skill(key) {
-    const name = key.replace("skill:", "");
-    const skill = name.toLowerCase();
-    const abs = abilitiesData.get(skill) || [];
-    if (abs.length === 0) return `(Missing skill: ${name})`;
-    let html = `
-      <div class="tip-skill">
-        <strong>${name}</strong><br>
-    `;
-    abs.forEach(a => {
-      html += `<div>${TooltipManager.capitalize(a.type)}: ${a.name}</div>`;
-    });
-    html += `</div>`;
-    return html;
-  }
-
   static ability(key) {
     const name = key.replace("ability:", "");
     let ability = null;
@@ -132,7 +116,6 @@ class TooltipManager {
   static resolve(key) {
     if (!key) return "";
     if (key.startsWith("rule:")) return TooltipManager.rule(key);
-    if (key.startsWith("skill:")) return TooltipManager.skill(key);
     if (key.startsWith("ability:")) return TooltipManager.ability(key);
     if (key.startsWith("gear:")) return TooltipManager.gear(key);
     if (key.startsWith("prof:")) return TooltipManager.prof(key);

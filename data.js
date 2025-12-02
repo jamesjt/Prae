@@ -56,11 +56,8 @@ function parseRulebook(rows) {
         } else {
             const name = row.Sections.replace(/^_+\s*/, '').trim();
             let details = row.Details;
-            if (details.startsWith(name + ' ')) {
-                details = details.substring(name.length + 1).trim();
-            } else if (details.startsWith(name + ': ')) {
-                details = details.substring(name.length + 2).trim();
-            }
+            details = details.replace(new RegExp(`^${name}(\\s*:\\s*)?`, 'i'), '').trim();
+            details = details.replace(/^-+/, '').trim(); // Remove leading '-' if any
             if (currentHeader && name) {
                 organized[currentHeader].subitems.push({ name, details });
             }

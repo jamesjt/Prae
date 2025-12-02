@@ -91,13 +91,6 @@
 #column1 {margin-right: 15px;}
 #column3 {margin-left: 15px;}
 
-.statsWrapper { 
-  display: flex;
-  flex-direction: row;
-  border-radius:8px;
-}
-
-
 /* Character Info Bar */
 #charInfo{
     padding-left: 5px;
@@ -234,7 +227,13 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 
 /* Secondary Stats */
+.statsWrapper { 
+  display: flex;
+  flex-direction: row;
+  border-radius:8px;
+}
 
+.statsInput{margin-right:10px;}
 .secondaryAttributesWrapper {}
 .secondaryAttributes {display:flex;height:40px;justify-content:space-between;}
 #secondaryAttributeValues {}

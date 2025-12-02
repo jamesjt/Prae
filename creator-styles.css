@@ -861,8 +861,8 @@ a.internalLink{
 .attvalue{width:30px;}
 
 
-.hoverRules{border-bottom:2px dotted black;}
-.hoverExpr{border-bottom: 2px dotted black;}
+.hoverRules{border-bottom:1px dotted black;}
+.hoverExpr{border-bottom: 1px dotted black;}
 .gearDetails {
     width: 12px;
     height: 11px;

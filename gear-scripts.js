@@ -15,17 +15,27 @@ function populateGearSelector(selectEl, options, placeholder) {
         if (!grouped[g.category]) grouped[g.category] = [];
         grouped[g.category].push(g);
     });
-    Object.keys(grouped).forEach(cat => {
+    // Sort groups with '-' first
+    const sortedCats = Object.keys(grouped).sort((a, b) => {
+        if (a === '-') return -1;
+        if (b === '-') return 1;
+        return a.localeCompare(b);
+    });
+    sortedCats.forEach(cat => {
         const optgroup = document.createElement('optgroup');
         optgroup.label = `-- ${cat} --`;
         grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g.name;
-            opt.textContent = g.name;
-            opt.dataset.load = g.load || 0; // No baseLoad in CSV
-            optgroup.appendChild(opt);
+            if (g.name && g.name !== '') { // Keep all with name, including '-'
+                const opt = document.createElement('option');
+                opt.value = g.name;
+                opt.textContent = g.name;
+                opt.dataset.load = g.load || 0; // No baseLoad in CSV
+                optgroup.appendChild(opt);
+            }
         });
-        selectEl.appendChild(optgroup);
+        if (optgroup.children.length > 0) { // Only add if has options
+            selectEl.appendChild(optgroup);
+        }
     });
 }
 

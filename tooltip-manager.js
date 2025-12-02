@@ -10,22 +10,7 @@ class TooltipManager {
       const key = el.getAttribute("data-tip");
       const html = TooltipManager.resolve(key);
 
-      const options = {
-        content: html,
-        allowHTML: true,
-        theme: "ruleTip",
-        maxWidth: 350,
-        placement: "top",
-        animation: "fade",
-        interactive: true,
-        delay: [200, 0],
-        duration: [200, 0]
-      };
-
-      if (key.startsWith("ability:")) {
-        options.trigger = 'manual';
-        options.hideOnClick = false;
-      }
+      const options = TooltipManager.getOptions(key);
 
       const instance = tippy(el, options);
 
@@ -56,6 +41,40 @@ class TooltipManager {
 
       TooltipManager.instances.set(el, instance);
     });
+  }
+
+  static getOptions(key) {
+    const baseOptions = {
+      content: TooltipManager.resolve(key), // Resolved earlier, but for completeness
+      allowHTML: true,
+      theme: "ruleTip",
+      maxWidth: 350,
+      placement: "top",
+      animation: "fade",
+      interactive: true,
+      delay: [200, 0],
+      duration: [200, 0]
+    };
+
+    if (key.startsWith("ability:")) {
+      return {
+        ...baseOptions,
+        trigger: 'manual',
+        hideOnClick: false
+      };
+    } else if (key.startsWith("expr:")) {
+      return { ...baseOptions }; // Example: Could add delay: [100, 0] in future
+    } else if (key.startsWith("gear:")) {
+      return { ...baseOptions }; // Example: Could add maxWidth: 400
+    } else if (key.startsWith("rule:")) {
+      return { ...baseOptions }; // Example: Could add theme: "ruleSpecific"
+    } else if (key.startsWith("prof:")) {
+      return { ...baseOptions };
+    } else if (key.startsWith("way:")) {
+      return { ...baseOptions };
+    }
+
+    return baseOptions; // Fallback for unknown
   }
 
   static rule(key) {
@@ -98,20 +117,16 @@ class TooltipManager {
     let html = `
       <div class="tip-ability-${ability.type.toLowerCase()}">
     `;
-    const order = ['name', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    const typeLower = ability.type.toLowerCase();
+    html += `<div class="tip-name-${typeLower}">${ability.name}</div>`;
+    const order = ['description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
     Object.keys(ability.details).sort((a, b) => {
       const ia = order.indexOf(a.toLowerCase());
       const ib = order.indexOf(b.toLowerCase());
       return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     }).forEach(key => {
       let value = ability.details[key];
-      const typeLower = ability.type.toLowerCase();
-      if (key.toLowerCase() === 'name') {
-        value = ability.name; // Use name as value for this special key
-        html += `<div class="tip-name-${typeLower}">${value}</div>`;
-      } else {
-        html += `<div class="tip-${key.toLowerCase()}-${typeLower}">${key}: ${value}</div>`;
-      }
+      html += `<div class="tip-${key.toLowerCase()}-${typeLower}">${key}: ${value}</div>`;
     });
     html += `</div>`;
     return html;

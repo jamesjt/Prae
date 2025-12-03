@@ -263,7 +263,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #paceValue{}
 #manaValue{}
 #inspiritValue{}
-#recovery{background-image: url("/images/recovery-white.png")}
+#recovery{background-image: url("images/recovery-white.png")}
 #armorValue{}
 #guardValue{}
 

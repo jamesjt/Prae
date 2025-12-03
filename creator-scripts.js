@@ -648,12 +648,12 @@ function calculateDerivedStats() {
     const agility = parseInt(document.getElementById('agilityValue').value) || 0;
     const wit = parseInt(document.getElementById('witValue').value) || 0;
     const empathy = parseInt(document.getElementById('empathyValue').value) || 0;
-    const breath = Math.floor((agility + wit + empathy) / 3);
+    const breath = 3 + Math.floor((agility + wit + empathy) / 3);
 
     const might = parseInt(document.getElementById('mightValue').value) || 0;
     const will = parseInt(document.getElementById('willValue').value) || 0;
     const vigor = parseInt(document.getElementById('vigorValue').value) || 0;
-    const inspirit = Math.floor((might + will + vigor) / 3);
+    const inspirit = 3 + Math.floor((might + will + vigor) / 3);
 
     // Check for Tough talent
     const hasTough = Array.from(document.querySelectorAll('.talentSelector')).some(sel => sel.value.includes('Tough'));
@@ -678,6 +678,5 @@ function calculateDerivedStats() {
     recoveryInput.max = recoveryBonus;
     const breathInput = document.getElementById('breathValue');
     breathInput.value = breath;
-    breathInput.max = breath;
     document.getElementById('inspiritValue').textContent = inspirit;
 }

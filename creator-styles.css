@@ -456,12 +456,9 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   width:10px;
   height:10px;
   right: 18px;
+  content:"X";
+  color:#d29a38;
   text-align: center;
-  border-radius:5px;
-  border-style:outset;
-  border-width:3px;
-  border-color:whitesmoke;
-  background-color:white;
   font-size: 10px;
 }
 

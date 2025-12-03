@@ -267,7 +267,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #marredValue {background-image: url("images/marred.png")}
 #desperateValue {background-image: url("images/desperate.png")}
 #deadValue {background-image: url("images/dead.png")}
-#pace {background-image: url("images/pace5.png")}
+#pace {background-image: url("images/pace6.png")}
 #breath{background-image: url("images/breath2.png")}
 #inspirit{background-image: url("images/inspirit2.png")}
 

@@ -135,7 +135,6 @@ document.addEventListener('change', e => {
     if (t.matches('select[id$="SkillRank"]')) {
         updateSingleSkillModAndPassive(t.id);
         updateWayOptions();
-        calculateSkillPoints();
         const type = t.id.replace('SkillRank', '').toLowerCase();
         if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
         updateAbilitySelectors('trick');
@@ -187,7 +186,6 @@ document.addEventListener('change', e => {
         calculateAttributeValues();
         updateAttributeGroups();
         updateAllSkillModsAndPassives();
-        calculateSkillPoints();
         calculateAbilities();
         if (t.matches('input[id$="Value"][type="number"]')) {
             const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
@@ -474,16 +472,6 @@ function populateRoleInfo(e) {
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
 }
-function calculateSkillPoints() {
-    const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const total = level * 3 + 9;
-    let spent = 0;
-    Object.values(SKILL_ID_MAP).forEach(id => {
-        const sel = document.getElementById(id);
-        if (sel) spent += parseInt(sel.value) || 0;
-    });
-    document.getElementById('skillPoints').textContent = total - spent;
-}
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const tExtra = talentAmount;
@@ -614,7 +602,6 @@ window.addEventListener('dataLoaded', () => {
     TooltipManager.init();
     populateRoleSelector();
     ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-    calculateSkillPoints();
     calculateAbilities();
     calculateAttributeValues();
     updateAttributeGroups();

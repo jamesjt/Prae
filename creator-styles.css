@@ -459,7 +459,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   content:"X";
   color:#d29a38;
   text-align: center;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .ritualCost{width: 45px; margin-left:2px; margin-right:2px;}

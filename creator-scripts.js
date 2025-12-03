@@ -476,7 +476,6 @@ function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const tExtra = talentAmount;
     const trExtra = tricksAmount;
-    document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
     const remaining = level + 1 - Math.max(0, tExtra + trExtra);
 }
 function calculateAttributeValues() {

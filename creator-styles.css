@@ -122,11 +122,6 @@
   border: 3px solid black;
 }
 
-.checkSection{border:4px double black;}
-#remSkill {width: 15px; margin-left: 5px; margin-right:5px;}
-#maxSkill {width: 70px; margin-left: 5px; margin-right:5px;}
-#totalAbilities {width:15px; margin-left: 5px; margin-right:5px;}
-#remAbilities {width: 15px; margin-left: 5px; margin-right:5px;}
 
 #charHeight {width: 40px;}
 #charBuild{width: 40px;}

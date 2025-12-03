@@ -31,19 +31,35 @@ function populateProficiencySelectors(type) {
     for (let i = 1; i <= 5; i++) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
         if (sel) {
-            sel.innerHTML = '<option value="">Select Proficiency</option>' + profs.map(p => `<option value="${p.name}">${p.shortdetails}</option>`).join('');
-            if (saved[i] && Array.from(sel.options).some(opt => opt.value === saved[i])) sel.value = saved[i];
+            saved[i] = sel.value;
+            sel.innerHTML = '<option value="">Select Proficiency</option>' +
+                profs.map(p => `<option value="${p.name}">${p.shortdetails}</option>`).join('');
+        }
+    }
+    for (let i = 1; i <= 5; i++) {
+        const sel = document.getElementById(type + 'ProfSelector' + i);
+        if (sel) {
+            if (saved[i] && Array.from(sel.options).some(opt => opt.value === saved[i])) {
+                sel.value = saved[i];
+            }
+            let desc = document.getElementById(type + 'ProfSelector' + i + 'Description');
+            if (!desc) {
+                sel.insertAdjacentHTML('afterend', `<div id="${type}ProfSelector${i}Description"></div>`);
+            }
+            if (sel.value) {
+                populateProficiencyInfo(sel.id, type);
+            }
         }
     }
 }
-
+// Update updateProficiencySelectors to call population after visibility
 function updateProficiencySelectors(type, rank) {
     for (let i = 1; i <= 5; i++) {
-        const sel = document.getElementById(type + 'ProfSelector' + i);
-        if (sel) sel.hidden = i > rank;
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
     }
+    populateProficiencySelectors(type); // Add this
 }
-
 // ———————————————————————— REUSABLE DYNAMIC SELECTORS ————————————————————————
 function rebuildDynamicSelectors(config, amount) {
     const {
@@ -119,7 +135,6 @@ document.addEventListener('change', e => {
     if (t.matches('select[id$="SkillRank"]')) {
         updateSingleSkillModAndPassive(t.id);
         updateWayOptions();
-        calculateSkillPoints();
         const type = t.id.replace('SkillRank', '').toLowerCase();
         if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
         updateAbilitySelectors('trick');
@@ -171,7 +186,6 @@ document.addEventListener('change', e => {
         calculateAttributeValues();
         updateAttributeGroups();
         updateAllSkillModsAndPassives();
-        calculateSkillPoints();
         calculateAbilities();
         if (t.matches('input[id$="Value"][type="number"]')) {
             const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
@@ -201,48 +215,192 @@ document.addEventListener('click', e => {
     const t = e.target;
     if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
         const type = t.id.includes('talent') ? 'talent' : 'trick';
-        const isPlus = t.id.includes('Plus');
-        if (isPlus) {
-            if (type === 'talent') talentAmount++;
-            else tricksAmount++;
+        let value = type === 'talent' ? talentAmount : tricksAmount;
+        const min = 1;
+        if (t.id.includes('Plus')) {
+            value += 1;
+        } else if (t.id.includes('Minus') && value > min) {
+            value -= 1;
+        }
+        if (type === 'talent') {
+            talentAmount = value;
         } else {
-            if (type === 'talent' && talentAmount > 1) talentAmount--;
-            else if (tricksAmount > 1) tricksAmount--;
+            tricksAmount = value;
         }
         updateAbilityTables(type);
+        calculateAbilities();
     }
 });
-// ———————————————————————— ABILITIES ————————————————————————
-function getQualifiedAbilities(type) {
-    const abs = [];
-    abilitiesData.forEach((skillAbs, skill) => {
-        const rank = parseInt(document.getElementById(SKILL_ID_MAP[skill.charAt(0).toUpperCase() + skill.slice(1)])?.value) || 0;
-        const qualified = skillAbs.filter(a => a.type === type && rank >= (a.details['Required Rank'] || 0));
-        abs.push(...qualified);
+// ———————————————————————— CORE FUNCTIONS ————————————————————————
+function populateRoleSelector() {
+    const sel = document.getElementById('roleSelector');
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
+    buildWayGroups();
+}
+function buildWayGroups() {
+    const sel = document.getElementById('roleSelector');
+    // Preserve current selection
+    const currentValue = sel.value;
+    // Fully reset to placeholder
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
+    // Filter available and unavailable
+    const available = [];
+    const unavailable = [];
+    waysData.forEach(way => {
+        const qualified = way.reqSkill === 'Any'
+            ? Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 1)
+            : parseInt(document.getElementById(way.skillId)?.value || 0) > 1;
+        (qualified ? available : unavailable).push(way);
     });
-    return abs.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort alphabetically
+    available.sort((a, b) => a.name.localeCompare(b.name));
+    unavailable.sort((a, b) => a.name.localeCompare(b.name));
+    // Add available group
+    if (available.length > 0) {
+        const availGroup = document.createElement('optgroup');
+        availGroup.label = 'Available Ways';
+        available.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            availGroup.appendChild(opt);
+        });
+        sel.appendChild(availGroup);
+    }
+    // Add unavailable group
+    if (unavailable.length > 0) {
+        const unavailGroup = document.createElement('optgroup');
+        unavailGroup.label = 'Unavailable Ways';
+        unavailable.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            unavailGroup.appendChild(opt);
+        });
+        sel.appendChild(unavailGroup);
+    }
+    // Restore selection if still valid
+    sel.value = currentValue;
+}
+function updateWayOptions() {
+    buildWayGroups();
 }
 function updateAbilitySelectors(type) {
-    const abs = getQualifiedAbilities(type);
-    const prefix = type === 'talent' ? 'talent' : 'tricks';
-    for (let i = 1; i <= 20; i++) {
-        const sel = document.getElementById(`${prefix}${i}`);
-        if (sel) {
-            const saved = sel.value;
-            sel.innerHTML = `<option value="${prefix}Empty">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>` +
-                abs.map(a => `<option value="${a.name}">${a.name} (${a.skill})</option>`).join('');
-            if (saved && Array.from(sel.options).some(opt => opt.value === saved)) sel.value = saved;
-        }
-    }
+    const qualified = getQualifiedAbilities(type);
+    const selectorClass = `${type}Selector`;
+    const emptyValue = `${type}Empty`;
+    const emptyLabel = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    
+    document.querySelectorAll(`.${selectorClass}`).forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = `<option value="${emptyValue}">${emptyLabel}</option>` + 
+            qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
+    });
 }
-function populateAbilityInfo(selectId, abs, type) {
+function getQualifiedAbilities(type) {
+    const result = [];
+    Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
+        const sel = document.getElementById(id);
+        if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
+            result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
+        }
+    });
+    return result;
+}
+function evaluateExpr(expr) {
+  // Replace skill names with current ranks
+  expr = expr.replace(/\b([A-Z][a-z]+)\b/g, match => {
+    const id = SKILL_ID_MAP[match];
+    if (id) {
+      return parseInt(document.getElementById(id)?.value) || 0;
+    }
+    return match;
+  });
+
+  // Tokenize: numbers and operators
+  const tokens = expr.match(/(\d+|[+\-*/])/g) || [];
+  if (tokens.length === 0) return 0;
+
+  // Handle * and / first (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '*' || tokens[i] === '/') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res;
+      if (tokens[i] === '*') {
+        res = left * right;
+      } else {
+        res = Math.floor(left / right);
+      }
+      tokens.splice(i - 1, 3, res);
+      i -= 2; // Adjust index after splice
+    }
+  }
+
+  // Handle + and - (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '+' || tokens[i] === '-') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res = tokens[i] === '+' ? left + right : left - right;
+      tokens.splice(i - 1, 3, res);
+      i -= 2;
+    }
+  }
+
+  return Math.floor(tokens[0]) || 0; // Final floor for safety
+}
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function escapeHtml(string) {
+    return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function processWithTooltips(text) {
+    let processed = text;
+    hoverRulesData.forEach(({ rule, detail }) => {
+        const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
+        processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
+
+    });
+    // Collect ability matchers: map from matchName (full or base) to fullName for data-tip
+    const abilityMatchers = new Map();
+    abilitiesData.forEach(abilities => {
+        abilities.forEach(ability => {
+            const fullName = ability.name;
+            const capitalizedSkill = ability.skill.charAt(0).toUpperCase() + ability.skill.slice(1);
+            const suffix = ` (${capitalizedSkill})`;
+            abilityMatchers.set(fullName, fullName);
+            if (fullName.endsWith(suffix)) {
+                const baseName = fullName.slice(0, -suffix.length);
+                if (!abilityMatchers.has(baseName)) { // Avoid conflicts; first wins
+                    abilityMatchers.set(baseName, fullName);
+                }
+            }
+        });
+    });
+    // Sort by length descending to replace longer phrases first
+    const sortedMatchers = Array.from(abilityMatchers.entries()).sort((a, b) => b[0].length - a[0].length);
+    // Wrap ability names/base names
+    sortedMatchers.forEach(([matchName, fullName]) => {
+        const regex = new RegExp(`\\b${escapeRegExp(matchName)}\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${fullName}">$&</span>`);
+    });
+    return processed;
+}
+function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId)?.value;
-    if (!value || value === `${type}Empty`) return;
-    const ability = abs.find(a => a.name === value);
+    const ability = abilities.find(a => a.name === value);
     const desc = document.getElementById(selectId + 'Description');
     if (!desc || !ability) { desc.innerHTML = ''; return; }
     desc.innerHTML = '';
-    Object.entries(ability.details).forEach(([key, val]) => {
+    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    Object.keys(ability.details).sort((a, b) => {
+        const ia = order.indexOf(a.toLowerCase());
+        const ib = order.indexOf(b.toLowerCase());
+        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    }).forEach(key => {
         if (key.toLowerCase() === 'name') return; // Skip rendering name
         let processedValue = ability.details[key];
         // Replace |expr| with spanned value
@@ -314,23 +472,11 @@ function populateRoleInfo(e) {
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
 }
-function calculateSkillPoints() {
-    const level = parseInt(document.getElementById('charLvl').value) || 1;
-    const total = level * 3 + 9;
-    let spent = 0;
-    Object.values(SKILL_ID_MAP).forEach(id => {
-        const sel = document.getElementById(id);
-        if (sel) spent += parseInt(sel.value) || 0;
-    });
-    document.getElementById('skillPoints').textContent = total - spent;
-}
 function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const tExtra = talentAmount;
     const trExtra = tricksAmount;
-    document.getElementById('abilityNumber').textContent = tExtra + trExtra + 2;
     const remaining = level + 1 - Math.max(0, tExtra + trExtra);
-    document.getElementById('remainingAbilities').textContent = remaining < 0 ? 0 : remaining;
 }
 function calculateAttributeValues() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
@@ -420,17 +566,30 @@ function updateGearLoad(i) {
 // Make all .draggable elements movable (no restrictions, touch/mouse support)
 interact('.draggable')
   .draggable({
-    inertia: true,  // Smooth momentum on release
-    autoScroll: true,  // Auto-scroll if dragging near edges
+    inertia: false,
+    autoScroll: false,
     listeners: {
-      move: (event) => {
+      start(event) {
         const target = event.target;
-        // Get current position (stored as data attributes)
-        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-        // Apply transform for movement
+
+        // Read computed transform matrix
+        const style = window.getComputedStyle(target);
+        const matrix = new DOMMatrixReadOnly(style.transform);
+
+        // m41 = translateX, m42 = translateY
+        target.setAttribute('data-x', matrix.m41);
+        target.setAttribute('data-y', matrix.m42);
+      },
+
+      move(event) {
+        const target = event.target;
+
+        // restore from dataset
+        let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        // apply transform and store values
         target.style.transform = `translate(${x}px, ${y}px)`;
-        // Store new position
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
       }
@@ -440,8 +599,7 @@ interact('.draggable')
 window.addEventListener('dataLoaded', () => {
     TooltipManager.init();
     populateRoleSelector();
-    ['strike', 'blast', 'invoke'].forEach(type => updateProficiencySelectors(type, 0));
-    calculateSkillPoints();
+    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     calculateAbilities();
     calculateAttributeValues();
     updateAttributeGroups();

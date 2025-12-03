@@ -561,7 +561,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     text-align: center;
 }
 
-.indent {padding-left: 40px;}
+.indent {padding-left: 20px;}
 .section {margin-top: 15px;}
 
 .section:nth-of-type(odd) header {

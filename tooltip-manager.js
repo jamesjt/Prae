@@ -213,7 +213,13 @@ class TooltipManager {
       const el = document.getElementById(id);
       if (el) {
         el.style.display = 'none';
-        return { content: el.innerHTML, meta: { type: 'static' } };
+        let content = el.innerHTML;
+        // Strip IDs to avoid duplicates in multiple tooltips
+        const temp = document.createElement('div');
+        temp.innerHTML = content;
+        temp.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
+        content = temp.innerHTML;
+        return { content, meta: { type: 'static' } };
       } else {
         return "(Missing static content)";
       }

@@ -46,71 +46,47 @@
 
             <article id="Traea" class="sectionBody">
                 <div id="charInfo">
-                    <input id="charName" class="charText" type="text" placeholder="Character name">
-                    <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1">
-                    <input id="childhood" class="charText" type="text" placeholder="Youth">
-                    <input id="training" class="charText" type="text" placeholder="Stirring">
-                    <select id="roleSelector">
-                      <option value="">Way</option>
-                    </select>
-                    <img id="showCheckList" class="detailsHoverPopoverDraggable" src="images/details.png" data-tip="static:checkList">
+                  <img id="showCheckList" class="detailsHoverPopoverDraggable" src="images/check.png" data-tip="static:checkList">
                     <div id="checkList" class="charDetails">
                       <div class="close-btn closeRitual">X</div>
-                      Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
-                      Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
-                      <br/>
-                      Total Abilities <span id="abilityNumber" class="filledField">7</span>
-                      Remaining Abilities <span id="remainingAbilities" class="filledField">2</span>
-                      <br/>
-                      <div id="childhoodCheck" class="checkSection">
-                        Childhood skills, 4 skill points:<br/>
+                      <div id="youthCheck" class="checkSection">
+                        •Youth, 4 skill points, max rank Basic:<br/>
                         <div class="indent">
-                          - 1 must be used to increase a Physical skill to Basic Rank.<br/>
-                          - 1 must be used to increase a Mental skill to Basic Rank.<br/>
-                          - 1 must be used to increase a Social skill to Basic Rank.<br/>
-                          - 1 can be used at player's discretion.
+                          - 1 must go to Body skills, 1 to Mind skills, 1 to Spirit skills, and the last may be spent anywhere.
                         </div>
                       </div>
                       <div id="trainingCheck" class="checkSection">
-                        Training skills, 5 skill points:<br/>
+                        •Stirring, 3 skill points, max rank Basic:<br/>
                         <div class="indent">
-                          - 1 must be used to increase a P,M or S skill to Basic Rank.<br/>
-                          - 1 must in a different category than above.<br/>
-                          - 1 can be used at player's discretion<br/>
-                          - 3 must be used to increase a skill with Basic to Trained Rank
+                          - 1 must go to Body skills, 1 to Mind skills, 1 to Spirit skills,
                         </div>
                       </div>
                       <div id="wayCheck" class="checkSection">
-                        Select a Way.<br/>
+                        • Way Training, 3 skill points, max rank Trained:<br/>
                         <div class="indent">
-                        - Increase the Way's attack skill Rank to 3:Trained<br/>
-                        - Learn the Talent and Foci related to your Way
-                        </div>
-                      </div>
-                      <div id="abilityCheck" class="checkSection">
-                        Gain 5 Ability Points<br/>
-                        <div class="indent">
-                          - 1 must be used on for a Talent<br/>
-                          - 1 must be used for a Foci<br/>
-                          - 2 must be used for a Arcana<br/>
-                          - The remaining 1 can be used at player's discretion
-                        </div>
-                      </div>
-                      <div id="proficiencyCheck" class="checkSection">
-                        For each attack skill of basic and above gain 1 proficiency point in that skill. <br/>
-                        <div class="indent">
-                          - For each proficiency point in Strikes or invokes learn one Critical Effect<br/>
-                          - For each proficiency point in Blasts learn an additional String
+                        - Ways each have a prequisite skill that must have a basic rank
+                        - The Way's attack skill becomes Rank 3:Trained<br/>
+                        - You gain the Way's Talent and it determines your Primary Attribute
+                        - Skills points can be spent anywhere. 
                         </div>
                       </div>
                       <div id="attributeCheck" class="checkSection">
-                        Assign Attributes
+                        • Assign Attribute Points
                         <div class="indent">
-                          - Select Primary Attribute. Assign it a value of 2. <br/>
-                          - Select Secondary Attribute. Assign it a value of 2. <br/>
-                          - Select Tertiary Attribute. Assing it a value of 1.<br/>
-                          - Distribute attribute points into sub-attributes (Priamry: 3, Secondary: 2, Tertiary 1)
+                          - The value of a primary attribute is the max value if its sub-attributes
+                          - Primary Attribute has a value of 2 and 3 points to distribute to its sub-attributes <br/>
+                          - Select Secondary Attribute, it has a value of 2 and 2 points to distribute <br/>
+                          - Select Tertiary Attribute, it has a value of 1 and 1 point to distribute<br/>
                         </div>
+                      </div>
+                      <div id="abilityCheck" class="checkSection">
+                        • Abilities, 1 Talent, 2 Tricks:<br/>
+                        <div class="indent">
+                          - Basic rank in a skill allows you to optionally select the Talent or Tricks associated the skill.
+                        </div>
+                      </div>
+                      <div id="proficiencyCheck" class="checkSection">
+                        • Proficiencies, 1 per Attack Skill Rank starting at Basic. 
                       </div>
                       <div id="gearCheck" class="checkSection">
                         Purchase Starting Gear
@@ -120,8 +96,21 @@
                           - Purchase additional gear with 150 starting g. 
                         </div>
                       </div>
+                      Remaining Skill Points <span id="skillPoints" class="filledField">12</span> 
+                      Max Skill Rank <span id="maxSkillRank" class="filledField">3:Trained</span>
+                       <br/>
+                      Total Abilities <span id="abilityNumber" class="filledField">7</span>
+                      Remaining Abilities <span id="remainingAbilities" class="filledField">2</span>
                     </div>
-
+                    <input id="charName" class="charText" type="text" placeholder="Character name">
+                    <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1">
+                    <input id="childhood" class="charText" type="text" placeholder="Youth">
+                    <input id="training" class="charText" type="text" placeholder="Stirring">
+                    <select id="roleSelector">
+                      <option value="">Way</option>
+                    </select>
+                    
+<!--
                     <img id="showCharDesc" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:charDesc">
                     <div id="charDesc" class="charDetails">
                       <div class="close-btn closeRitual">X</div>
@@ -155,6 +144,7 @@
                       <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
                       <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
                     </div>
+-->
                     <button id="charSave" onclick="saveCharacter();">Save</button>                    
                 </div>
 

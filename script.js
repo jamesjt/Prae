@@ -253,3 +253,18 @@ window.addEventListener('dataLoaded', () => {
 // Rest unchanged
 
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
+function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// On load, check for ?section=...
+window.addEventListener('load', () => {
+    const section = getQueryParam('section');
+    if (section) {
+        const link = document.querySelector(`.nav-list a[data-section="${section}"]`);
+        if (link) {
+            link.click();  // Simulate click to activate the section and handle CSS enabling
+        }
+    }
+});

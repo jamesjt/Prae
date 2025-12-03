@@ -200,11 +200,47 @@ document.querySelectorAll('.nav-list a').forEach(link => {
     });
 });
 
-// Load Prae data
-// script.js (excerpt)
 
-// Remove your loadData() call and .then chain
-// Instead, listen for event
+function setupSidebarScrollSync() {
+    const sections = document.querySelectorAll('.section');
+    const sidebarItems = document.querySelectorAll('.sidebar-item[data-header]');
+    const sidebar = document.querySelector('.sidebar');
+
+    // Create observer to detect visible sections
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Find matching sidebar item (header or subitem)
+                const id = entry.target.id;
+                const item = document.querySelector(`.sidebar-item[data-header="${id}"], .sidebar-item[data-subitem="${id.split('-').pop()}"]`);
+                
+                if (item) {
+                    // Optional: Highlight active item
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Scroll sidebar to item if out of view
+                    const rect = item.getBoundingClientRect();
+                    const sidebarRect = sidebar.getBoundingClientRect();
+                    if (rect.top < sidebarRect.top || rect.bottom > sidebarRect.bottom) {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });  // Adjust thresholds for "in view"
+
+    sections.forEach(section => observer.observe(section));
+}
+
+window.addEventListener('dataLoaded', () => {
+    renderSidebar(allData);
+    renderSections(allData);
+    setupSidebarScrollSync();  // Add this call here
+});
+
+
+document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
 window.addEventListener('dataLoaded', () => {
     renderSidebar(allData);
     renderSections(allData);

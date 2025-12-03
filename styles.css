@@ -19,7 +19,10 @@ hr {
     display: flex;
     flex-direction: column;
 }
-
+.sidebar-item.active {
+    background-color: #3a3a3a;
+    color: #d29a38;
+}
 .content-section {
     display: none;
 }

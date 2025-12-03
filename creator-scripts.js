@@ -676,6 +676,8 @@ function calculateDerivedStats() {
     const recoveryInput = document.getElementById('recoveryValue');
     recoveryInput.value = recoveryBonus;
     recoveryInput.max = recoveryBonus;
-    document.getElementById('breathValue').textContent = breath;
+    const breathInput = document.getElementById('breathValue');
+    breathInput.value = breath;
+    breathInput.max = breath;
     document.getElementById('inspiritValue').textContent = inspirit;
 }

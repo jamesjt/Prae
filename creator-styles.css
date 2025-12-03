@@ -239,7 +239,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #secondaryAttributeValues {}
 
 .statsValue{font-size:20px;width:40px;text-align:center;background-size:contain; background-repeat: no-repeat;display:flex;justify-content: center;align-items: center;background-position: center center;}
-.statsValue input{font-size:20px;width:40px;color:whitesmoke;background-color:#00000000;border:none;margin-left:12px;margin-top:8px;}
+.statsValue input{font-size:20px;width:40px;color:whitesmoke;background-color:#00000000;border:none;margin-left:35px;margin-top:8px;}
 .statsValue input:hover{background-color:whitesmoke;color:black;}
 
 .statsDesc{
@@ -272,7 +272,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #marred {background-color: #6385BE; color:white;}
 #desperate {background-color:#72639F; color:white;}
 #pace {background-image: url("images/pace4.png")}
-#breath{background-image: url("images/breath.png")}
+#breath{background-image: url("images/breath2.png")}
 #inspirit{background-image: url("images/inspirit2.png")}
 
 #recovery{background-image: url("images/recovery2.png")}

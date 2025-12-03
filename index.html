@@ -930,6 +930,12 @@
                         <div id="trickTables"></div> <!-- JS populates -->
                     </div>
                 </div><!-- End abilityWrapper -->
+                <!-- New Save/Load UI -->
+                <div id="saveLoadContainer" style="margin-top: 20px; text-align: center;">
+                    <input type="text" id="saveCodeInput" placeholder="Enter save code here..." style="width: 300px; padding: 10px;">
+                    <button id="loadButton">Load</button>
+                    <button id="saveButton">Save</button>
+                </div>
       </article>
     </section>
     </div>
@@ -938,6 +944,7 @@
     <script src="creator-scripts.js"></script>
     <script src="gear-scripts.js"></script>
     <script src="tooltip-manager.js"></script>
+    <script src="save-load.js"></script> <!-- New script include -->
     <script>
         // Tab navigation
         document.querySelectorAll('.nav-list a').forEach(link => {

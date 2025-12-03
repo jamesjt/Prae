@@ -278,7 +278,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 
 #recovery{background-image: url("images/recovery-white.png")}
 #mana {background-image: url("images/mana.png")}
-#guard {background-image: url("images/guard.png")}
+#guard {background-image: url("images/guard-white.png")}
 
 
 

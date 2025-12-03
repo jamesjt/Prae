@@ -254,7 +254,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #guardDesc{}
 #recoveryDesc {}
 #manaDesc{}
-#conversionDesc{}
+#inspiritDesc{}
 #paceDesc{}
 #maxHpValue{}
 #marredValue{}
@@ -263,7 +263,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #paceValue{}
 #manaValue{}
 #inspiritValue{}
-#recovery{background-image: url("images/recovery-white.png")}
+#recovery {}
 #armorValue{}
 #guardValue{}
 
@@ -271,15 +271,15 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #maxHP {padding-top: 5px;}
 #marred {background-color: #6385BE; color:white;}
 #desperate {background-color:#72639F; color:white;}
-#recovery {}
+#recovery {background-image: url("images/pace.png")}
 #pace {}
 #initiative {}
-#initialMomentem {}
-#conversion {}
-#recovery {}
-#mana {}
-#conversion {}
-#guard {}
+#breath{background-image: url("images/breath.png")}
+#inspirit{}
+
+#recovery{background-image: url("images/recovery-white.png")}
+#mana {background-image: url("images/mana.png")}
+#guard {background-image: url("images/guard.png")}
 
 
 

@@ -267,7 +267,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #armorValue{}
 #guardValue{}
 
-#armor {}
+#armor {background-image: url("images/armor2.png")}
 #maxHP {padding-top: 5px;}
 #marred {background-color: #6385BE; color:white;}
 #desperate {background-color:#72639F; color:white;}

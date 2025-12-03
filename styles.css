@@ -63,99 +63,83 @@ hr {
 
 h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 
-#search-container { margin-bottom: 20px; text-align: center; }
-#search {
-    width: 100%; max-width: 400px; padding: 10px; border: 1px solid #333;
-    border-radius: 4px; background-color: #222222; color: #e0e0e0; font-size: 16px;
-}
-#search::placeholder { color: #888; }
+#search-container { margin-bottom: 20px; }
+#search { width: 100%; padding: 10px; font-size: 1em; border-radius: 4px; border: 1px solid #444; background-color: #333; color: #ddd; }
 
-.section {
-    background-color: #222222;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    max-width: 1000px;
-}
-.section.traea-section { box-shadow:0 0px 6px #8B6F47;margin:10px }
+.section { margin-bottom: 40px; }
+.section h3 { color: #d29a38; border-bottom: 2px solid #d29a38; padding-bottom: 10px; }
+.section-content { font-size: 1em; color: #ccc; }
+.indent-1 { margin-left: 20px; }
+.indent-2 { margin-left: 40px; }
+.indent-3 { margin-left: 60px; }
 
-.section h3 {
-    margin: 0 0 10px;
-    color: #d29a38;
-    font-size: 30px;
-    column-span: all;
-    font-family: "Times New Roman", serif;
-    font-variant: small-caps;
-    font-weight: 500;
+.no-results { text-align: center; color: #888; font-style: italic; }
+
+.navbar { background-color: #111; padding: 10px; position: fixed; width: 100%; top: 0; z-index: 1000; }
+.nav-list { display: flex; justify-content: center; gap: 20px; }
+.nav-list a { color: #ddd; text-decoration: none; padding: 10px 20px; border-radius: 4px; }
+.nav-list a:hover { background-color: #333; }
+.nav-list a.active { background-color: #d29a38; color: #111; }
+
+.traea-section h3 { color: #8B6F47; border-bottom-color: #8B6F47; }
+
+/* Tippy Custom Theme */
+.tippy-box[data-theme~='ruleTip'] {
+  background-color: #2a2a2a;
+  color: #ddd;
+  border: 1px solid #444;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+.tippy-box[data-theme~='ruleTip'] .tippy-arrow { color: #2a2a2a; }
+
+.hoverRule { border-bottom: 1px dotted #d29a38; cursor: help; }
+.hoverGear { border-bottom: 1px dotted #8B6F47; cursor: help; }
+.hoverAbility { border-bottom: 1px dotted #ccc; cursor: help; }
+.hoverProf { border-bottom: 1px dotted #aaa; cursor: help; }
+.hoverWay { border-bottom: 1px dotted #bbb; cursor: help; }
+.hoverExpr { border-bottom: 1px dotted #999; cursor: help; }
+
+.tip-rule { font-style: italic; }
+.tip-gear strong { color: #8B6F47; }
+.tip-ability-talent, .tip-ability-trick, .tip-ability-ritual {
+  background: #333;
+  padding: 10px;
+  border-radius: 4px;
+}
+.tip-name-talent, .tip-name-trick, .tip-name-ritual { font-weight: bold; color: #d29a38; }
+.tip-prof strong { color: #ccc; }
+.tip-way strong { color: #bbb; }
+
+.tippy-box[data-theme~='ruleTip'][data-placement^='top'] > .tippy-arrow:before {
+  border-top-color: #2a2a2a;
 }
 
-.indent-1 { margin-left: 1em; }
-.indent-2 { margin-left: 2em; }
-.indent-3 { margin-left: 3em; }
-.indent-4 { margin-left: 4em; }
+.draggable .tippy-content { cursor: grab; }
 
-.section-content p {
-    margin: 0 0 10px;
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  color: #888;
+  font-weight: bold;
 }
+.close-btn:hover { color: #ddd; }
 
-.internal-link a { border-bottom: 1px dotted whitesmoke; color: whitesmoke; text-decoration: none; }
-.no-results { text-align: center; color: #888; font-style: italic; padding: 20px; }
+/* Creator Styles Placeholder - Actual in creator-styles.css */
 
-@media (max-width: 768px) {
-    .sidebar { width: 100%; position: static; max-height: none; overflow-y: visible; top: 0; }
-    .main-content { margin-left: 0; padding: 10px; }
-    .section { margin-left: 0; max-width: 100%; }
-    .container { margin-top: 120px; }
+/* Save/Load Buttons */
+#charSave, #charLoad {
+    padding: 5px 10px;
+    background: #d29a38;
+    border: none;
+    color: #111;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 5px;
 }
-
-/* Navbar */
-.navbar {
-    background-color: #222222;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    padding: 5px 0;
+#loadId {
+    width: 200px;
+    padding: 5px;
+    margin-left: 10px;
 }
-.nav-list { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; }
-.nav-list a {
-    color: #e0e0e0; text-decoration: none; font-size: 1.2em;
-    font-family: Roboto, Helvetica, sans-serif; padding: 10px 15px;
-    border-radius: 4px; transition: background-color 0.3s;
-}
-.nav-list a:hover, .nav-list a.active { background-color: #3a3a3a; color: #d29a38; }
-
-/* All your original ability/gear styles — fully preserved */
-.ability-group-container{display:grid;grid-template-columns: 1fr 1fr;}
-.gear-list-container{display:grid;grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr 1fr;box-shadow: 0 0 10px rgba(0,0,0,0.7);}
-.level-list-container{display:grid;grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;box-shadow: 0 0 10px rgba(0,0,0,0.7);}
-.armor-list-container{display:grid;grid-template-columns: 0.1fr 0.1fr 0.05fr 0.3fr 1fr;box-shadow: 0 0 10px rgba(0,0,0,0.7);}
-.ability-tricks-container,.ability-talents-container,.gear-list-container{}
-.level-list{text-align: center;}
-.ability-trick,.ability-talent,.ability-ritual{
-    margin: 0px 15px 0px 0px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.7);
-    border-radius:8px;
-    margin-bottom: 10px;
-    font-family: "Times New Roman", serif;
-}
-.ability-trick{margin-right:15px;}
-.gear-list,.level-list{font-family: "Times New Roman", serif;}
-.ability-trick div:nth-of-type(2n),.ability-talent div:nth-of-type(2n),.ability-ritual div:nth-of-type(2n),.gear-list div:nth-of-type(2n),.level-list div:nth-of-type(2n){
-    color:black;background-color: rgba(239,239,239,1);padding:0px 7px;
-}
-.ability-talent div:nth-of-type(2n+1){color:black;background-color: rgba(217,217,217,1);padding:0px 7px;}
-.ability-trick div:nth-of-type(2n+1){color:black;background-color: rgba(215,228,223,1);padding:0px 7px;}
-.ability-ritual div:nth-of-type(2n+1){color:black;background-color: rgba(217,228,237,1);padding:0px 7px;}
-.gear-list div:nth-of-type(2n+1),.level-list div:nth-of-type(2n+1){color:black;background-color: rgba(226,210,197,1);padding:0px 7px;}
-.ability-trick div:last-of-type,.ability-talent div:last-of-type,.ability-ritual div:last-of-type{border-radius: 0 0 8px 8px;}
-.ability-trick div:first-child,.ability-talent div:first-child,.ability-ritual div:first-child{
-    color:whitesmoke;font-variant: small-caps;padding:0px 7px;font-size:20px;border-radius:8px 8px 0px 0px;
-}
-.ability-trick div:first-child{background-color: rgba(114,133,126,1);}
-.ability-talent div:first-child{background-color: rgba(88,89,96,1);}
-.ability-ritual div:first-child{background-color: rgba(8,55,99,1);}
-.gear-list div:first-child,.level-list div:first-child{background-color: rgba(74,53,34,1);padding:0px 7px;color:whitesmoke;}
-.way-text{margin-right:15px;}

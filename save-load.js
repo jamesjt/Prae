@@ -183,13 +183,66 @@ function loadFromCode(code) {
     }
 }
 
+// Cookie helpers
+function setCookie(name, value, days = 365) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${date.toUTCString()}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[2]) : null;
+}
+
+// Render saved codes as clickable links
+function renderSavedCodes() {
+    const container = document.getElementById('savedCodesList');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const codesJson = getCookie('savedCodes');
+    const codes = codesJson ? JSON.parse(codesJson) : [];
+
+    if (codes.length === 0) {
+        container.innerHTML = '<p>No saved codes yet.</p>';
+        return;
+    }
+
+    codes.forEach((code, index) => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = `Load Save ${index + 1}`;
+        link.style.display = 'block';
+        link.style.margin = '5px 0';
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadFromCode(code);
+        });
+        container.appendChild(link);
+    });
+}
+
+// Save code and update cookie
+function saveAndStoreCode() {
+    const code = generateSaveCode();
+    const codesJson = getCookie('savedCodes');
+    let codes = codesJson ? JSON.parse(codesJson) : [];
+
+    codes.push(code);
+    if (codes.length > 10) codes.shift(); // Limit to last 10
+
+    setCookie('savedCodes', JSON.stringify(codes));
+    document.getElementById('saveCodeInput').value = code;
+    renderSavedCodes();
+    alert('Save code generated, stored in cookie, and added to list.');
+}
+
 // Init: Wire buttons after dataLoaded (to ensure all elements exist)
 window.addEventListener('dataLoaded', () => {
-    document.getElementById('saveButton')?.addEventListener('click', () => {
-        const code = generateSaveCode();
-        document.getElementById('saveCodeInput').value = code;
-        alert('Save code generated and copied to input field.');
-    });
+    renderSavedCodes(); // Load and display existing codes on init
+
+    document.getElementById('saveButton')?.addEventListener('click', saveAndStoreCode);
 
     document.getElementById('loadButton')?.addEventListener('click', () => {
         const code = document.getElementById('saveCodeInput').value.trim();

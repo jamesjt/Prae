@@ -238,7 +238,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .secondaryAttributes {display:flex;height:40px;justify-content:center;align-items: center;}
 #secondaryAttributeValues {}
 
-.statsValue{font-size:20px;width:40px;width:80px;text-align:center;background-size:contain; background-repeat: no-repeat;display:flex;justify-content: center;align-items: center;background-position: center center;}
+.statsValue{font-size:20px;height:45px;width:80px;text-align:center;background-size:contain; background-repeat: no-repeat;display:flex;justify-content: center;align-items: center;background-position: center center;}
 .statsValue input{font-size:20px;width:40px;color:whitesmoke;background-color:#00000000;border:none;margin-left:37px;margin-top:1px;}
 .statsValue input:hover{background-color:whitesmoke;color:black;}
 

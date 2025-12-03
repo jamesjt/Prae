@@ -221,15 +221,6 @@ function setupSidebarScrollSync() {
                     const headerId = parts[0];
                     const subId = parts.slice(1).join('-');
                     item = document.querySelector(`.sidebar-item[data-header="${headerId}"][data-subitem="${subId}"]`);
-                    if (item) {
-                        // Expand parent if subitem
-                        const parentHeader = item.closest('.subitems').previousElementSibling;
-                        const subContainer = item.closest('.subitems');
-                        if (parentHeader && !parentHeader.classList.contains('expanded')) {
-                            parentHeader.classList.add('expanded');
-                            subContainer.classList.add('visible');
-                        }
-                    }
                 } else {
                     item = document.querySelector(`.sidebar-item[data-header="${id}"]`);
                 }
@@ -239,14 +230,12 @@ function setupSidebarScrollSync() {
                     sidebarItems.forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
                     
-                    // Scroll sidebar to item if out of view (with delay for expansion)
-                    setTimeout(() => {
-                        const rect = item.getBoundingClientRect();
-                        const sidebarRect = sidebar.getBoundingClientRect();
-                        if (rect.top < sidebarRect.top || rect.bottom > sidebarRect.bottom) {
-                            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }
-                    }, 100);  // Short delay for CSS transition
+                    // Scroll sidebar to item if out of view
+                    const rect = item.getBoundingClientRect();
+                    const sidebarRect = sidebar.getBoundingClientRect();
+                    if (rect.top < sidebarRect.top || rect.bottom > sidebarRect.bottom) {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                 }
             }
         });

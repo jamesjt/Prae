@@ -18,13 +18,15 @@ function renderSidebar(data) {
         let html = '';
         Object.keys(data).forEach(header => {
             const isTraea = header.toLowerCase().includes('traea');
+            const headerId = header.replace(/\s+/g, '-');
             const subHtml = data[header].subitems.map(s => {
                 const traea = s.name.toLowerCase().includes('traea');
-                return `<div class="sidebar-item sidebar-subitem ${traea?'traea-item':''}" data-header="${header}" data-subitem="${s.name}">${s.name}</div>`;
+                const subId = s.name.replace(/\s+/g, '-');
+                return `<div class="sidebar-item sidebar-subitem ${traea?'traea-item':''}" data-header="${headerId}" data-subitem="${subId}">${s.name}</div>`;
             }).join('');
             html += `
-                <div class="sidebar-item section-header ${isTraea?'traea-item':''}" data-header="${header}">${header}</div>
-                <div class="subitems" data-subitems="${header}">${subHtml}</div>
+                <div class="sidebar-item section-header ${isTraea?'traea-item':''}" data-header="${headerId}">${header}</div>
+                <div class="subitems" data-subitems="${headerId}">${subHtml}</div>
             `;
         });
         sidebar.innerHTML = html;
@@ -36,7 +38,7 @@ function renderSidebar(data) {
         document.querySelectorAll('.sidebar-item').forEach(item => item.addEventListener('click', () => {
             const h = item.dataset.header;
             const s = item.dataset.subitem;
-            const id = (s ? `${h}-${s}` : h).replace(/\s+/g, '-');
+            const id = (s ? `${h}-${s}` : h);
             const element = document.getElementById(id);
             if (element) {
                 const navbarHeight = document.querySelector('.navbar').offsetHeight || 60;
@@ -201,6 +203,7 @@ document.querySelectorAll('.nav-list a').forEach(link => {
 });
 
 
+// Add this new function here
 function setupSidebarScrollSync() {
     const sections = document.querySelectorAll('.section');
     const sidebarItems = document.querySelectorAll('.sidebar-item[data-header]');
@@ -212,7 +215,15 @@ function setupSidebarScrollSync() {
             if (entry.isIntersecting) {
                 // Find matching sidebar item (header or subitem)
                 const id = entry.target.id;
-                const item = document.querySelector(`.sidebar-item[data-header="${id}"], .sidebar-item[data-subitem="${id.split('-').pop()}"]`);
+                let item;
+                if (id.includes('-')) {
+                    const parts = id.split('-');
+                    const headerId = parts[0];
+                    const subId = parts.slice(1).join('-');
+                    item = document.querySelector(`.sidebar-item[data-header="${headerId}"][data-subitem="${subId}"]`);
+                } else {
+                    item = document.querySelector(`.sidebar-item[data-header="${id}"]`);
+                }
                 
                 if (item) {
                     // Optional: Highlight active item
@@ -237,13 +248,6 @@ window.addEventListener('dataLoaded', () => {
     renderSidebar(allData);
     renderSections(allData);
     setupSidebarScrollSync();  // Add this call here
-});
-
-
-document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
-window.addEventListener('dataLoaded', () => {
-    renderSidebar(allData);
-    renderSections(allData);
 });
 
 // Rest unchanged

@@ -268,9 +268,10 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 #guardValue{}
 
 #armor {background-image: url("images/armor2.png")}
-#maxHP {padding-top: 5px;}
-#marred {background-color: #6385BE; color:white;}
-#desperate {background-color:#72639F; color:white;}
+#vitValue {background-image: url("images/vit.png")}
+#marredValue {background-image: url("images/marred.png")}
+#desperateValue {background-image: url("images/desperate.png")}
+#deadValue {background-image: url("images/dead.png")}
 #pace {background-image: url("images/pace4.png")}
 #breath{background-image: url("images/breath2.png")}
 #inspirit{background-image: url("images/inspirit2.png")}

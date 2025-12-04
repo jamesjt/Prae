@@ -102,7 +102,6 @@ function rebuildDynamicSelectors(config, amount) {
             populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
         }
     }
-    calculateAbilities();
 }
 function populateAbilitySelectors(type) {
     const abilities = getQualifiedAbilities(type);

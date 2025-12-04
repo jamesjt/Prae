@@ -135,35 +135,37 @@ function processTextForTooltips(text) {
   };
 
   // Extracted replacement applicator
-  function applyReplacements(text, items, type) {
-    items.sort((a, b) => b.length - a.length);
+  function applyReplacements(text, items, getName, type) {
+    items.sort((a, b) => (getName(b) || '').length - (getName(a) || '').length);
     items.forEach(item => {
-      const regex = new RegExp(`\\b${escapeRegExp(item)}\\b`, 'gi');
-      text = text.replace(regex, match => addPlaceholder(type, match));
+      const name = getName(item);
+      if (name) {
+        const regex = new RegExp(`\\b${escapeRegExp(name)}\\b`, 'gi');
+        text = text.replace(regex, match => addPlaceholder(type, match));
+      }
     });
     return text;
   }
 
   // Rules (pre-sorted data)
-  text = applyReplacements(text, hoverRulesData.map(r => r.rule), 'rule');
+  text = applyReplacements(text, hoverRulesData, r => r.rule, 'rule');
 
   // Gear (pre-sorted data)
-  text = applyReplacements(text, gearData.map(g => g.name), 'gear');
+  text = applyReplacements(text, gearData, g => g.name, 'gear');
 
   // Abilities
   const abilityNames = [];
   abilitiesData.forEach(abs => {
-    abs.forEach(a => abilityNames.push(a.name));
+    abs.forEach(a => abilityNames.push(a));
   });
-  text = applyReplacements(text, abilityNames, 'ability');
+  text = applyReplacements(text, abilityNames, a => a.name, 'ability');
 
   // Proficiencies
-  const profNames = [...profData.strike, ...profData.blast, ...profData.invoke].map(p => p.name);
-  text = applyReplacements(text, profNames, 'prof');
+  const profs = [...profData.strike, ...profData.blast, ...profData.invoke];
+  text = applyReplacements(text, profs, p => p.name, 'prof');
 
   // Ways
-  const wayNames = waysData.map(w => w.name);
-  text = applyReplacements(text, wayNames, 'way');
+  text = applyReplacements(text, waysData, w => w.name, 'way');
 
   // Now replace all placeholders with actual HTML
   placeholders.forEach(({ ph, html }) => {

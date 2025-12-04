@@ -102,6 +102,7 @@ function rebuildDynamicSelectors(config, amount) {
             populateAbilityInfo(select.id, getQualifiedAbilities(abilityType), abilityType);
         }
     }
+    calculateAbilities();
 }
 function populateAbilitySelectors(type) {
     const abilities = getQualifiedAbilities(type);
@@ -289,7 +290,6 @@ function updateAttributeGroups() {
 }
 function calculateAttributeValues(groupKey) {
     const group = ATTRIBUTE_GROUPS[groupKey];
-    if (!group) return;
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const priority = document.getElementById(group.priorityId)?.value || 'priorityUnassigned';
     const points = calculateAttributePoints(priority, level);

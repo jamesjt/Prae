@@ -5,6 +5,22 @@ function getIndentLevel(text) {
     return match ? match[0].length : 0;
 }
 
+// Extracted function for processing details text
+function processDetails(details) {
+    const paras = details.split(/\n\s*\n/);
+    return paras.map(para => {
+        if (!para.trim()) return '';
+        const lines = para.split('\n').filter(l => l.trim());
+        const tippedLines = lines.map(line => {
+            const level = getIndentLevel(line);
+            const cleaned = line.replace(/^-+\s*/, '');
+            const tipped = processTextForTooltips(cleaned);
+            return level > 0 ? `<p class="indent-${level}">${tipped}</p>` : tipped;
+        });
+        return tippedLines.join('<br>');
+    }).filter(p => p).join('<br><br>');
+}
+
 // Render sidebar
 function renderSidebar(data) {
     try {
@@ -59,18 +75,7 @@ function renderSections(data, term = '') {
             html = '<div class="no-results">No results found.</div>';
         } else {
             Object.keys(filtered).forEach(header => {
-                const paras = filtered[header].details.split(/\n\s*\n/);
-                const processed = paras.map(para => {
-                    if (!para.trim()) return '';
-                    const lines = para.split('\n').filter(l => l.trim());
-                    const tippedLines = lines.map(line => {
-                        const level = getIndentLevel(line);
-                        const cleaned = line.replace(/^-+\s*/, '');
-                        const tipped = processTextForTooltips(cleaned);
-                        return level > 0 ? `<p class="indent-${level}">${tipped}</p>` : tipped;
-                    });
-                    return tippedLines.join('<br>');
-                }).filter(p => p).join('<br><br>');
+                const processed = processDetails(filtered[header].details);
                 html += `
                     <div class="section" id="${header.replace(/\s+/g, '-')}">
                         <h3>${header}</h3>
@@ -79,18 +84,7 @@ function renderSections(data, term = '') {
                 `;
                 filtered[header].subitems.forEach(sub => {
                     const isTraea = sub.name.toLowerCase().includes('traea');
-                    const subParas = sub.details.split(/\n\s*\n/);
-                    const subProcessed = subParas.map(para => {
-                        if (!para.trim()) return '';
-                        const lines = para.split('\n').filter(l => l.trim());
-                        const tippedLines = lines.map(line => {
-                            const level = getIndentLevel(line);
-                            const cleaned = line.replace(/^-+\s*/, '');
-                            const tipped = processTextForTooltips(cleaned);
-                            return level > 0 ? `<p class="indent-${level}">${tipped}</p>` : tipped;
-                        });
-                        return tippedLines.join('<br>');
-                    }).filter(p => p).join('<br><br>');
+                    const subProcessed = processDetails(sub.details);
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">
                             <h3>${sub.name}</h3>

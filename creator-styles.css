@@ -148,7 +148,7 @@
 .att-desc-font{font-size: 8px}
 
 .attributeSelect{margin-top: 15px;border:none;font-size:12px}
-.attributeSelect:hover{background-color:white;color:white;}
+.attributeSelect:hover{background-color:white !important;color:black !important;}
 
 #bodyPriority{background-color: var(--bodyColor0);color:var(--bodyColor0);}
 #mindPriority{background-color: var(--mindColor0);color:var(--mindColor0);}

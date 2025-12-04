@@ -683,7 +683,7 @@ a.internalLink{
 .attvalue{width:30px;}
 
 
-.hoverRules{border-bottom:1px dotted black;position:relative;}
+.hoverRule{border-bottom:1px dotted black;position:relative;}
 .hoverRule::after {
   content: "";
   position: absolute;

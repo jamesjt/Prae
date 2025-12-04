@@ -104,272 +104,516 @@ function rebuildDynamicSelectors(config, amount) {
     }
     calculateAbilities();
 }
-function populateAbilitySelectors(abilityType) {
-    const abilities = getQualifiedAbilities(abilityType);
-    const max = abilityType === 'talent' ? talentAmount : tricksAmount;
-    const prefix = abilityType === 'talent' ? 'talent' : 'tricks';
-    const offset = abilityType === 'talent' ? 1 : 0; // Talents start from 2 (after wayTalent)
-    for (let i = 1; i <= max + offset; i++) {
-        const sel = document.getElementById(`${prefix}${i}`);
-        if (sel) {
-            const saved = sel.value;
-            sel.innerHTML = '<option value="">Select Ability</option>' +
-                abilities.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
-            if (saved && Array.from(sel.options).some(opt => opt.value === saved)) {
-                sel.value = saved;
-            }
-            const desc = document.getElementById(`${prefix}${i}Description`);
-            if (desc && sel.value) {
-                populateAbilityInfo(sel.id, abilities, abilityType);
-            }
-        }
-    }
+function updateAbilityTables(type) {
+    const isTalent = type === 'talent';
+    const amount = isTalent ? talentAmount : tricksAmount;
+    rebuildDynamicSelectors({
+        containerSelector: isTalent ? '.talentWrapper' : '.trickWrapper',
+        itemPrefix: isTalent ? 'talent' : 'tricks',
+        itemClass: isTalent ? 'talentAbility' : 'trickAbility',
+        selectorClass: isTalent ? 'talentSelector' : 'trickSelector',
+        extraOffset: isTalent ? 0 : 1,
+        populateFunction: () => updateAbilitySelectors(type),
+        abilityType: type
+    }, amount);
 }
-function populateAbilityInfo(id, abilities, abilityType) {
-    const sel = document.getElementById(id);
-    const desc = document.getElementById(id + 'Description');
-    if (!sel || !desc) return;
-    const name = sel.value;
-    const ability = abilities.find(a => a.name === name);
-    if (ability) {
-        const details = ability.details;
-        let html = '';
-        Object.keys(details).forEach(key => {
-            if (key !== 'Name') { // Skip redundant name
-                html += `<div>${key}: ${details[key]}</div>`;
-            }
-        });
-        desc.innerHTML = html;
-    } else {
-        desc.innerHTML = '';
-    }
-}
-function populateProficiencyInfo(id, type) {
-    const sel = document.getElementById(id);
-    const desc = document.getElementById(id + 'Description');
-    if (!sel || !desc) return;
-    const name = sel.value;
-    const prof = profData[type].find(p => p.name === name);
-    if (prof) {
-        desc.innerHTML = prof.details;
-    } else {
-        desc.innerHTML = '';
-    }
-}
-function getQualifiedAbilities(abilityType) {
-    const qualified = [];
-    abilitiesData.forEach((abs, skill) => {
-        const rankEl = document.getElementById(SKILL_ID_MAP[capitalize(skill)]);
-        const rank = parseInt(rankEl?.value) || 0;
-        if (rank >= 1) { // Basic+ qualifies
-            qualified.push(...abs.filter(a => a.type === abilityType));
-        }
-    });
-    return qualified;
-}
-// ———————————————————————— EVENT LISTENERS ————————————————————————
+// ———————————————————————— ONE EVENT LISTENER (OPTIMIZED) ————————————————————————
 document.addEventListener('change', e => {
     const t = e.target;
-    if (t.matches('.attributeSelect')) return updateAttributeGroups();
-    if (t.matches('.attInput')) return calculateAttributeValues();
-    if (t.matches('.skillRankSelect')) return updateSingleSkillModAndPassive(t.id);
-    if (t.matches('.attackSkills')) {
-        const type = t.id.replace('SkillRank', '').toLowerCase();
-        updateProficiencySelectors(type, parseInt(t.value) || 0);
-        return;
-    }
-    if (t.matches('#roleSelector')) return updateWay();
+    const clamp = (el, min = 0) => (el.value = Math.max(min, parseInt(el.value) || min), parseInt(el.value));
+
+    // Talent/Trick Selectors (combined)
     if (t.matches('.talentSelector, .trickSelector')) {
-        const abilityType = t.classList.contains('talentSelector') ? 'talent' : 'trick';
-        populateAbilityInfo(t.id, getQualifiedAbilities(abilityType), abilityType);
+        const type = t.className.replace('Selector', '');
+        populateAbilityInfo(t.id, getQualifiedAbilities(type), type);
+        calculateAbilities();
+        calculateDerivedStats();
         return;
     }
-    if (t.matches('.profSelector')) {
-        const type = t.id.match(/^(strike|blast|invoke)/)[1];
-        populateProficiencyInfo(t.id, type);
-        return;
-    }
-    if (t.id === 'charLvl') return calculateDerivedStats();
-});
-// Buttons for ability amounts
-document.addEventListener('click', e => {
-    const t = e.target;
-    if (t.matches('#talentPlus, #talentMinus')) {
-        if (t.id === 'talentPlus') {
-            talentAmount += 1;
-        } else if (t.id === 'talentMinus' && talentAmount > 1) {
-            talentAmount -= 1;
-        }
-        updateAbilityTables('talent');
-    } else if (t.matches('#tricksPlus, #tricksMinus')) {
-        if (t.id === 'tricksPlus') {
-            tricksAmount += 1;
-        } else if (t.id === 'tricksMinus' && tricksAmount > 1) {
-            tricksAmount -= 1;
-        }
-        updateAbilityTables('trick');
-    }
-});
-// ———————————————————————— UPDATERS ————————————————————————
-function updateAbilityTables(abilityType) {
-    const config = abilityType === 'talent' ? {
-        containerSelector: '.talentWrapper',
-        itemPrefix: 'talent',
-        itemClass: 'talentAbility',
-        selectorClass: 'talentSelector',
-        populateFunction: () => populateAbilitySelectors('talent'),
-        abilityType: 'talent',
-        extraOffset: 1 // For wayTalent offset
-    } : {
-        containerSelector: '.trickWrapper',
-        itemPrefix: 'tricks',
-        itemClass: 'trickAbility',
-        selectorClass: 'trickSelector',
-        populateFunction: () => populateAbilitySelectors('trick'),
-        abilityType: 'trick'
-    };
-    const amount = abilityType === 'talent' ? talentAmount : tricksAmount;
-    rebuildDynamicSelectors(config, amount);
-}
-function calculateAbilities() {
-    // Stub for future; currently no calc needed beyond population
-}
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-function updateWay() {
-    const sel = document.getElementById('roleSelector');
-    const selectedName = sel.value;
-    const selectedWay = waysData.find(w => w.name === selectedName);
-    if (!selectedWay) return;
-    const props = selectedWay.props;
-    const nameDiv = document.getElementById('wayTalentName');
-    const descDiv = document.getElementById('wayTalentDesc');
-    if (nameDiv) nameDiv.textContent = props.name || 'Unnamed Way';
-    if (descDiv) {
-        let html = '';
-        Object.keys(props).forEach(key => {
-            if (key !== 'name' && props[key]) {
-                html += `<div>${capitalize(key)}: ${props[key]}</div>`;
+
+    // Skill Ranks
+    if (t.matches('select[id$="SkillRank"]')) {
+        updateSingleSkillModAndPassive(t.id);
+        updateWayOptions();
+        const type = t.id.replace('SkillRank', '').toLowerCase();
+        if (['strike', 'blast', 'invoke'].includes(type)) updateProficiencySelectors(type, parseInt(t.value) || 0);
+        updateAbilitySelectors('trick');
+        updateAbilitySelectors('talent');
+        // Refresh existing ability descriptions
+        document.querySelectorAll('.talentSelector, .trickSelector').forEach(sel => {
+            if (sel.value && sel.value !== `${sel.className.replace('Selector', '')}Empty`) {
+                const abType = sel.className.replace('Selector', '');
+                populateAbilityInfo(sel.id, getQualifiedAbilities(abType), abType);
             }
         });
-        descDiv.innerHTML = html;
+        // Refresh way talent if selected
+        const roleSel = document.getElementById('roleSelector');
+        if (roleSel && roleSel.value !== 'wayEmpty') {
+            populateRoleInfo({ target: roleSel });
+        }
+        // Refresh proficiency descriptions if applicable
+        if (['strike', 'blast', 'invoke'].includes(type)) {
+            for (let i = 1; i <= 5; i++) {
+                const sel = document.getElementById(type + 'ProfSelector' + i);
+                if (sel && !sel.hidden && sel.value) {
+                    populateProficiencyInfo(sel.id, type);
+                }
+            }
+        }
+        calculateDerivedStats();
+        return;
     }
-    const attackType = selectedWay.props['attack']?.toLowerCase() || '';
-    let attackSkillId = '';
-    if (attackType === 'strike') attackSkillId = 'strikeSkillRank';
-    else if (attackType === 'blast') attackSkillId = 'blastSkillRank';
-    else if (attackType === 'invoke') attackSkillId = 'invokeSkillRank';
-    if (attackSkillId) {
-        const attackEl = document.getElementById(attackSkillId);
-        if (attackEl) {
-            attackEl.value = 2; // Trained
-            triggerChange(attackEl);
+
+    // Priorities, Level, Sub-attributes (combined attribute-related)
+    if (t.matches('#bodyPriority, #mindPriority, #spiritPriority, #charLvl, input[id$="Value"][type="number"]')) {
+        if (t.matches('#bodyPriority, #mindPriority, #spiritPriority')) {
+            const priorities = {
+                body: document.getElementById('bodyPriority'),
+                mind: document.getElementById('mindPriority'),
+                spirit: document.getElementById('spiritPriority')
+            };
+            const changedAttr = t.id.replace('Priority', '').toLowerCase();
+            const newPri = t.value;
+            const priorityUnassigned = 'priorityUnassigned';
+            if (newPri !== priorityUnassigned) {
+                for (const [attr, sel] of Object.entries(priorities)) {
+                    if (attr !== changedAttr && sel.value === newPri) {
+                        sel.value = priorityUnassigned;
+                    }
+                }
+            }
+        }
+        calculateAttributeValues();
+        updateAttributeGroups();
+        updateAllSkillModsAndPassives();
+        calculateAbilities();
+        if (t.matches('input[id$="Value"][type="number"]')) {
+            const groupKey = /might|agility|brawn/.test(t.id) ? 'body' : /will|wit|resolve/.test(t.id) ? 'mind' : 'spirit';
+            updateAttributeGroup(ATTRIBUTE_GROUPS[groupKey]);
+            updateSkillsForMod(t.id);
+        }
+        calculateDerivedStats();
+        return;
+    }
+
+    // Way selector
+    if (t.matches('#roleSelector')) {
+        populateRoleInfo(e);
+        return;
+    }
+
+    // Proficiency Selectors
+    if (t.matches('[id$="ProfSelector"]')) {
+        const type = t.id.match(/(strike|blast|invoke)ProfSelector/)?.[1];
+        if (type) {
+            calculateProficiencyPoints(type);
+            populateProficiencyInfo(t.id, type);
         }
     }
-    const primaryAttr = selectedWay.props['primary attribute']?.toLowerCase() || '';
-    let primaryId = '';
-    if (primaryAttr === 'body') primaryId = 'bodyPriority';
-    else if (primaryAttr === 'mind') primaryId = 'mindPriority';
-    else if (primaryAttr === 'spirit') primaryId = 'spiritPriority';
-    if (primaryId) {
-        const primaryEl = document.getElementById(primaryId);
-        if (primaryEl) {
-            primaryEl.value = 'priorityPrimary';
-            triggerChange(primaryEl);
+});
+document.addEventListener('click', e => {
+    const t = e.target;
+    if (t.matches('#talentPlus, #talentMinus, #tricksPlus, #tricksMinus')) {
+        const type = t.id.includes('talent') ? 'talent' : 'trick';
+        let value = type === 'talent' ? talentAmount : tricksAmount;
+        const min = 1;
+        if (t.id.includes('Plus')) {
+            value += 1;
+        } else if (t.id.includes('Minus') && value > min) {
+            value -= 1;
+        }
+        if (type === 'talent') {
+            talentAmount = value;
+        } else {
+            tricksAmount = value;
+        }
+        updateAbilityTables(type);
+        calculateAbilities();
+    }
+});
+// ———————————————————————— CORE FUNCTIONS ————————————————————————
+function populateRoleSelector() {
+    const sel = document.getElementById('roleSelector');
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
+    buildWayGroups();
+}
+function buildWayGroups() {
+    const sel = document.getElementById('roleSelector');
+    // Preserve current selection
+    const currentValue = sel.value;
+    // Fully reset to placeholder
+    sel.innerHTML = '<option value="wayEmpty">Select Way</option>';
+    // Filter available and unavailable
+    const available = [];
+    const unavailable = [];
+    waysData.forEach(way => {
+        const qualified = way.reqSkill === 'Any'
+            ? Object.values(SKILL_ID_MAP).some(id => parseInt(document.getElementById(id)?.value || 0) > 1)
+            : parseInt(document.getElementById(way.skillId)?.value || 0) > 1;
+        (qualified ? available : unavailable).push(way);
+    });
+    // Sort alphabetically
+    available.sort((a, b) => a.name.localeCompare(b.name));
+    unavailable.sort((a, b) => a.name.localeCompare(b.name));
+    // Add available group
+    if (available.length > 0) {
+        const availGroup = document.createElement('optgroup');
+        availGroup.label = 'Available Ways';
+        available.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            availGroup.appendChild(opt);
+        });
+        sel.appendChild(availGroup);
+    }
+    // Add unavailable group
+    if (unavailable.length > 0) {
+        const unavailGroup = document.createElement('optgroup');
+        unavailGroup.label = 'Unavailable Ways';
+        unavailable.forEach(way => {
+            const opt = document.createElement('option');
+            opt.value = way.name;
+            opt.textContent = way.name;
+            unavailGroup.appendChild(opt);
+        });
+        sel.appendChild(unavailGroup);
+    }
+    // Restore selection if still valid
+    sel.value = currentValue;
+}
+function updateWayOptions() {
+    buildWayGroups();
+}
+function updateAbilitySelectors(type) {
+    const qualified = getQualifiedAbilities(type);
+    const selectorClass = `${type}Selector`;
+    const emptyValue = `${type}Empty`;
+    const emptyLabel = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    
+    document.querySelectorAll(`.${selectorClass}`).forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = `<option value="${emptyValue}">${emptyLabel}</option>` + 
+            qualified.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+        if (cur && qualified.some(a => a.name === cur)) sel.value = cur;
+    });
+}
+function getQualifiedAbilities(type) {
+    const result = [];
+    Object.entries(SKILL_ID_MAP).forEach(([name, id]) => {
+        const sel = document.getElementById(id);
+        if (sel && parseInt(sel.value) >= 2 && abilitiesData.get(name.toLowerCase())) {
+            result.push(...abilitiesData.get(name.toLowerCase()).filter(a => a.type === type));
+        }
+    });
+    return result;
+}
+function evaluateExpr(expr) {
+  // Replace skill names with current ranks
+  expr = expr.replace(/\b([A-Z][a-z]+)\b/g, match => {
+    const id = SKILL_ID_MAP[match];
+    if (id) {
+      return parseInt(document.getElementById(id)?.value) || 0;
+    }
+    return match;
+  });
+
+  // Tokenize: numbers and operators
+  const tokens = expr.match(/(\d+|[+\-*/])/g) || [];
+  if (tokens.length === 0) return 0;
+
+  // Handle * and / first (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '*' || tokens[i] === '/') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res;
+      if (tokens[i] === '*') {
+        res = left * right;
+      } else {
+        res = Math.floor(left / right);
+      }
+      tokens.splice(i - 1, 3, res);
+      i -= 2; // Adjust index after splice
+    }
+  }
+
+  // Handle + and - (left to right)
+  for (let i = 1; i < tokens.length; i += 2) {
+    if (tokens[i] === '+' || tokens[i] === '-') {
+      let left = parseFloat(tokens[i - 1]);
+      let right = parseFloat(tokens[i + 1]);
+      let res = tokens[i] === '+' ? left + right : left - right;
+      tokens.splice(i - 1, 3, res);
+      i -= 2;
+    }
+  }
+
+  return Math.floor(tokens[0]) || 0; // Final floor for safety
+}
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function escapeHtml(string) {
+    return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+function processWithTooltips(text) {
+    let processed = text;
+    hoverRulesData.forEach(({ rule, detail }) => {
+        const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
+        processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
+
+    });
+    // Collect ability matchers: map from matchName (full or base) to fullName for data-tip
+    const abilityMatchers = new Map();
+    abilitiesData.forEach(abilities => {
+        abilities.forEach(ability => {
+            const fullName = ability.name;
+            const capitalizedSkill = ability.skill.charAt(0).toUpperCase() + ability.skill.slice(1);
+            const suffix = ` (${capitalizedSkill})`;
+            abilityMatchers.set(fullName, fullName);
+            if (fullName.endsWith(suffix)) {
+                const baseName = fullName.slice(0, -suffix.length);
+                if (!abilityMatchers.has(baseName)) { // Avoid conflicts; first wins
+                    abilityMatchers.set(baseName, fullName);
+                }
+            }
+        });
+    });
+    // Sort by length descending to replace longer phrases first
+    const sortedMatchers = Array.from(abilityMatchers.entries()).sort((a, b) => b[0].length - a[0].length);
+    // Wrap ability names/base names
+    sortedMatchers.forEach(([matchName, fullName]) => {
+        const regex = new RegExp(`\\b${escapeRegExp(matchName)}\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${fullName}">$&</span>`);
+    });
+    return processed;
+}
+function populateAbilityInfo(selectId, abilities, type) {
+    const value = document.getElementById(selectId)?.value;
+    const ability = abilities.find(a => a.name === value);
+    const desc = document.getElementById(selectId + 'Description');
+    if (!desc || !ability) { desc.innerHTML = ''; return; }
+    desc.innerHTML = '';
+    const order = ['keywords', 'description', 'passive', 'active', 'cost', 'trigger', 'effect', 'enhancements', 'augments'];
+    Object.keys(ability.details).sort((a, b) => {
+        const ia = order.indexOf(a.toLowerCase());
+        const ib = order.indexOf(b.toLowerCase());
+        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    }).forEach(key => {
+        if (key.toLowerCase() === 'name') return; // Skip rendering name
+        let processedValue = ability.details[key];
+        // Replace |expr| with spanned value
+        processedValue = processedValue.replace(/\|([^|]+)\|/g, (match, expr) => {
+            const computed = evaluateExpr(expr);
+            return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
+        });
+        const div = document.createElement('div');
+        div.className = type + key.charAt(0).toUpperCase() + key.slice(1);
+        div.innerHTML = processWithTooltips(processedValue);
+        desc.appendChild(div);
+    });
+}
+function populateProficiencyInfo(selectId, type) {
+    const value = document.getElementById(selectId)?.value;
+    if (!value) return;
+    const prof = profData[type].find(p => p.name === value);
+    const desc = document.getElementById(selectId + 'Description');
+    if (!desc || !prof || !prof.details) { desc.innerHTML = ''; return; }
+    desc.innerHTML = processWithTooltips(prof.details);
+}
+function populateRoleInfo(e) {
+    const name = e.target.value;
+    if (!name || name === 'wayEmpty') return;
+    const way = waysData.find(w => w.name === name);
+    if (!way) return;
+    document.getElementById('wayTalentName').textContent = way.name;
+    const desc = document.getElementById('wayTalentDesc');
+    desc.innerHTML = '';
+    ['passive', 'focus', 'critical effect'].forEach(key => {
+        const propKey = Object.keys(way.props).find(k => k.toLowerCase().includes(key));
+        let val = propKey ? way.props[propKey] : '';
+        if (val) {
+            val = val.replace(/\|([^|]+)\|/g, (match, expr) => {
+                const computed = evaluateExpr(expr);
+                return `<span class="hoverExpr" data-tip="expr:${expr}">${computed}</span>`;
+            });
+            const div = document.createElement('div');
+            div.className = 'talent' + key.charAt(0).toUpperCase() + key.slice(1).replace(/\s/g, '');
+            div.innerHTML = processWithTooltips(val);
+            desc.appendChild(div);
+        }
+    });
+    const attackSkill = way.props[Object.keys(way.props).find(k => k.includes('attack skill'))] || way.reqSkill;
+    const skillId = SKILL_ID_MAP[attackSkill];
+    if (skillId) {
+        const sel = document.getElementById(skillId);
+        if (sel && parseInt(sel.value) < 2) {
+            sel.value = '2';
+            sel.dispatchEvent(new Event('change'));
+        }
+        // Add this here: Trigger proficiency update
+        if (['strikeSkillRank', 'blastSkillRank', 'invokeSkillRank'].includes(skillId)) {
+            const type = skillId.replace('SkillRank', '').toLowerCase();
+            const rank = parseInt(sel.value) || 0;
+            updateProficiencySelectors(type, rank);
         }
     }
-    updateAbilityTables('talent');
+    const primary = way.props[Object.keys(way.props).find(k => k.includes('primary attribute'))];
+    if (primary) {
+        const map = { 'Body': 'bodyPriority', 'Mind': 'mindPriority', 'Spirit': 'spiritPriority' };
+        const pri = document.getElementById(map[primary]);
+        if (pri) {
+            pri.value = '1';
+            pri.dispatchEvent(new Event('change'));
+        }
+    }
+    calculateAttributeValues();
+    updateAttributeGroups();
+    updateAllSkillModsAndPassives();
+}
+function calculateAbilities() {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const tExtra = talentAmount;
+    const trExtra = tricksAmount;
+    const remaining = level + 1 - Math.max(0, tExtra + trExtra);
 }
 function calculateAttributeValues() {
-    Object.keys(ATTRIBUTE_GROUPS).forEach(group => {
-        const { primaryValueId, subIds } = ATTRIBUTE_GROUPS[group];
-        const subs = subIds.map(id => parseInt(document.getElementById(id)?.value) || 0);
-        const maxSub = Math.max(...subs);
-        document.getElementById(primaryValueId).textContent = maxSub;
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = 2 + (level >= 2 ? 1 : 0) + (level >= 8 ? 1 : 0);
+    const sec = 2 + (level >= 6 ? 1 : 0);
+    const ter = 1 + (level >= 4 ? 1 : 0) + (level >= 10 ? 1 : 0);
+    ['body', 'mind', 'spirit'].forEach(attr => {
+        const priVal = document.getElementById(attr + 'Priority').value;
+        let val = priVal === '1' ? pri : priVal === '2' ? sec : priVal === '3' ? ter : 0;
+        document.getElementById(attr + 'Value').textContent = val;
     });
-    updateAllSkillModsAndPassives();
-    calculateDerivedStats();
+    updateSkillsForMod('bodyValue');
+    updateSkillsForMod('mindValue');
+    updateSkillsForMod('spiritValue');
 }
-function updateAttributeGroups() {
-    const priorities = {};
-    Object.keys(ATTRIBUTE_GROUPS).forEach(group => {
-        const el = document.getElementById(ATTRIBUTE_GROUPS[group].priorityId);
-        if (el) priorities[el.value] = group;
+function updateAttributeGroups() { Object.values(ATTRIBUTE_GROUPS).forEach(g => updateAttributeGroup(g)); }
+function updateAttributeGroup(group) {
+    const level = parseInt(document.getElementById('charLvl').value) || 1;
+    const pri = document.getElementById(group.priorityId).value;
+    let points = pri === '' ? 0 : 1 + Math.floor((level - 1) / 3);
+    if (pri === '1') points = 3 + Math.floor((level + 1) / 3);
+    if (pri === '2') points = 2 + Math.floor(level / 3);
+    const max = parseInt(document.getElementById(group.primaryValueId).textContent) || 0;
+    let sum = 0;
+    group.subIds.forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp) {
+            inp.max = max;
+            let v = Math.min(max, Math.max(0, parseInt(inp.value) || 0));
+            inp.value = v;
+            sum += v;
+        }
     });
-    const pointsMap = { priorityPrimary: 3, prioritySecondary: 2, priorityTertiary: 1 };
-    Object.keys(ATTRIBUTE_GROUPS).forEach(group => {
-        const prio = document.getElementById(ATTRIBUTE_GROUPS[group].priorityId)?.value || '';
-        const pointsEl = document.getElementById(ATTRIBUTE_GROUPS[group].pointsId);
-        if (pointsEl) pointsEl.textContent = pointsMap[prio] || 0;
-    });
-    calculateAttributeValues();
-}
-function updateAllSkillModsAndPassives() {
-    Object.keys(SKILL_ID_MAP).forEach(skill => {
-        const skillId = SKILL_ID_MAP[skill];
-        updateSingleSkillModAndPassive(skillId);
-    });
+    const rem = points - sum;
+    const el = document.getElementById(group.pointsId);
+    el.textContent = rem;
+    el.classList.toggle('hidden', rem === 0);
+    group.subIds.forEach(id => updateSkillsForMod(id));
 }
 function updateSingleSkillModAndPassive(skillId) {
-    const rankEl = document.getElementById(skillId);
-    const rank = parseInt(rankEl?.value) || 0;
-    const modId = skillId.replace('Rank', 'Mod');
-    const passiveId = skillId.replace('Rank', 'Passive');
-    const modAttrId = SKILL_MOD_MAP[skillId];
-    const modAttrVal = parseInt(document.getElementById(modAttrId)?.value) || parseInt(document.getElementById(modAttrId.replace('Value', 'Value'))?.textContent) || 0;
-    const mod = rank + modAttrVal;
-    const passive = 10 + mod;
-    const damage = rank + 2; // For attacks
-    const modEl = document.getElementById(modId);
-    const passiveEl = document.getElementById(passiveId);
-    if (modEl) modEl.textContent = mod;
-    if (passiveEl) {
-        const isAttack = /(strike|blast|invoke)Damage/i.test(passiveId);
-        passiveEl.textContent = isAttack ? damage : passive;
+    const sel = document.getElementById(skillId);
+    if (!sel) return;
+    const rank = parseInt(sel.value) || 0;
+    const modId = SKILL_MOD_MAP[skillId];
+    const modVal = parseInt(document.getElementById(modId)?.value || document.getElementById(modId)?.textContent || 0);
+    const name = skillId.replace('SkillRank', '');
+    const modEl = document.getElementById(name + 'Mod');
+    if (modEl) modEl.textContent = modVal;
+    const passiveEl = document.getElementById(name + 'Passive');
+    if (passiveEl) passiveEl.textContent = 2 + rank + modVal;
+    /*if (['strike', 'blast', 'invoke'].includes(name.toLowerCase())) {
+        const dmgEl = document.getElementById(name + 'DamageMod') || document.getElementById(name + 'Damage');
+        if (dmgEl) dmgEl.textContent = modVal;
+    }*/
+}
+function updateSkillsForMod(subId) {
+    Object.entries(SKILL_MOD_MAP).forEach(([skillId, modId]) => {
+        if (modId === subId) updateSingleSkillModAndPassive(skillId);
+    });
+}
+function updateAllSkillModsAndPassives() {
+    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSingleSkillModAndPassive(skillId));
+}
+function updateProficiencySelectors(type, rank) {
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(type + 'ProfSelector' + i);
+        if (el) el.hidden = i > rank;
     }
-    if (/(strike|blast|invoke)SkillRank/.test(skillId)) {
-        const type = skillId.replace('SkillRank', '').toLowerCase();
-        updateProficiencySelectors(type, rank);
+}
+function updateGearLoad(i) {
+    const select = document.getElementById('gear' + i + 'Select');
+    if (!select) return;
+    const selectedOption = select.options[select.selectedIndex];
+    const baseLoad = parseFloat(selectedOption.getAttribute('data-load')) || 0;
+    const amtInput = document.getElementById('gear' + i + 'Amt');
+    const qty = Math.max(1, parseInt(amtInput?.value) || 1); // Clamp to >=1
+    if (amtInput) amtInput.value = qty; // Enforce clamp
+    const totalLoad = baseLoad * qty;
+    const loadDiv = document.getElementById('gear' + i + 'Load');
+    if (loadDiv) {
+        const formattedLoad = totalLoad.toFixed(2).replace(/\.?0+$/, '');
+        loadDiv.textContent = totalLoad > 0 ? formattedLoad : '';
+        // Color red if qty >1 AND baseLoad >1
+        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
     }
-    if (rank >= 1) {
-        updateAbilityTables('talent');
-        updateAbilityTables('trick');
+}
+// Make all .draggable elements movable (no restrictions, touch/mouse support)
+interact('.draggable')
+  .draggable({
+    inertia: false,
+    autoScroll: false,
+    listeners: {
+      start(event) {
+        const target = event.target;
+
+        // Read computed transform matrix
+        const style = window.getComputedStyle(target);
+        const matrix = new DOMMatrixReadOnly(style.transform);
+
+        // m41 = translateX, m42 = translateY
+        target.setAttribute('data-x', matrix.m41);
+        target.setAttribute('data-y', matrix.m42);
+      },
+
+      move(event) {
+        const target = event.target;
+
+        // restore from dataset
+        let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        // apply transform and store values
+        target.style.transform = `translate(${x}px, ${y}px)`;
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+      }
     }
+  });
+// ———————————————————————— INIT ————————————————————————
+window.addEventListener('dataLoaded', () => {
+    TooltipManager.init();
+    populateRoleSelector();
+    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
+    calculateAbilities();
+    calculateAttributeValues();
+    updateAttributeGroups();
+    updateAllSkillModsAndPassives();
+    ['strike', 'blast', 'invoke'].forEach(t => {
+        const sel = document.getElementById(t + 'SkillRank');
+        if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
+    });
+    updateAbilityTables('talent');
+    updateAbilityTables('trick');
     calculateDerivedStats();
-}
-function populateRoleSelector() {
-    const selector = document.getElementById('roleSelector');
-    if (!selector) return;
+    // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
+});
 
-    // Group by attack type
-    const groups = {};
-    waysData.forEach(way => {
-        const attack = (way.props['attack'] || '').toLowerCase().trim();
-        if (['strike', 'blast', 'invoke'].includes(attack)) {
-            if (!groups[attack]) groups[attack] = [];
-            groups[attack].push(way);
-        }
-    });
-
-    // Fixed order
-    const groupOrder = ['strike', 'blast', 'invoke'];
-
-    // Build HTML: placeholder + sorted groups
-    let html = '<option value="">Select Way</option>';
-    groupOrder.forEach(groupKey => {
-        if (groups[groupKey]) {
-            // Sort alpha by name
-            groups[groupKey].sort((a, b) => a.name.localeCompare(b.name));
-            html += `<optgroup label="${capitalize(groupKey)}">`;
-            html += groups[groupKey].map(w => `<option value="${w.name}">${w.name}</option>`).join('');
-            html += '</optgroup>';
-        }
-    });
-
-    selector.innerHTML = html;
-}
-// ———————————————————————— DERIVED STATS ————————————————————————
 function calculateDerivedStats() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const vitBase = 30;
@@ -420,29 +664,4 @@ function calculateDerivedStats() {
     const breathInput = document.getElementById('breathValue');
     breathInput.value = breath;
     document.getElementById('inspiritValue').textContent = inspirit;
-}
-// ———————————————————————— INIT ————————————————————————
-window.addEventListener('dataLoaded', () => {
-    TooltipManager.init();
-    populateRoleSelector();
-    ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
-    calculateAbilities();
-    calculateAttributeValues();
-    updateAttributeGroups();
-    updateAllSkillModsAndPassives();
-    ['strike', 'blast', 'invoke'].forEach(t => {
-        const sel = document.getElementById(t + 'SkillRank');
-        if (sel) updateProficiencySelectors(t, parseInt(sel.value) || 0);
-    });
-    updateAbilityTables('talent');
-    updateAbilityTables('trick');
-    calculateDerivedStats();
-    // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
-});
-
-function triggerChange(el) {
-    if (el) {
-        const event = new Event('change', { bubbles: true });
-        el.dispatchEvent(event);
-    }
 }

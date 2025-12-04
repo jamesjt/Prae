@@ -134,41 +134,35 @@ function processTextForTooltips(text) {
     return ph;
   };
 
+  // Extracted replacement applicator
+  function applyReplacements(text, items, getName, type) {
+    items.sort((a, b) => b.length - a.length).forEach(item => {
+      const regex = new RegExp(`\\b${escapeRegExp(item)}\\b`, 'gi');
+      text = text.replace(regex, match => addPlaceholder(type, match));
+    });
+    return text;
+  }
+
   // Rules
-  hoverRulesData.sort((a, b) => b.rule.length - a.rule.length).forEach(r => {
-    const regex = new RegExp(`\\b${escapeRegExp(r.rule)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('rule', match));
-  });
+  text = applyReplacements(text, hoverRulesData.map(r => r.rule), null, 'rule');
 
   // Gear
-  gearData.sort((a, b) => b.name.length - a.name.length).forEach(g => {
-    const regex = new RegExp(`\\b${escapeRegExp(g.name)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('gear', match));
-  });
+  text = applyReplacements(text, gearData.map(g => g.name), null, 'gear');
 
   // Abilities
   const abilityNames = [];
   abilitiesData.forEach(abs => {
     abs.forEach(a => abilityNames.push(a.name));
   });
-  abilityNames.sort((a, b) => b.length - a.length).forEach(n => {
-    const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('ability', match));
-  });
+  text = applyReplacements(text, abilityNames, null, 'ability');
 
   // Proficiencies
   const profNames = [...profData.strike, ...profData.blast, ...profData.invoke].map(p => p.name);
-  profNames.sort((a, b) => b.length - a.length).forEach(n => {
-    const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('prof', match));
-  });
+  text = applyReplacements(text, profNames, null, 'prof');
 
   // Ways
   const wayNames = waysData.map(w => w.name);
-  wayNames.sort((a, b) => b.length - a.length).forEach(n => {
-    const regex = new RegExp(`\\b${escapeRegExp(n)}\\b`, 'gi');
-    text = text.replace(regex, match => addPlaceholder('way', match));
-  });
+  text = applyReplacements(text, wayNames, null, 'way');
 
   // Now replace all placeholders with actual HTML
   placeholders.forEach(({ ph, html }) => {

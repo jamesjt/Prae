@@ -459,6 +459,7 @@ window.addEventListener('dataLoaded', () => {
     populateRoleSelector();
     ['strike', 'blast', 'invoke'].forEach(type => populateProficiencySelectors(type));
     calculateAbilities();
+    calculateAttributeValues();
     updateAttributeGroups();
     updateAllSkillModsAndPassives();
     ['strike', 'blast', 'invoke'].forEach(t => {

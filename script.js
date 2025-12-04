@@ -233,12 +233,7 @@ window.addEventListener('dataLoaded', () => {
     setupSidebarScrollSync();  // Add this call here
 });
 
-
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
-window.addEventListener('dataLoaded', () => {
-    renderSidebar(allData);
-    renderSections(allData);
-});
 
 // Rest unchanged
 

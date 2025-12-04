@@ -129,28 +129,29 @@ document.addEventListener('change', e => {
             let attackType;
             let profExtra = '';
             if (attackString.includes('strike')) {
-                attackType = 'strikeSkillRank';
-                profExtra = attackString.replace('strike', '').trim();
+                attackType = 'strike';
+                profExtra = attackString.replace('strike', '').trim().toLowerCase();
             } else if (attackString.includes('blast')) {
-                attackType = 'blastSkillRank';
-                profExtra = attackString.replace('blast', '').trim();
+                attackType = 'blast';
+                profExtra = attackString.replace('blast', '').trim().toLowerCase();
             } else if (attackString.includes('invoke')) {
-                attackType = 'invokeSkillRank';
-                profExtra = attackString.replace('invoke', '').trim();
+                attackType = 'invoke';
+                profExtra = attackString.replace('invoke', '').trim().toLowerCase();
             }
             if (attackType) {
-                const attackEl = document.getElementById(attackType);
+                const attackEl = document.getElementById(`${attackType}SkillRank`);
                 if (attackEl) {
                     attackEl.value = '2'; // 3: Trained
                     triggerChange(attackEl);
                 }
                 if (profExtra) {
-                    const profType = attackType.replace('SkillRank', '');
-                    const profEl = document.getElementById(`${profType}ProfSelector1`);
-                    if (profEl) {
-                        const capitalizedExtra = profExtra.charAt(0).toUpperCase() + profExtra.slice(1);
-                        profEl.value = capitalizedExtra;
-                        triggerChange(profEl);
+                    const matchingProf = profData[attackType].find(p => p.name.toLowerCase() === profExtra);
+                    if (matchingProf) {
+                        const profEl = document.getElementById(`${attackType}ProfSelector1`);
+                        if (profEl) {
+                            profEl.value = matchingProf.name;
+                            triggerChange(profEl);
+                        }
                     }
                 }
             }

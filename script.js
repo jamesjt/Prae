@@ -237,7 +237,6 @@ document.getElementById('search').addEventListener('input', e => renderSections(
 
 // Rest unchanged
 
-document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
 function getQueryParam(name) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(name);

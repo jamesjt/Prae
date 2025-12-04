@@ -129,29 +129,28 @@ document.addEventListener('change', e => {
             let attackType;
             let profExtra = '';
             if (attackString.includes('strike')) {
-                attackType = 'strike';
-                profExtra = attackString.replace('strike', '').trim().toLowerCase();
+                attackType = 'strikeSkillRank';
+                profExtra = attackString.replace('strike', '').trim();
             } else if (attackString.includes('blast')) {
-                attackType = 'blast';
-                profExtra = attackString.replace('blast', '').trim().toLowerCase();
+                attackType = 'blastSkillRank';
+                profExtra = attackString.replace('blast', '').trim();
             } else if (attackString.includes('invoke')) {
-                attackType = 'invoke';
-                profExtra = attackString.replace('invoke', '').trim().toLowerCase();
+                attackType = 'invokeSkillRank';
+                profExtra = attackString.replace('invoke', '').trim();
             }
             if (attackType) {
-                const attackEl = document.getElementById(`${attackType}SkillRank`);
+                const attackEl = document.getElementById(attackType);
                 if (attackEl) {
                     attackEl.value = '2'; // 3: Trained
                     triggerChange(attackEl);
                 }
                 if (profExtra) {
-                    const matchingProf = profData[attackType].find(p => p.name.toLowerCase() === profExtra);
-                    if (matchingProf) {
-                        const profEl = document.getElementById(`${attackType}ProfSelector1`);
-                        if (profEl) {
-                            profEl.value = matchingProf.name;
-                            triggerChange(profEl);
-                        }
+                    const profType = attackType.replace('SkillRank', '');
+                    const profEl = document.getElementById(`${profType}ProfSelector1`);
+                    if (profEl) {
+                        const capitalizedExtra = profExtra.charAt(0).toUpperCase() + profExtra.slice(1);
+                        profEl.value = capitalizedExtra;
+                        triggerChange(profEl);
                     }
                 }
             }

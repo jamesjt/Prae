@@ -763,17 +763,15 @@ a.internalLink{
 }
 .save-entry {
     margin: 5px 0;
-    border: 1px solid #d29a38;
 }
 
 .save-link {
     margin-right: 10px;
-    color: #d29a38;
-}
+    color: #ddd;
 
 .save-copy {
     cursor: pointer;
-    color: #d29a38;
+    color: #ddd;
     margin-right: 10px;
 }
 
@@ -784,5 +782,5 @@ a.internalLink{
 }
 
 .no-saves {
-    color: #d29a38;
+    color: #ddd;
 }

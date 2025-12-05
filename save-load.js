@@ -118,18 +118,18 @@ function loadFromCode(code) {
                 triggerChange(el);
             }
         });
+
         Object.entries(state.attrs.subs).forEach(([sub, value]) => {
             const el = document.getElementById(`${sub}Value`);
             if (el) {
                 el.value = value;
-                triggerInput(el); // Input for numbers
                 triggerChange(el);
             }
         });
 
-        // 5. Profs (depends on attack ranks from way/skills)
-        ['strike', 'blast', 'invoke'].forEach(type => {
-            state.profs[type].forEach((prof, i) => {
+        // 5. Proficiencies (depends on attack skills)
+        Object.entries(state.profs).forEach(([type, profs]) => {
+            profs.forEach((prof, i) => {
                 const el = document.getElementById(`${type}ProfSelector${i+1}`);
                 if (el) {
                     el.value = prof;
@@ -205,27 +205,26 @@ function renderSavedCodes() {
     const saves = savesJson ? JSON.parse(savesJson) : [];
 
     if (saves.length === 0) {
-        container.innerHTML = '<p>No saved codes yet.</p>';
+        container.innerHTML = '<p class="no-saves">No saved codes yet.</p>';
         return;
     }
 
     saves.forEach((item, index) => {
         const div = document.createElement('div');
+        div.className = 'save-entry';
         const link = document.createElement('a');
+        link.className = 'save-link';
         link.href = '#';
         const truncatedCode = item.code.length > 20 ? item.code.substring(0, 20) + '...' : item.code;
         link.textContent = `${item.name}: [${truncatedCode}]`;
-        link.style.marginRight = '10px';
         link.addEventListener('click', (e) => {
             e.preventDefault();
             loadFromCode(item.code);
         });
 
         const copySpan = document.createElement('span');
+        copySpan.className = 'save-copy';
         copySpan.textContent = 'Copy';
-        copySpan.style.cursor = 'pointer';
-        copySpan.style.color = 'blue';
-        copySpan.style.marginRight = '10px';
         copySpan.addEventListener('click', () => {
             navigator.clipboard.writeText(item.code).then(() => {
                 alert('Full code copied to clipboard!');
@@ -235,10 +234,8 @@ function renderSavedCodes() {
         });
 
         const deleteSpan = document.createElement('span');
+        deleteSpan.className = 'save-delete';
         deleteSpan.textContent = 'X';
-        deleteSpan.style.cursor = 'pointer';
-        deleteSpan.style.color = 'red';
-        deleteSpan.style.marginLeft = '5px';
         deleteSpan.addEventListener('click', () => {
             saves.splice(index, 1);
             setCookie('savedCodes', JSON.stringify(saves));
@@ -248,7 +245,6 @@ function renderSavedCodes() {
         div.appendChild(link);
         div.appendChild(copySpan);
         div.appendChild(deleteSpan);
-        div.style.margin = '5px 0';
         container.appendChild(div);
     });
 }

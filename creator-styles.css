@@ -761,3 +761,28 @@ a.internalLink{
   border-radius: 3px;
   cursor:alias;
 }
+.save-entry {
+    margin: 5px 0;
+    border: 1px solid #d29a38;
+}
+
+.save-link {
+    margin-right: 10px;
+    color: #d29a38;
+}
+
+.save-copy {
+    cursor: pointer;
+    color: #d29a38;
+    margin-right: 10px;
+}
+
+.save-delete {
+    cursor: pointer;
+    color: red;
+    margin-left: 5px;
+}
+
+.no-saves {
+    color: #d29a38;
+}

@@ -25,8 +25,8 @@ const ATTRIBUTE_GROUPS = {
 let talentAmount = 1;
 let tricksAmount = 1;
 
-// New helper: Populate selectors for a single proficiency type
-function populateSingleProfType(type, profs) {
+function populateProficiencySelectors(type) {
+    const profs = profData[type] || [];
     const saved = {};
     for (let i = 1; i <= 5; i++) {
         const sel = document.getElementById(type + 'ProfSelector' + i);
@@ -51,11 +51,6 @@ function populateSingleProfType(type, profs) {
             }
         }
     }
-}
-
-function populateProficiencySelectors(type) {
-    const profs = profData[type] || [];
-    populateSingleProfType(type, profs);
 }
 // Update updateProficiencySelectors to call population after visibility
 function updateProficiencySelectors(type, rank) {

@@ -13,8 +13,6 @@ let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
 let hoverRulesData = [];
-let abilityFieldOrders = {}; // New global for dynamic field orders
-
 // Generic fetch + parse function
 async function fetchAndParseCsv(url, customParser = null) {
     try {
@@ -43,7 +41,6 @@ async function fetchAndParseCsv(url, customParser = null) {
         throw err; // Re-throw for callers
     }
 }
-
 // Parser for main CSV (your original organizeRows logic)
 function parseRulebook(rows) {
     const dataRows = rows.slice(1).map(values => ({  // Skip header row
@@ -66,59 +63,37 @@ function parseRulebook(rows) {
     });
     return organized;
 }
-
 // Parser for abilities CSV (moved from creator-scripts.js)
 function parseAbilities(rows) {
     const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
     const abilitiesMap = new Map();
-    const fieldOrders = { talent: [], trick: [], ritual: [] }; // To store ordered fields per type
-    const hasCollectedFields = { talent: false, trick: false, ritual: false }; // Track if collected for type
-    let currentFields = []; // Temp array for current ability's fields
-
     skills.forEach((skill, colIndex) => {
         let currentAbility = null;
-        let currentType = null;
         for (let r = 1; r < rows.length; r++) {
             const keyCell = rows[r][0]?.trim() || '';
             const valueCell = rows[r][colIndex + 1]?.trim() || '';
             if (keyCell.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
-                // Finish previous ability if exists
                 if (currentAbility) {
-                    currentAbility.details['Name'] = currentAbility.name;
+                    currentAbility.details['Name'] = currentAbility.name; // Add name to details
                     if (!abilitiesMap.has(skill)) abilitiesMap.set(skill, []);
                     abilitiesMap.get(skill).push(currentAbility);
-
-                    // If first of type, save the field order
-                    if (!hasCollectedFields[currentType]) {
-                        fieldOrders[currentType] = currentFields;
-                        hasCollectedFields[currentType] = true;
-                    }
                 }
                 const typeMatch = keyCell.match(/^(Talent|Trick|Ritual)/i);
-                currentType = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
-                currentAbility = { type: currentType, name: valueCell || `(Unnamed ${currentType})`, skill, details: {} };
-                currentFields = ['Name']; // Start with Name as first field
+                const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
+                currentAbility = { type, name: valueCell || `(Unnamed ${type})`, skill, details: {} };
             } else if (currentAbility && keyCell.includes(' ')) {
                 const detailKey = keyCell.split(' ').slice(2).join(' ');
                 currentAbility.details[detailKey] = valueCell;
-                currentFields.push(detailKey); // Collect in order
             }
         }
-        // Finish last ability
         if (currentAbility) {
-            currentAbility.details['Name'] = currentAbility.name;
+            currentAbility.details['Name'] = currentAbility.name; // Add name to details
             if (!abilitiesMap.has(skill)) abilitiesMap.set(skill, []);
             abilitiesMap.get(skill).push(currentAbility);
-
-            if (!hasCollectedFields[currentType]) {
-                fieldOrders[currentType] = currentFields;
-                hasCollectedFields[currentType] = true;
-            }
         }
     });
-    return { abilitiesMap, fieldOrders };
+    return abilitiesMap;
 }
-
 // Parser for ways CSV (moved from creator-scripts.js)
 function parseWays(rows) {
     const includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
@@ -137,16 +112,21 @@ function parseWays(rows) {
             for (let k in props) {
                 props[k] = props[k].replace(/(\w+)">(\1)/g, '$1');
             }
-            const nameKey = Object.keys(props).find(k => k.includes('name'));
-            if (nameKey && props[nameKey]) {
-                parsedWays.push({ name: props[nameKey], props });
+            const nameKey = Object.keys(props).find(k => k.includes('way name'));
+            const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
+            const name = nameKey ? props[nameKey] : '';
+            const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
+            if (name && reqSkill) {
+                const skillId = reqSkill.trim() === 'Any' ? 'Any' : SKILL_ID_MAP[reqSkill.trim()];
+                if (skillId || reqSkill.trim() === 'Any') {
+                    parsedWays.push({ name, props, reqSkill: reqSkill.trim(), skillId });
+                }
             }
         }
     }
     return parsedWays;
 }
-
-// Parser for rules CSV (generalized from prefixMap logic; includes profs, gear, hoverRules)
+// Parser for rules CSV (renamed from parseChar for clarity)
 function parseRules(rows) {
     const headers = rows[0].map(h => h.trim().toLowerCase()); // Normalize to lower for matching
     const catIdx = headers.indexOf('datacategory');
@@ -246,7 +226,6 @@ function parseRules(rows) {
     // Return all parsed parts
     return { dataByCategory, hoverRules };
 }
-
 // Main load function (loads all in parallel)
 async function loadAllData() {
     try {
@@ -258,9 +237,7 @@ async function loadAllData() {
         ]);
         // Parse each
         allData = parseRulebook(rulebookRows);
-        const { abilitiesMap, fieldOrders } = parseAbilities(abilitiesRows);
-        abilitiesData = abilitiesMap;
-        abilityFieldOrders = fieldOrders;
+        abilitiesData = parseAbilities(abilitiesRows);
         waysData = parseWays(waysRows);
         const { dataByCategory, hoverRules } = parseRules(rulesRows);
         gearData = dataByCategory.gear || [];

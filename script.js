@@ -231,15 +231,12 @@ function addAbilityFieldClasses() {
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
         const children = div.children;
-        if (children.length < 7) return; // Skip if not full structure
-        children[0].classList.add(`${type}Name`);
-        children[1].classList.add(`${type}Keywords`);
-        children[2].classList.add(`${type}Description`);
-        children[3].classList.add(`${type}Cost`);
-        children[4].classList.add(`${type}EffectSm`);
-        children[5].classList.add(`${type}EffectBig`);
-        children[6].classList.add(`${type}ManaUse`);
-        // Add more if other fields exist in some abilities
+        const fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Cost`, `${type}EffectSm`, `${type}EffectBig`, `${type}ManaUse`];
+        fieldClasses.forEach((className, idx) => {
+            if (children[idx]) {
+                children[idx].classList.add(className);
+            }
+        });
     });
 }
 

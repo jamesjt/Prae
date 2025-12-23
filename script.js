@@ -230,36 +230,12 @@ function addAbilityFieldClasses() {
     const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
-        if (div.children.length === 0) return;
-
-        // Extract name from first child (strip skill suffix like " (Lore)")
-        const fullName = div.children[0].textContent.trim();
-        const name = fullName.replace(/ \(.+\)$/, '');
-        const skillMatch = fullName.match(/\((.+)\)$/);
-        const skill = skillMatch ? skillMatch[1].toLowerCase() : null;
-
-        // Find matching ability
-        let ability = null;
-        if (skill && abilitiesData.has(skill)) {
-            ability = abilitiesData.get(skill).find(a => a.name === name && a.type === type);
-        }
-        if (!ability) {
-            // Fallback: search all skills
-            for (const abs of abilitiesData.values()) {
-                ability = abs.find(a => a.name === name && a.type === type);
-                if (ability) break;
-            }
-        }
-        if (!ability) return; // Skip if not found
-
         const orders = abilityFieldOrders[type] || [];
-        let childIdx = 0;
-        orders.forEach(field => {
-            if (ability.details[field]?.trim()) {
-                if (div.children[childIdx]) {
-                    div.children[childIdx].classList.add(`${type}-${field.toLowerCase()}`);
-                }
-                childIdx++;
+        const fieldClasses = orders.map(f => `${type}-${f.toLowerCase()}`);
+        const children = div.children;
+        fieldClasses.forEach((className, idx) => {
+            if (children[idx]) {
+                children[idx].classList.add(className);
             }
         });
     });

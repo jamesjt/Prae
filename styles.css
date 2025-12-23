@@ -147,7 +147,7 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 .talent-name{background-color: rgba(88,89,96,1);}
 .ritual-name{background-color: rgba(8,55,99,1);}
 .talent-keywords,.talent-passive,.talent-effect,.trick-keywords,.trick-cost,.trick-effectbig{color:black;background-color: rgba(239,239,239,1);padding:0px 7px;}
-.talent-description, .talent-active, .trick-description,.trick-effectsm,.trick-mana-use{background-color: rgba(217,217,217,1); padding:0px 7px;color:black;}
+.talent-description, .talent-active, .trick-description,.trick-effectsm,.trick-manause{background-color: rgba(217,217,217,1); padding:0px 7px;color:black;}
 
 
 .ability-trick{margin-right:15px;}

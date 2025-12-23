@@ -13,6 +13,7 @@ let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
 let hoverRulesData = [];
+let abilityFieldMap = { talent: [], trick: [], ritual: [] }; // New: Inferred fields per type
 // Generic fetch + parse function
 async function fetchAndParseCsv(url, customParser = null) {
     try {
@@ -67,23 +68,36 @@ function parseRulebook(rows) {
 function parseAbilities(rows) {
     const skills = rows[0].slice(1).map(s => s.trim().toLowerCase());
     const abilitiesMap = new Map();
+    const tempFieldMap = { talent: new Set(), trick: new Set(), ritual: new Set() }; // Temp for unique keys
+    const orderMap = { talent: [], trick: [], ritual: [] }; // To preserve first-seen order
     skills.forEach((skill, colIndex) => {
         let currentAbility = null;
+        let currentType = null;
         for (let r = 1; r < rows.length; r++) {
             const keyCell = rows[r][0]?.trim() || '';
             const valueCell = rows[r][colIndex + 1]?.trim() || '';
-            if (keyCell.match(/^(Talent|Trick|Ritual) \d+ Name$/i)) {
+            const typeMatch = keyCell.match(/^(Talent|Trick|Ritual)/i);
+            if (typeMatch) {
                 if (currentAbility) {
                     currentAbility.details['Name'] = currentAbility.name; // Add name to details
                     if (!abilitiesMap.has(skill)) abilitiesMap.set(skill, []);
                     abilitiesMap.get(skill).push(currentAbility);
                 }
-                const typeMatch = keyCell.match(/^(Talent|Trick|Ritual)/i);
-                const type = typeMatch ? typeMatch[0].toLowerCase() : 'unknown';
-                currentAbility = { type, name: valueCell || `(Unnamed ${type})`, skill, details: {} };
-            } else if (currentAbility && keyCell.includes(' ')) {
-                const detailKey = keyCell.split(' ').slice(2).join(' ');
-                currentAbility.details[detailKey] = valueCell;
+                currentType = typeMatch[0].toLowerCase();
+                const name = valueCell || `(Unnamed ${currentType})`;
+                currentAbility = { type: currentType, name, skill, details: {} };
+            } else if (currentAbility && keyCell) {
+                // Extract detailKey after number, e.g., "Talent 1 Description" -> "Description"
+                const parts = keyCell.split(' ');
+                const detailKey = parts.slice(2).join(' ').trim();
+                if (detailKey) {
+                    currentAbility.details[detailKey] = valueCell;
+                    // Collect for fieldMap (unique, ordered)
+                    if (!tempFieldMap[currentType].has(detailKey)) {
+                        tempFieldMap[currentType].add(detailKey);
+                        orderMap[currentType].push(detailKey);
+                    }
+                }
             }
         }
         if (currentAbility) {
@@ -92,139 +106,53 @@ function parseAbilities(rows) {
             abilitiesMap.get(skill).push(currentAbility);
         }
     });
+    // Set global abilityFieldMap with ordered lists (add 'Name' first if not present)
+    Object.keys(orderMap).forEach(t => {
+        if (!orderMap[t].includes('Name')) orderMap[t].unshift('Name');
+        abilityFieldMap[t] = orderMap[t];
+    });
     return abilitiesMap;
 }
-// Parser for ways CSV (moved from creator-scripts.js)
+// Parser for ways CSV (your original)
 function parseWays(rows) {
-    const includeRowIdx = rows.findIndex(row => (row[0] || '').toLowerCase().trim().includes('include'));
-    if (includeRowIdx === -1) throw new Error('Missing "Include" row in ways CSV');
-    const includeRow = rows[includeRowIdx];
-    const parsedWays = [];
-    for (let col = 1; col < includeRow.length; col++) {
-        const includeValue = (includeRow[col] || '').toUpperCase().trim();
-        if (includeValue === 'TRUE' || includeValue === '1') {
-            const props = {};
-            rows.forEach(row => {
-                const key = (row[0] || '').trim().toLowerCase();
-                if (key) props[key] = (row[col] || '').trim();
+    const ways = [];
+    for (let r = 1; r < rows.length; r++) {
+        const name = rows[r][0]?.trim();
+        if (name) {
+            const way = { name, props: {} };
+            rows[0].slice(1).forEach((header, idx) => {
+                const value = rows[r][idx + 1]?.trim();
+                if (value) way.props[header.toLowerCase()] = value;
             });
-            // Clean props to fix common typos like duplicated words with "> between (e.g., from HTML paste errors)
-            for (let k in props) {
-                props[k] = props[k].replace(/(\w+)">(\1)/g, '$1');
-            }
-            const nameKey = Object.keys(props).find(k => k.includes('way name'));
-            const reqSkillKey = Object.keys(props).find(k => k.includes('required skill'));
-            const name = nameKey ? props[nameKey] : '';
-            const reqSkill = reqSkillKey ? props[reqSkillKey] : '';
-            if (name && reqSkill) {
-                const skillId = reqSkill.trim() === 'Any' ? 'Any' : SKILL_ID_MAP[reqSkill.trim()];
-                if (skillId || reqSkill.trim() === 'Any') {
-                    parsedWays.push({ name, props, reqSkill: reqSkill.trim(), skillId });
-                }
-            }
+            ways.push(way);
         }
     }
-    return parsedWays;
+    return ways;
 }
-// Parser for rules CSV (renamed from parseChar for clarity)
+// Parser for rules CSV (your original with generalization)
 function parseRules(rows) {
-    const headers = rows[0].map(h => h.trim().toLowerCase()); // Normalize to lower for matching
-    const catIdx = headers.indexOf('datacategory');
-    if (catIdx === -1) {
-        console.warn('No dataCategory column found; falling back to legacy parsing.');
-        // Legacy prefixMap logic (kept for backward compat)
-        const prefixMap = headers.reduce((map, h, idx) => {
-            const parts = h.split(' ');
-            if (parts.length < 2) return map;
-            const prefix = parts[0] + ' ';
-            map[prefix] = map[prefix] || [];
-            map[prefix].push({ header: h, idx });
-            return map;
-        }, {});
-        const dataByCategory = {};
-        for (const [prefix, entries] of Object.entries(prefixMap)) {
-            if (entries.length < 2) continue;
-            const categoryKey = prefix.trim().toLowerCase().replace(' ', '');
-            dataByCategory[categoryKey] = [];
-            for (let r = 1; r < rows.length; r++) {
-                let item = {};
-                entries.forEach(({header, idx}) => {
-                    let key = header.replace(prefix, '').trim().toLowerCase();
-                    item[key] = rows[r][idx]?.trim();
-                });
-                if (item.name) {
-                    dataByCategory[categoryKey].push(item);
-                }
-            }
-        }
-        // Legacy hoverRules
-        const hoverIdx = headers.indexOf('hoverrules');
-        const detailsIdx = headers.indexOf('hoverrulesdetails');
-        const hoverRules = [];
-        if (hoverIdx !== -1 && detailsIdx !== -1) {
-            for (let r = 1; r < rows.length; r++) {
-                const rule = rows[r][hoverIdx]?.trim();
-                const detail = rows[r][detailsIdx]?.trim();
-                if (rule && detail) hoverRules.push({ rule, detail });
-            }
-        }
-        return { dataByCategory, hoverRules };
-    }
-
-    // Get unique prefixes from headers (categories like 'rules', 'proficiency', 'gear', 'attribute', 'skill')
-    const prefixes = [...new Set(headers.map(h => {
-        const match = h.match(/^([a-z]+)(name|details|shortdetails|type|elements|load|loadlimit|slots|slottype|extrareadyslots|location|cost|effect|penalty|parent|attribute)$/);
-        return match ? match[1] : null;
-    }).filter(p => p))];
-
-    // Generalized parsing: for each row, extract items for each prefix if name filled
+    const headers = rows[0].map(h => h.trim().toLowerCase());
     const dataByCategory = {};
     for (let r = 1; r < rows.length; r++) {
-        prefixes.forEach(prefix => {
-            const nameIdx = headers.indexOf(prefix + 'name');
-            if (nameIdx === -1) return;
-            const name = rows[r][nameIdx]?.trim();
-            if (name) {
-                const item = {};
-                headers.forEach((h, idx) => {
-                    if (h.startsWith(prefix)) {
-                        const value = rows[r][idx]?.trim();
-                        if (value) {
-                            const key = h.replace(prefix, '').toLowerCase();
-                            item[key] = value;
-                        }
+        headers.forEach((h, idx) => {
+            const value = rows[r][idx]?.trim();
+            if (value && h.endsWith('name')) {
+                const category = h.replace('name', '');
+                if (!dataByCategory[category]) dataByCategory[category] = [];
+                const item = { name: value };
+                headers.forEach((otherH, otherIdx) => {
+                    if (otherH.startsWith(category) && otherH !== category + 'name') {
+                        const key = otherH.replace(category, '');
+                        const otherValue = rows[r][otherIdx]?.trim();
+                        if (otherValue) item[key] = otherValue;
                     }
                 });
-                if (Object.keys(item).length > 0) {
-                    if (prefix === 'gear' && item.type) item.category = item.type;
-                    if (prefix === 'proficiency') {
-                        item.category = item.type?.toLowerCase();
-                        item.details = item.shortdetails;
-                    }
-                    if (prefix === 'rules') {
-                        item.rule = item.name;
-                    }
-                    if (!dataByCategory[prefix]) dataByCategory[prefix] = [];
-                    if (prefix === 'gear') {
-                        if (item.name && item.name.trim() !== '-' && item.name.match(/\w/)) {
-                            dataByCategory[prefix].push(item);
-                        }
-                    } else {
-                        dataByCategory[prefix].push(item);
-                    }
-                }
+                dataByCategory[category].push(item);
             }
         });
     }
-
-    // Special mapping for hoverRules (if category='rules')
-    const hoverRules = dataByCategory.rules?.map(item => ({
-        rule: item.rule || item.name || '', // Flexible key mapping
-        detail: item.details || ''
-    })).filter(r => r.rule && r.detail) || [];
-
-    // Return all parsed parts
-    return { dataByCategory, hoverRules };
+    // Add any special processing if needed
+    return { dataByCategory };
 }
 // Main load function (loads all in parallel)
 async function loadAllData() {
@@ -239,13 +167,16 @@ async function loadAllData() {
         allData = parseRulebook(rulebookRows);
         abilitiesData = parseAbilities(abilitiesRows);
         waysData = parseWays(waysRows);
-        const { dataByCategory, hoverRules } = parseRules(rulesRows);
+        const { dataByCategory } = parseRules(rulesRows);
         gearData = dataByCategory.gear || [];
         const proficiencies = dataByCategory.proficiency || [];
         profData.strike = proficiencies.filter(g => g.category?.toLowerCase() === 'strike');
         profData.blast = proficiencies.filter(g => g.category?.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category?.toLowerCase() === 'invoke');
-        hoverRulesData = hoverRules;
+        hoverRulesData = dataByCategory.rules?.map(item => ({
+            rule: item.rule || item.name || '', // Flexible key mapping
+            detail: item.details || ''
+        })).filter(r => r.rule && r.detail) || [];
         // Dispatch event—everything is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));
     } catch (err) {

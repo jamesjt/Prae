@@ -1,3 +1,4 @@
+// script.js
 // Count leading dashes
 function getIndentLevel(text) {
     if (!text) return 0;
@@ -224,10 +225,29 @@ function setupSidebarScrollSync() {
     sections.forEach(section => observer.observe(section));
 }
 
+// New function to add per-field classes to rulebook abilities
+function addAbilityFieldClasses() {
+    const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
+    abilityDivs.forEach(div => {
+        const type = div.className.replace('ability-', '');
+        const children = div.children;
+        if (children.length < 7) return; // Skip if not full structure
+        children[0].classList.add(`${type}Name`);
+        children[1].classList.add(`${type}Keywords`);
+        children[2].classList.add(`${type}Description`);
+        children[3].classList.add(`${type}Cost`);
+        children[4].classList.add(`${type}EffectSm`);
+        children[5].classList.add(`${type}EffectBig`);
+        children[6].classList.add(`${type}ManaUse`);
+        // Add more if other fields exist in some abilities
+    });
+}
+
 window.addEventListener('dataLoaded', () => {
     renderSidebar(allData);
     renderSections(allData);
     setupSidebarScrollSync();  // Add this call here
+    addAbilityFieldClasses(); // Post-render class addition
 });
 
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));

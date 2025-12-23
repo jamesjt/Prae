@@ -169,7 +169,7 @@ function processTextForTooltips(text) {
   text = applyReplacements(text, waysData, w => w.name, 'way');
 
   // Now replace all placeholders with actual HTML
-  placeholders.forEach(({ ph, html } ) => {
+  placeholders.forEach(({ ph, html }) => {
     text = text.replace(ph, html);
   });
 
@@ -230,11 +230,11 @@ function addAbilityFieldClasses() {
     const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
-        const fields = abilityFieldMap[type] || []; // From global inferred in data.js
         const children = div.children;
-        fields.forEach((field, idx) => {
+        const fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Cost`, `${type}EffectSm`, `${type}EffectBig`, `${type}ManaUse`];
+        fieldClasses.forEach((className, idx) => {
             if (children[idx]) {
-                children[idx].classList.add(`${type}${field}`);
+                children[idx].classList.add(className);
             }
         });
     });

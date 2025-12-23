@@ -25,23 +25,6 @@ const ATTRIBUTE_GROUPS = {
 let talentAmount = 1;
 let tricksAmount = 1;
 
-// New: Shared logic for ability field HTML with class mapping (extracted from populateAbilityInfo)
-function makeAbilityHTML(ability, type) {
-    let html = '';
-    const classMap = {
-        'Trigger': (type === 'trick' || type === 'ritual') ? 'EffectSm' : 'Trigger',
-        'Effect': (type === 'trick' || type === 'ritual') ? 'EffectBig' : 'Effect',
-        'Mana Use': 'ManaUse'
-    };
-    ['Keywords', 'Description', 'Passive', 'Active', 'Cost', 'Trigger', 'Effect', 'Mana Use', 'Enhancements', 'Augments'].forEach(key => {
-        if (ability.details[key]) {
-            const cls = classMap[key] || key;
-            html += `<div class="${type}${cls}">${ability.details[key]}</div>`;
-        }
-    });
-    return html;
-}
-
 // New helper: Populate selectors for a single proficiency type
 function populateSingleProfType(type, profs) {
     const saved = {};

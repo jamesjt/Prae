@@ -227,17 +227,10 @@ function setupSidebarScrollSync() {
 
 // New function to add per-field classes to rulebook abilities
 function addAbilityFieldClasses() {
-    // Define type-specific field orders based on spreadsheet structure
-    const fieldOrders = {
-        talent: ['Name', 'Keywords', 'Description', 'Passive', 'Active', 'Effect'],
-        trick: ['Name', 'Keywords', 'Description', 'Cost', 'EffectSm', 'EffectBig', 'ManaUse'],
-        ritual: ['Name', 'Trick', 'Keywords', 'Cost', 'CastTime', 'Duration', 'ShortDescEffect', 'Effect', 'Enhancements', 'Augments', 'Resist', 'Description']
-    };
-
     const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
-        const orders = fieldOrders[type] || [];
+        const orders = abilityFieldOrders[type] || [];
         const fieldClasses = orders.map(f => `${type}-${f.toLowerCase()}`);
         const children = div.children;
         fieldClasses.forEach((className, idx) => {

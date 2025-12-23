@@ -241,8 +241,30 @@ function updateAttributeGroups() {
     // Implementation for updating attribute groups
 }
 
+function updateSingleSkillModAndPassive(skillId) {
+    const rankEl = document.getElementById(skillId);
+    if (!rankEl) return;
+    const rank = parseInt(rankEl.value) || 0;
+    const attrId = SKILL_MOD_MAP[skillId];
+    const attrValue = parseInt(document.getElementById(attrId)?.value) || 0;
+    const modId = skillId.replace('SkillRank', 'Mod').replace('Rank', 'Mod'); // e.g., 'athleticsSkillRank' -> 'athleticsMod'
+    const modEl = document.getElementById(modId);
+    if (modEl) modEl.textContent = rank + attrValue;
+
+    let passiveId = skillId.replace('SkillRank', 'Passive').replace('Rank', 'Passive');
+    const passiveEl = document.getElementById(passiveId);
+    if (passiveEl) passiveEl.textContent = ''; // Default empty for non-attack skills; extend if needed for specific skills
+
+    // For attack skills, update damage instead (base 3 + rank)
+    if (skillId.includes('strike') || skillId.includes('blast') || skillId.includes('invoke')) {
+        const damageId = skillId.replace('SkillRank', 'Damage').replace('Rank', 'Damage');
+        const damageEl = document.getElementById(damageId);
+        if (damageEl) damageEl.textContent = 3 + rank;
+    }
+}
+
 function updateAllSkillModsAndPassives() {
-    Object.keys(SKILL_ID_MAP).forEach(skillId => updateSingleSkillModAndPassive(skillId));
+    Object.keys(SKILL_ID_MAP).forEach(skill => updateSingleSkillModAndPassive(SKILL_ID_MAP[skill]));
 }
 
 function updateProficiencySelectors(type, rank) {

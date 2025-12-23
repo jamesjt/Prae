@@ -67,6 +67,43 @@ function renderSidebar(data) {
     }
 }
 
+// New: Shared logic for ability field HTML with class mapping
+function makeAbilityHTML(ability, type) {
+    let html = '';
+    const classMap = {
+        'Trigger': (type === 'trick' || type === 'ritual') ? 'EffectSm' : 'Trigger',
+        'Effect': (type === 'trick' || type === 'ritual') ? 'EffectBig' : 'Effect',
+        'Mana Use': 'ManaUse'
+    };
+    ['Keywords', 'Description', 'Passive', 'Active', 'Cost', 'Trigger', 'Effect', 'Mana Use', 'Enhancements', 'Augments'].forEach(key => {
+        if (ability.details[key]) {
+            const cls = classMap[key] || key;
+            html += `<div class="${type}${cls}">${ability.details[key]}</div>`;
+        }
+    });
+    return html;
+}
+
+// New: Render structured abilities for special sections
+function renderAbilitiesSection(header) {
+    const type = header.toLowerCase().slice(0, -1); // 'Talents' -> 'talent'
+    let html = '<div class="ability-group-container">';
+    for (let [skill, abs] of abilitiesData) {
+        const matching = abs.filter(a => a.type === type);
+        if (matching.length > 0) {
+            html += `<h4>${skill.charAt(0).toUpperCase() + skill.slice(1)}</h4>`;
+            matching.forEach(a => {
+                html += `<div class="ability-${type}">`;
+                html += `<div class="${type}Name">${a.name} (${skill})</div>`;
+                html += makeAbilityHTML(a, type);
+                html += '</div>';
+            });
+        }
+    }
+    html += '</div>';
+    return html;
+}
+
 // Render sections with dash indentation
 function renderSections(data, term = '') {
     try {
@@ -80,9 +117,13 @@ function renderSections(data, term = '') {
                 html += `
                     <div class="section" id="${header.replace(/\s+/g, '-')}">
                         <h3>${header}</h3>
-                        <div class="section-content">${processed}</div>
-                    </div>
                 `;
+                if (['Talents', 'Tricks', 'Rituals'].includes(header)) {
+                    html += renderAbilitiesSection(header);
+                } else {
+                    html += `<div class="section-content">${processed}</div>`;
+                }
+                html += `</div>`;
                 filtered[header].subitems.forEach(sub => {
                     const isTraea = sub.name.toLowerCase().includes('traea');
                     const subProcessed = processDetails(sub.details);
@@ -225,32 +266,10 @@ function setupSidebarScrollSync() {
     sections.forEach(section => observer.observe(section));
 }
 
-// New function to add per-field classes to rulebook abilities
-function addAbilityFieldClasses() {
-    const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
-    abilityDivs.forEach(div => {
-        const type = div.className.replace('ability-', '');
-        let fieldClasses;
-        if (type === 'talent') {
-            fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Passive`, `${type}Active`, `${type}Effect`];
-        } else {
-            // For tricks and rituals, assume Cost/Trigger/Effect structure (update if CSV differs)
-            fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Cost`, `${type}Trigger`, `${type}Effect`];
-        }
-        const children = div.children;
-        fieldClasses.forEach((className, idx) => {
-            if (children[idx]) {
-                children[idx].classList.add(className);
-            }
-        });
-    });
-}
-
 window.addEventListener('dataLoaded', () => {
     renderSidebar(allData);
     renderSections(allData);
     setupSidebarScrollSync();  // Add this call here
-    addAbilityFieldClasses(); // Post-render class addition
 });
 
 document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));

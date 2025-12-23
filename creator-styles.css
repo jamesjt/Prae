@@ -682,7 +682,7 @@ a.internalLink{
 
 .attvalue{width:30px;}
 
-
+.hoverRules{border-bottom:1px dotted black;}
 .hoverRule{border-bottom:1px dotted black;}
 .hoverExpr{border-bottom: 1px dotted black;}
 .gearDetails {

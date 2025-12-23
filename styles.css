@@ -143,17 +143,22 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 }
 
 .trick-name, .talent-name, .ritual-name{color:whitesmoke;font-variant: small-caps;padding:0px 7px;font-size:20px;border-radius:8px 8px 0px 0px;}
+.trick-name{background-color: rgba(114,133,126,1);}
+.talent-name{background-color: rgba(88,89,96,1);}
+.ritual-name{background-color: rgba(8,55,99,1);}
+.talent-keywords,.talent-passive,.talent-effect,.trick-keywords,.trick-cost,.trick-effectbig{color:black;background-color: rgba(239,239,239,1);padding:0px 7px;}
+
+
+
 .ability-trick{margin-right:15px;}
 .gear-list,.level-list{font-family: "Times New Roman", serif;}
-.ability-trick div:nth-of-type(2n),.ability-talent div:nth-of-type(2n),.ability-ritual div:nth-of-type(2n),.gear-list div:nth-of-type(2n),.level-list div:nth-of-type(2n){
+.gear-list div:nth-of-type(2n),.level-list div:nth-of-type(2n){
     color:black;background-color: rgba(239,239,239,1);padding:0px 7px;
 }
 .ability-ritual div:nth-of-type(2n+1){color:black;background-color: rgba(217,228,237,1);padding:0px 7px;}
 .gear-list div:nth-of-type(2n+1),.level-list div:nth-of-type(2n+1){color:black;background-color: rgba(226,210,197,1);padding:0px 7px;}
 .ability-trick div:last-of-type,.ability-talent div:last-of-type,.ability-ritual div:last-of-type{border-radius: 0 0 8px 8px;}
 
-.trick-name{background-color: rgba(114,133,126,1);}
-.talent-name{background-color: rgba(88,89,96,1);}
-.ritual-name{background-color: rgba(8,55,99,1);}
+
 .gear-list div:first-child,.level-list div:first-child{background-color: rgba(74,53,34,1);padding:0px 7px;color:whitesmoke;}
 .way-text{margin-right:15px;}

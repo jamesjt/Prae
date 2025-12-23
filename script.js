@@ -230,14 +230,8 @@ function addAbilityFieldClasses() {
     const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
-        let fieldClasses;
-        if (type === 'talent') {
-            fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Passive`, `${type}Active`, `${type}Effect`];
-        } else {
-            // For tricks and rituals, assume Cost/Trigger/Effect structure (update if CSV differs)
-            fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Cost`, `${type}Trigger`, `${type}Effect`];
-        }
         const children = div.children;
+        const fieldClasses = [`${type}Name`, `${type}Keywords`, `${type}Description`, `${type}Cost`, `${type}EffectSm`, `${type}EffectBig`, `${type}ManaUse`];
         fieldClasses.forEach((className, idx) => {
             if (children[idx]) {
                 children[idx].classList.add(className);

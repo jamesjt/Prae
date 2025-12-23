@@ -225,21 +225,23 @@ function setupSidebarScrollSync() {
     sections.forEach(section => observer.observe(section));
 }
 
-// New function to add per-field classes to rulebook abilities
+// Shared helper to add classes to ability field containers
+function addAbilityFieldClassesToContainer(container, type) {
+    const children = container.children;
+    const fieldOrder = ['Name', 'Keywords', 'Description', 'Cost', 'EffectSm', 'EffectBig', 'ManaUse'];
+    fieldOrder.forEach((field, idx) => {
+        if (children[idx]) {
+            children[idx].classList.add(`${type}${field}`);
+        }
+    });
+}
+
+// Updated function to add per-field classes to rulebook abilities
 function addAbilityFieldClasses() {
     const abilityDivs = document.querySelectorAll('.ability-talent, .ability-trick, .ability-ritual');
     abilityDivs.forEach(div => {
         const type = div.className.replace('ability-', '');
-        const children = div.children;
-        if (children.length < 7) return; // Skip if not full structure
-        children[0].classList.add(`${type}Name`);
-        children[1].classList.add(`${type}Keywords`);
-        children[2].classList.add(`${type}Description`);
-        children[3].classList.add(`${type}Cost`);
-        children[4].classList.add(`${type}EffectSm`);
-        children[5].classList.add(`${type}EffectBig`);
-        children[6].classList.add(`${type}ManaUse`);
-        // Add more if other fields exist in some abilities
+        addAbilityFieldClassesToContainer(div, type);
     });
 }
 

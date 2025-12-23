@@ -683,19 +683,7 @@ a.internalLink{
 .attvalue{width:30px;}
 
 
-.hoverRule{border-bottom:1px dotted black;position:relative;}
-.hoverRule::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-
-  width: 25px;   /* corner size */
-  height: 25px;
-
-  border-bottom: 4px solid #d29a38;
-  border-right:  4px solid #d29a38;
-}
+.hoverRule{border-bottom:1px dotted black;}
 .hoverExpr{border-bottom: 1px dotted black;}
 .gearDetails {
     width: 12px;

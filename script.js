@@ -98,6 +98,10 @@ function renderSections(data, term = '') {
                         if (attackSkill) {
                             subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
                         }
+                        const proficiency = way.props['granted proficiency'] || '';
+                        if (proficiency) {
+                            subProcessed = subProcessed.replace(/(<div><b>Attack Skill:<\/b>.*?<\/div>)/, `$1<div><b>Granted Proficiency:<\/b> ${proficiency}</div>`);
+                        }
                     }
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">

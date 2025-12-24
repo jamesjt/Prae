@@ -351,43 +351,16 @@ function evaluateExpr(expr) {
 
   return Math.floor(tokens[0]) || 0; // Final floor for safety
 }
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 function escapeHtml(string) {
     return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 function processWithTooltips(text) {
-    let processed = text;
-    hoverRulesData.forEach(({ rule, detail }) => {
-        const regex = new RegExp(`\\b${escapeRegExp(rule)}\\b`, 'gi');
-        processed = processed.replace(regex,`<span class="hoverRules" data-tip="rule:${rule}">$&</span>`);
-
-    });
-    // Collect ability matchers: map from matchName (full or base) to fullName for data-tip
-    const abilityMatchers = new Map();
-    abilitiesData.forEach(abilities => {
-        abilities.forEach(ability => {
-            const fullName = ability.name;
-            const capitalizedSkill = ability.skill.charAt(0).toUpperCase() + ability.skill.slice(1);
-            const suffix = ` (${capitalizedSkill})`;
-            abilityMatchers.set(fullName, fullName);
-            if (fullName.endsWith(suffix)) {
-                const baseName = fullName.slice(0, -suffix.length);
-                if (!abilityMatchers.has(baseName)) { // Avoid conflicts; first wins
-                    abilityMatchers.set(baseName, fullName);
-                }
-            }
-        });
-    });
-    // Sort by length descending to replace longer phrases first
-    const sortedMatchers = Array.from(abilityMatchers.entries()).sort((a, b) => b[0].length - a[0].length);
-    // Wrap ability names/base names
-    sortedMatchers.forEach(([matchName, fullName]) => {
-        const regex = new RegExp(`\\b${escapeRegExp(matchName)}\\b`, 'gi');
-        processed = processed.replace(regex, `<span class="hoverAbility" data-tip="ability:${fullName}">$&</span>`);
-    });
-    return processed;
+    const classMap = {
+        rule: 'hoverRules',
+        ability: 'hoverAbility'
+    };
+    const allowedTypes = new Set(['rule', 'ability']);
+    return applyTooltipMatcher(text, { allowedTypes, classMap });
 }
 function populateAbilityInfo(selectId, abilities, type) {
     const value = document.getElementById(selectId)?.value;

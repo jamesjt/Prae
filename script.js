@@ -136,62 +136,15 @@ function filterData(data, term) {
 
 // Add to script.js (new function)
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function processTextForTooltips(text) {
-  // Use placeholders to avoid chained replacements affecting inserted HTML
-  const placeholders = [];
-  let placeholderIndex = 0;
-
-  // Helper to add placeholder for a match
-  const addPlaceholder = (type, match) => {
-    const ph = `{tip:${placeholderIndex}}`;
-    placeholders.push({ ph, html: `<span class="hover${type.charAt(0).toUpperCase() + type.slice(1)}" data-tip="${type}:${match}">${match}</span>` });
-    placeholderIndex++;
-    return ph;
+  const classMap = {
+    rule: 'hoverRule',
+    gear: 'hoverGear',
+    ability: 'hoverAbility',
+    prof: 'hoverProf',
+    way: 'hoverWay'
   };
-
-  // Extracted replacement applicator
-  function applyReplacements(text, items, getName, type) {
-    items.sort((a, b) => (getName(b) || '').length - (getName(a) || '').length);
-    items.forEach(item => {
-      const name = getName(item);
-      if (name) {
-        const regex = new RegExp(`\\b${escapeRegExp(name)}\\b`, 'gi');
-        text = text.replace(regex, match => addPlaceholder(type, match));
-      }
-    });
-    return text;
-  }
-
-  // Rules (pre-sorted data)
-  text = applyReplacements(text, hoverRulesData, r => r.rule, 'rule');
-
-  // Gear (pre-sorted data)
-  text = applyReplacements(text, gearData, g => g.name, 'gear');
-
-  // Abilities
-  const abilityNames = [];
-  abilitiesData.forEach(abs => {
-    abs.forEach(a => abilityNames.push(a));
-  });
-  text = applyReplacements(text, abilityNames, a => a.name, 'ability');
-
-  // Proficiencies
-  const profs = [...profData.strike, ...profData.blast, ...profData.invoke];
-  text = applyReplacements(text, profs, p => p.name, 'prof');
-
-  // Ways
-  text = applyReplacements(text, waysData, w => w.name, 'way');
-
-  // Now replace all placeholders with actual HTML
-  placeholders.forEach(({ ph, html }) => {
-    text = text.replace(ph, html);
-  });
-
-  return text;
+  return applyTooltipMatcher(text, { classMap });
 }
 
 // Navigation between sections

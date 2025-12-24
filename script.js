@@ -22,6 +22,83 @@ function processDetails(details) {
     }).filter(p => p).join('<br><br>');
 }
 
+// New function to render structured way content from props
+function renderWayContent(way) {
+    let html = '<div class="way-text">';
+    
+    // Intro fields
+    if (way.props['primary attribute']) {
+        html += `<div><b>Primary Attribute: </b>${way.props['primary attribute']}</div>`;
+    }
+    if (way.props['required skill']) {
+        html += `<div><b>Required Skill:</b> ${way.props['required skill']}</div>`;
+    }
+    if (way.props['suggested skills']) {
+        html += `<div><b>Suggested Skills:</b> ${way.props['suggested skills']}</div>`;
+    }
+    
+    // Derived attack skill
+    const primary = way.props['primary attribute'] || '';
+    const attackMap = { 'Body': 'Strike', 'Mind': 'Blast', 'Spirit': 'Invoke' };
+    const attackSkill = attackMap[primary] || '';
+    if (attackSkill) {
+        html += `<div><b>Attack Skill:</b> ${attackSkill}</div>`;
+    }
+    
+    // Granted proficiency
+    const proficiency = way.props['proficiency'] || '';
+    if (proficiency) {
+        html += `<div><b>Granted Proficiency:</b> ${proficiency}</div>`;
+    }
+    
+    html += '<br>';
+    
+    // Description with tooltips
+    if (way.props['description']) {
+        html += processTextForTooltips(way.props['description']);
+    }
+    
+    html += '</div>';
+    
+    // Abilities container
+    html += '<div class="ability-group-container">';
+    
+    // Talent
+    if (way.props['talent name']) {
+        html += '<div class="ability-talents-container"><div class="ability-talent">';
+        html += `<div class="talent-name">${way.props['talent name']}</div>`;
+        ['keywords', 'description', 'passive', 'active', 'effect'].forEach(field => {
+            const key = `talent ${field}`;
+            if (way.props[key]) {
+                html += `<div class="talent-${field}">${processTextForTooltips(way.props[key])}</div>`;
+            }
+        });
+        html += '</div></div>';
+    }
+    
+    // Tricks (check for up to 2)
+    html += '<div class="ability-tricks-container">';
+    for (let i = 1; i <= 2; i++) {
+        const prefix = i === 1 ? 'trick ' : 'trick2 ';
+        if (way.props[`${prefix}name`]) {
+            html += '<div class="ability-trick">';
+            html += `<div class="trick-name">${way.props[`${prefix}name`]}</div>`;
+            ['keywords', 'description', 'cost', 'effectsm', 'effectbig', 'manause'].forEach(field => {
+                const key = `${prefix}${field}`;
+                if (way.props[key]) {
+                    html += `<div class="trick-${field}">${processTextForTooltips(way.props[key])}</div>`;
+                }
+            });
+            html += '</div>';
+        }
+    }
+    html += '</div>';
+    
+    html += '</div>'; // Close ability-group-container
+    
+    return html;
+}
+
 // Render sidebar
 function renderSidebar(data) {
     try {
@@ -85,23 +162,16 @@ function renderSections(data, term = '') {
                 `;
                 filtered[header].subitems.forEach(sub => {
                     const isTraea = sub.name.toLowerCase().includes('traea');
-                    let subProcessed = processDetails(sub.details);
+                    let subProcessed = '';
                     let imageHtml = '';
                     const way = waysData.find(w => w.name.toLowerCase() === sub.name.toLowerCase());
-                    if (way && way.props.image) {
-                        imageHtml = `<img src="images/rulebookArt/${way.props.image}" alt="${sub.name} Art" class="way-image">`;
-                    }
                     if (way) {
-                        const primary = way.props['primary attribute'] || '';
-                        const attackMap = { 'Body': 'Strike', 'Mind': 'Blast', 'Spirit': 'Invoke' };
-                        const attackSkill = attackMap[primary] || '';
-                        if (attackSkill) {
-                            subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
+                        subProcessed = renderWayContent(way);
+                        if (way.props.image) {
+                            imageHtml = `<img src="images/rulebookArt/${way.props.image}" alt="${sub.name} Art" class="way-image">`;
                         }
-                        const proficiency = way.props['proficiency'] || '';
-                        if (proficiency) {
-                            subProcessed = subProcessed.replace(/(<div><b>Attack Skill:<\/b>.*?<\/div>)/, `$1<div><b>Granted Proficiency:<\/b> ${proficiency}</div>`);
-                        }
+                    } else {
+                        subProcessed = processDetails(sub.details);
                     }
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">

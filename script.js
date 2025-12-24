@@ -98,7 +98,7 @@ function renderSections(data, term = '') {
                         if (attackSkill) {
                             subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
                         }
-                        const proficiency = way.props['granted proficiency'] || '';
+                        const proficiency = way.props['proficiency'] || '';
                         if (proficiency) {
                             subProcessed = subProcessed.replace(/(<div><b>Attack Skill:<\/b>.*?<\/div>)/, `$1<div><b>Granted Proficiency:<\/b> ${proficiency}</div>`);
                         }

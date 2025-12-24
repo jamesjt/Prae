@@ -85,11 +85,19 @@ function renderSections(data, term = '') {
                 `;
                 filtered[header].subitems.forEach(sub => {
                     const isTraea = sub.name.toLowerCase().includes('traea');
-                    const subProcessed = processDetails(sub.details);
+                    let subProcessed = processDetails(sub.details);
                     let imageHtml = '';
                     const way = waysData.find(w => w.name.toLowerCase() === sub.name.toLowerCase());
                     if (way && way.props.image) {
                         imageHtml = `<img src="images/rulebookArt/${way.props.image}" alt="${sub.name} Art" class="way-image">`;
+                    }
+                    if (way) {
+                        const primary = way.props['primary attribute'] || '';
+                        const attackMap = { 'Body': 'Strike', 'Mind': 'Blast', 'Spirit': 'Invoke' };
+                        const attackSkill = attackMap[primary] || '';
+                        if (attackSkill) {
+                            subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
+                        }
                     }
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">

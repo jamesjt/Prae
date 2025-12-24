@@ -161,3 +161,12 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 
 .gear-list div:first-child,.level-list div:first-child{background-color: rgba(74,53,34,1);padding:0px 7px;color:whitesmoke;}
 .way-text{margin-right:15px;}
+
+.way-image {
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

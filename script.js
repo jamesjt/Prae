@@ -86,9 +86,17 @@ function renderSections(data, term = '') {
                 filtered[header].subitems.forEach(sub => {
                     const isTraea = sub.name.toLowerCase().includes('traea');
                     const subProcessed = processDetails(sub.details);
+                    let imageHtml = '';
+                    if (header.startsWith('Ways of')) {
+                        const way = waysData.find(w => w.name.toLowerCase() === sub.name.toLowerCase());
+                        if (way && way.props.image) {
+                            imageHtml = `<img src="images/rulebookArt/${way.props.image}" alt="${sub.name} Art" class="way-image">`;
+                        }
+                    }
                     html += `
                         <div class="section ${isTraea?'traea-section':''}" id="${(header + '-' + sub.name).replace(/\s+/g, '-')}">
                             <h3>${sub.name}</h3>
+                            ${imageHtml}
                             <div class="section-content">${subProcessed}</div>
                         </div>
                     `;

@@ -32,6 +32,9 @@
   --trickColor:rgba(114,133,126,1);
   --talentColor:rgba(88,89,96,1);
   --TraeaGold:#d29a38;
+  --abilityLight:rgba(239,239,239,1);
+  --abilityDark:rgba(217,217,217,1);
+  --panelShadow:0px 0px 10px 3px rgba(10, 10, 10, 0.75);
 }
 .detailsHoverPopoverDraggable{
   position:relative;
@@ -52,7 +55,7 @@
   max-width: 650px;  /* Match charDetails */
   padding: 2px;
   border-radius: 8px;
-  box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
+  box-shadow: var(--panelShadow);
   background-color: #2A2A2A;
   color: whitesmoke;
   cursor: all-scroll;
@@ -69,7 +72,7 @@
     justify-content: center;
     background-color: #a0a0a0;
     border-radius: 5px;
-    color: black;;
+    color: black;
     border: 1px solid black !important;
     max-height:20px;
 }
@@ -99,12 +102,17 @@
     margin: 10px 10px 15px 0px;
 }
 
-.charText{margin-left: 5px;margin-right: 5px;}
+.charText{margin-left: 5px;margin-right: 5px;background-color:white;color:black;border:none;}
+.charText.has-value{background-color:black;color:#d29a38;}
+.charText:hover,.charText:focus{background-color:white !important;color:black !important;}
+.charText::placeholder{color:#888;}
 #charName {width: 120px; height: 12px;}
-#charLvl {width: 29px;}
+#charLvl {width: 29px;background-color:black !important;color:#d29a38 !important;}
 #youth {width: 90px;}
 #training {width: 90px;}
-#roleSelector {width: 110px; margin-left: 5px; margin-right:5px;}
+#roleSelector {width: 110px; margin-left: 5px; margin-right:5px;background-color:white;color:black;border:none;}
+#roleSelector.has-value{background-color:black;color:#d29a38;}
+#roleSelector:hover,#roleSelector:focus{background-color:white !important;color:black !important;}
 #charSave {width: 40px; margin-right:5px; margin-top:4px; border-radius: 6px; padding:2px; background-color:white; float:right;}
 
 .charDetails {
@@ -114,7 +122,7 @@
   left:40px;
   padding:25px;
   border-radius:8px;
-  box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
+  box-shadow: var(--panelShadow);
   /*background: url('../imgs/scrollBackground4.png') no-repeat center top;*/
   background-size: 100% 100%;
   cursor: all-scroll;
@@ -198,9 +206,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     flex-direction: column;
     align-items: center;
 }
-.bodyAtt {}
-.mmindAtt {}
-.spiritAtt {}
 .attributePoints {
     border-radius:  8px;
     width: 40px;
@@ -230,9 +235,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 }
 
 .statsInput{margin-right:10px;}
-.secondaryAttributesWrapper {}
 .secondaryAttributes {display:flex;height:40px;justify-content:center;align-items: center;}
-#secondaryAttributeValues {}
 
 .statsValue{font-size:20px;height:45px;width:80px;text-align:center;background-size:contain; background-repeat: no-repeat;display:flex;justify-content: center;align-items: center;background-position: center center;}
 .statsValue input{font-size:20px;width:40px;color:whitesmoke;background-color:#00000000;border:none;margin-left:39px;margin-top:1px;}
@@ -243,25 +246,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
     text-align: center;
     width:80px;
 }
-
-#maxHPDesc, #marredDesc, #desperateDesc,#deadDesc {}
-#armorDesc{}
-#paceDesc {}
-#guardDesc{}
-#recoveryDesc {}
-#manaDesc{}
-#inspiritDesc{}
-#paceDesc{}
-#maxHpValue{}
-#marredValue{}
-#desperateValue{}
-#deadValue{}
-#paceValue{}
-#manaValue{}
-#inspiritValue{}
-#recovery {}
-#armorValue{}
-#guardValue{}
 
 #armor {background-image: url("images/armor2.png")}
 #vitValue {background-image: url("images/vit.png")}
@@ -385,7 +369,6 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .contents-container {padding-left:10px;background-color:var(--gearLiquids);border:1px inset black;}
 .contents-container select {background-color:var(--gearLiquids);}
 .contents-container input {background-color:var(--gearLiquids);margin-left:5px;}
-.stowedGear{}
 .gearCoinsContainer{display:flex; justify-content: center;align-items: center;font-size: 10px}
 #coinsGold{border-color:#d29a38}
 #coinsTok{border-color: teal}
@@ -394,7 +377,7 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .gearCoinsLabel{font-size:14px}
 .gearCoins{width: 25px !important;border-width: 0px 0px 1px 0px !important; text-align:center;border-style: solid!important; background-color: black;margin-left: 12px;border-radius: 4px;}
 .gearCoins:hover{background-color: white;color:black;}
-#coinInputs{display:flex; border-}
+#coinInputs{display:flex;}
 #totalLoadDisplay{font-size:14px;margin-left:5px;}
 .gearWeapon {background-color:var(--bodyColor0);border:1px inset black;}
 .gearWeapon select {background-color:var(--bodyColor0);}
@@ -441,16 +424,15 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
   width:700px;
   left:-400px;
   top:20px;
-  border: 8px solid var(--mindColor0);;
+  border: 8px solid var(--mindColor0);
   border-radius:8px;
-  box-shadow: 0px 0px 10px 3px rgba(10, 10, 10, 0.75);
+  box-shadow: var(--panelShadow);
   background-color:var(--mindColor3);
   cursor: all-scroll;
   z-index:100;
 }
 
 .ritualBody{width: 700px;max-height: 700px;overflow: scroll;background-color:var(--mindColor3) !important;}
-.ritualHeader{}
 .closeRitual {
   cursor: alias;
   position:absolute;
@@ -494,19 +476,28 @@ select:has(> option[value="priorityUnassigned"]:checked)  {
 .talentSelector{background-color:var(--talentColor) !important;color:white;border:none;padding-left:5px;width:100%;height:25px;font-size: 16px;}
 .talentKeywords{display:none}
 .talentDescription{display:none}
-.talentPassive{color:black;background-color: rgba(217,217,217,1);padding:0px 5px; font-size: 14px;}
-.talentActive{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
-.talentFocus{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
-.talentEffect{color:black;background-color: rgba(217,217,217,1);padding:0px 5px;font-size: 14px;}
-.talentCriticaleffect{color:black;background-color: rgba(217,217,217,1);padding:0px 5px;font-size: 14px;}
+.talentPassive{color:black;background-color: var(--abilityDark);padding:0px 5px; font-size: 14px;}
+.talentActive{color:black;background-color: var(--abilityLight);padding:0px 5px;font-size: 14px;}
+.talentFocus{color:black;background-color: var(--abilityLight);padding:0px 5px;font-size: 14px;}
+.talentEffect{color:black;background-color: var(--abilityDark);padding:0px 5px;font-size: 14px;}
+.talentCriticaleffect{color:black;background-color: var(--abilityDark);padding:0px 5px;font-size: 14px;}
 
 .trickKeywords{display:none}
 .trickDescription{display:none}
-.trickCost{color:black;background-color: rgba(217,217,217,1);padding:0px 5px; font-size: 14px;}
-.trickEffectSm{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
-.trickEffectBig{color:black;background-color: rgba(217,217,217,1);padding:0px 5px;font-size: 14px;}
-.trickManaUse{color:black;background-color: rgba(239,239,239,1);padding:0px 5px;font-size: 14px;}
+.trickCost{color:black;background-color: var(--abilityDark);padding:0px 5px; font-size: 14px;}
+.trickEffectSm{color:black;background-color: var(--abilityLight);padding:0px 5px;font-size: 14px;}
+.trickEffectBig{color:black;background-color: var(--abilityDark);padding:0px 5px;font-size: 14px;}
+.trickManaUse{color:black;background-color: var(--abilityLight);padding:0px 5px;font-size: 14px;}
 
+/* Enhancement/Augment styling — distinct left border accent */
+.talentEnhancements,.trickEnhancements,.ritualEnhancements{
+    color:black;background-color: var(--abilityLight);padding:2px 5px 2px 8px;font-size:14px;
+    border-left:3px solid #d29a38;
+}
+.talentAugments,.trickAugments,.ritualAugments{
+    color:black;background-color: var(--abilityDark);padding:2px 5px 2px 8px;font-size:14px;
+    border-left:3px solid #8B6F47;
+}
 
 .trickWrapper {width:500px;}
 .trickAbility {margin-top: 10px;}
@@ -667,11 +658,7 @@ a.internalLink{
     width: 700px;
     background-color: white;
 }
-.draggable {
-
-}
-
-::-webkit-scrollbar { display:none; !important }
+::-webkit-scrollbar { display:none !important; }
 
 .abilityTable{
     margin-bottom: 15px;
@@ -740,15 +727,6 @@ a.internalLink{
     border: 2px solid #555;
     border-radius: 6px;
 }
-.detailsHoverPopoverDraggable{
-  position:relative;
-  top:4px;
-  height:16px;
-  width:16px;
-  background-color:white;
-  border-radius: 3px;
-  cursor:alias;
-}
 .save-entry {
     margin: 5px 0;
 }
@@ -756,6 +734,7 @@ a.internalLink{
 .save-link {
     margin-right: 10px;
     color: #ddd;
+}
 
 .save-copy {
     cursor: pointer;

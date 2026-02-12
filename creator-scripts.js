@@ -275,6 +275,7 @@ function buildWayGroups() {
             const opt = document.createElement('option');
             opt.value = way.name;
             opt.textContent = way.name;
+            opt.disabled = true;
             unavailGroup.appendChild(opt);
         });
         sel.appendChild(unavailGroup);
@@ -585,6 +586,16 @@ window.addEventListener('dataLoaded', () => {
     updateAbilityTables('trick');
     calculateDerivedStats();
     // Note: gear-scripts.js will also init via 'dataLoaded' (as in your original)
+});
+
+// Toggle has-value class on char info inputs for clean hidden-until-hover styling
+['charName', 'childhood', 'training'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => el.classList.toggle('has-value', el.value.trim() !== ''));
+});
+document.getElementById('roleSelector')?.addEventListener('change', function() {
+    this.classList.toggle('has-value', this.value !== 'wayEmpty');
 });
 
 function calculateDerivedStats() {

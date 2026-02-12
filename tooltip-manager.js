@@ -108,20 +108,25 @@ class TooltipManager {
 
   static rule(key) {
     const rule = key.replace("rule:", "");
-    const entry = hoverRulesData.find(r => r.rule === rule);
+    const entry = ruleByName.get(rule);
     return entry?.detail ?? `(Missing rule: ${rule})`;
   }
 
   static gear(key) {
     const name = key.replace("gear:", "");
-    const item = gearData.find(g => g.name === name);
+    const item = gearByName.get(name);
     if (!item) return `(Gear not found: ${name})`;
+
+    let extra = '';
+    if (item.slots) extra += `Slots: ${item.slots}<br>`;
+    if (item.loadlimit) extra += `Load Limit: ${item.loadlimit}<br>`;
 
     return `
       <div class="tip-gear">
         <strong>${item.name}</strong><br>
-        <div>${item.details}</div> 
+        <div>${item.details}</div>
         Load: ${item.load ?? 0}<br>
+        ${extra}
       </div>`;
   }
 
@@ -137,11 +142,7 @@ class TooltipManager {
 
   static ability(key) {
     const name = key.replace("ability:", "");
-    let ability = null;
-    for (let abs of abilitiesData.values()) {
-      ability = abs.find(a => a.name.toLowerCase() === name.toLowerCase());
-      if (ability) break;
-    }
+    const ability = abilityByName.get(name.toLowerCase());
     if (!ability) return `(Missing ability: ${name})`;
     const typeLower = ability.type.toLowerCase();
     const outerClass = `tip-ability-${typeLower}`;
@@ -168,15 +169,12 @@ class TooltipManager {
 
   static prof(key) {
     const name = key.replace("prof:", "");
-    let prof = null;
-    for (let type in profData) {
-      prof = profData[type].find(p => p.name === name);
-      if (prof) break;
-    }
+    const prof = profByName.get(name);
     if (!prof) return `(Missing proficiency: ${name})`;
+    const typeLabel = prof.category ? TooltipManager.capitalize(prof.category) : '';
     return `
       <div class="tip-prof">
-        <strong>${name}</strong><br>
+        <strong>${name}</strong>${typeLabel ? ` <em>(${typeLabel})</em>` : ''}<br>
         <div>${prof.details}</div>
       </div>`;
   }

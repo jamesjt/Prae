@@ -1,12 +1,49 @@
 // gear-scripts.js
 
-// Add near top constants
-
 let allOptions = [];
 let nonPackOptions = [];
 let liquidsOptions = [];
-let gearSlots = 5; // Dynamic gear slots
+let gearSlots = 5;
 let readyState = Array(gearSlots).fill(null).map(() => ({ gear: '', amt: 1, stowed: [], contents: [] }));
+
+// ———————————————————— Helpers ————————————————————
+
+function createDetailsIcon(entry, item, idPrefix) {
+    if (item?.details?.trim()) {
+        const div = document.createElement('div');
+        div.id = `${idPrefix}-details`;
+        div.className = 'gearDetails';
+        div.textContent = 'i';
+        div.setAttribute("data-tip", `gear:${item.name}`);
+        entry.appendChild(div);
+    }
+}
+
+function updateTypeClass(entry, item, preserveClasses) {
+    entry.classList.forEach(cls => {
+        if (cls.startsWith('gear') && !preserveClasses.includes(cls)) {
+            entry.classList.remove(cls);
+        }
+    });
+    if (item && item.category) {
+        entry.classList.add('gear' + item.category);
+    }
+}
+
+function updateSlotLoad(selectEl, qty, loadDiv) {
+    if (!selectEl || !loadDiv) return;
+    const opt = selectEl.options[selectEl.selectedIndex];
+    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
+    const total = baseLoad * qty;
+    loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
+    loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
+}
+
+function formatLoad(value) {
+    return value > 0 ? value.toFixed(2).replace(/\.?0+$/, '') : '';
+}
+
+// ———————————————————— Gear Selector Population ————————————————————
 
 function populateGearSelector(selectEl, options, placeholder) {
     selectEl.innerHTML = `<option value="emptyStowedGearSlot">${placeholder}</option>`;
@@ -15,7 +52,6 @@ function populateGearSelector(selectEl, options, placeholder) {
         if (!grouped[g.category]) grouped[g.category] = [];
         grouped[g.category].push(g);
     });
-    // Sort groups with '-' first
     const sortedCats = Object.keys(grouped).sort((a, b) => {
         if (a === '-') return -1;
         if (b === '-') return 1;
@@ -25,85 +61,73 @@ function populateGearSelector(selectEl, options, placeholder) {
         const optgroup = document.createElement('optgroup');
         optgroup.label = `-- ${cat} --`;
         grouped[cat].sort((a, b) => a.name.localeCompare(b.name)).forEach(g => {
-            if (g.name && g.name !== '') { // Keep all with name, including '-'
+            if (g.name && g.name !== '') {
                 const opt = document.createElement('option');
                 opt.value = g.name;
                 opt.textContent = g.name;
-                opt.dataset.load = g.load || 0; // No baseLoad in CSV
+                opt.dataset.load = g.load || 0;
                 optgroup.appendChild(opt);
             }
         });
-        if (optgroup.children.length > 0) { // Only add if has options
+        if (optgroup.children.length > 0) {
             selectEl.appendChild(optgroup);
         }
     });
 }
 
+// ———————————————————— Rebuild Gear (uses DocumentFragment) ————————————————————
+
 function rebuildGearSelectors() {
-    allOptions = gearData.filter(g => (g.category?.toLowerCase() ?? '') !== 'liquid'); // Adjustable exclusion
-    nonPackOptions = allOptions.filter(g => (g.category?.toLowerCase() ?? '') !== 'pack');  // Case-insensitive exclude
+    allOptions = gearData.filter(g => (g.category?.toLowerCase() ?? '') !== 'liquid');
+    nonPackOptions = allOptions.filter(g => (g.category?.toLowerCase() ?? '') !== 'pack');
     liquidsOptions = gearData.filter(g => g.category?.toLowerCase() === 'liquid');
 
     const container = document.getElementById('gearEntries');
     container.innerHTML = '';
 
-    // Save old readyState
     const oldReadyState = [...readyState];
-
-    // Resize readyState
     readyState = Array(gearSlots).fill(null).map((_, idx) => oldReadyState[idx] || { gear: '', amt: 1, stowed: [], contents: [] });
+
+    const fragment = document.createDocumentFragment();
 
     for (let i = 1; i <= gearSlots; i++) {
         const entry = document.createElement('div');
         entry.className = 'gearEntry';
 
-        // We'll build the details HTML only if needed later
-        let detailsHtml = '';
-
         entry.innerHTML = `
             <select id="gear${i}Select" class="gearSelector"></select>
             <input type="number" id="gear${i}Amt" class="gearAmtInputField" min="1" value="1"/>
             <div id="gear${i}Load" class="gearLoad"></div>
-            ${detailsHtml}
         `;
 
-        container.appendChild(entry);
+        fragment.appendChild(entry);
+    }
 
-        // Populate selector
+    container.appendChild(fragment);
+
+    // Now that elements are in the DOM, populate and wire them up
+    for (let i = 1; i <= gearSlots; i++) {
         const sel = document.getElementById(`gear${i}Select`);
         populateGearSelector(sel, allOptions, 'Ready Slot');
 
-        // Restore from readyState
         sel.value = readyState[i-1].gear || '';
         const amtInput = document.getElementById(`gear${i}Amt`);
         amtInput.value = readyState[i-1].amt || 1;
 
-        // If has details, add icon
-        const item = allOptions.find(g => g.name === readyState[i-1].gear);
-        if (item?.details?.trim()) {
-            const detailsDiv = document.createElement('div');
-            detailsDiv.id = `gear${i}Details`;
-            detailsDiv.className = 'gearDetails';
-            detailsDiv.textContent = 'i';
-            detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-            entry.appendChild(detailsDiv);
-        }
-
-        // Add type class
+        const item = gearByName.get(readyState[i-1].gear);
+        const entry = sel.closest('.gearEntry');
+        createDetailsIcon(entry, item, `gear${i}`);
         if (item && item.category) {
             entry.classList.add('gear' + item.category);
         }
 
-        // Render stowed/contents if applicable
         if (readyState[i-1].stowed.length > 0) renderStowed(i);
         if (readyState[i-1].contents.length > 0) renderContents(i);
 
-        // On change: update load + conditionally add details icon
         sel.addEventListener('change', () => {
-            handleReadySelectChange(i);  // This now handles EVERYTHING: details, packs, state, stowed rendering, and loads
+            handleReadySelectChange(i);
         });
 
-        // Amount input
         const amtInputListener = function () {
             const val = Math.max(1, parseInt(this.value) || 1);
             this.value = val;
@@ -118,75 +142,57 @@ function rebuildGearSelectors() {
 
     calculateLoad();
 }
+
+// ———————————————————— Ready Select Change ————————————————————
+
 function handleReadySelectChange(i) {
     const sel = document.getElementById(`gear${i}Select`);
     const newGearName = sel.value;
-    const item = allOptions.find(g => g.name === newGearName);
+    const item = gearByName.get(newGearName);
     const entry = sel.closest('.gearEntry');
-    // Remove previous type classes
-    entry.classList.forEach(cls => {
-        if (cls.startsWith('gear') && cls !== 'gearEntry') {
-            entry.classList.remove(cls);
-        }
-    });
-    // Add new type class if item selected
-    if (item && item.category) {
-        const typeClass = 'gear' + item.category;
-        entry.classList.add(typeClass);
-    }
-    // === 1. Remove old details icon (if any) ===
-    const oldDetails = document.getElementById(`gear${i}Details`);
+
+    updateTypeClass(entry, item, ['gearEntry']);
+
+    // Remove old details icon, add new if needed
+    const oldDetails = document.getElementById(`gear${i}-details`);
     if (oldDetails) oldDetails.remove();
-    // === 2. Add details icon only if item has details ===
-    if (item?.details?.trim()) {
-        const detailsDiv = document.createElement('div');
-        detailsDiv.id = `gear${i}Details`;
-        detailsDiv.className = 'gearDetails';
-        detailsDiv.textContent = 'i';
-        detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-        entry.appendChild(detailsDiv);
-    }
-    // === 3. Handle pack logic ===
-    const wasPack = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category.toLowerCase() === 'pack';
-    const isPack = item?.category.toLowerCase() === 'pack';
+    createDetailsIcon(entry, item, `gear${i}`);
+
+    // Handle pack logic
+    const oldItem = gearByName.get(readyState[i-1].gear);
+    const wasPack = oldItem?.category?.toLowerCase() === 'pack';
+    const isPack = item?.category?.toLowerCase() === 'pack';
     if (wasPack && !isPack) {
         readyState[i-1].stowed = [];
-        renderStowed(i); // This removes the container
+        renderStowed(i);
     }
-    if (isPack && !wasPack) {
+    if (isPack && (!wasPack || readyState[i-1].gear !== newGearName)) {
         const slots = parseInt(item.slots || 0);
         readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderStowed(i);
     }
-    if (isPack && wasPack && readyState[i-1].gear !== newGearName) {
-        const slots = parseInt(item.slots || 0);
-        readyState[i-1].stowed = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
-        renderStowed(i);
-    }
-    // === 4. Handle container logic ===
-    const wasContainer = readyState[i-1].gear && allOptions.find(g => g.name === readyState[i-1].gear)?.category.toLowerCase() === 'container';
-    const isContainer = item?.category.toLowerCase() === 'container';
+
+    // Handle container logic
+    const wasContainer = oldItem?.category?.toLowerCase() === 'container';
+    const isContainer = item?.category?.toLowerCase() === 'container';
     if (wasContainer && !isContainer) {
         readyState[i-1].contents = [];
-        renderContents(i); // This removes the container
+        renderContents(i);
     }
-    if (isContainer && !wasContainer) {
+    if (isContainer && (!wasContainer || readyState[i-1].gear !== newGearName)) {
         const slots = parseInt(item.slots || 0);
         readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
         renderContents(i);
     }
-    if (isContainer && wasContainer && readyState[i-1].gear !== newGearName) {
-        const slots = parseInt(item.slots || 0);
-        readyState[i-1].contents = Array(slots).fill(null).map(() => ({ gear: '', amt: 1 }));
-        renderContents(i);
-    }
-    // Update state
+
     readyState[i-1].gear = newGearName;
     readyState[i-1].amt = parseInt(document.getElementById(`gear${i}Amt`).value) || 1;
-    // Update load
     updateReadyLoad(i);
     calculateLoad();
 }
+
+// ———————————————————— Render Stowed ————————————————————
+
 function renderStowed(i) {
     let container = document.getElementById(`stowed-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
@@ -206,16 +212,14 @@ function renderStowed(i) {
 
     readyState[i-1].stowed.forEach((s, j) => {
         const stowedIndex = j + 1;
+        const idPrefix = `stowed-${i}-${stowedIndex}`;
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearStowed';
 
-        let detailsHtml = '';
-
         entry.innerHTML = `
-            <select id="stowed-${i}-${stowedIndex}-select" class="gearSelector"></select>
-            <input type="number" id="stowed-${i}-${stowedIndex}-amt" min="1" value="${s.amt}"/>
-            <div id="stowed-${i}-${stowedIndex}-load" class="gearLoad"></div>
-            ${detailsHtml}
+            <select id="${idPrefix}-select" class="gearSelector"></select>
+            <input type="number" id="${idPrefix}-amt" min="1" value="${s.amt}"/>
+            <div id="${idPrefix}-load" class="gearLoad"></div>
         `;
 
         container.appendChild(entry);
@@ -223,55 +227,21 @@ function renderStowed(i) {
         const sel = entry.querySelector('select');
         populateGearSelector(sel, nonPackOptions, 'Stowed slot');
 
-        // Restore saved selection and add details if needed
         if (s.gear) {
             sel.value = s.gear;
-            const item = nonPackOptions.find(g => g.name === s.gear);
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-            // Add type class for stowed item
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
+            const item = gearByName.get(s.gear);
+            createDetailsIcon(entry, item, idPrefix);
+            updateTypeClass(entry, item, ['gearEntry', 'gearStowed']);
         }
 
-        // On change
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
-            const item = nonPackOptions.find(g => g.name === selectedName);
+            const item = gearByName.get(selectedName);
 
-            // Remove old details
-            const oldDetails = document.getElementById(`stowed-${i}-${stowedIndex}-details`);
+            const oldDetails = document.getElementById(`${idPrefix}-details`);
             if (oldDetails) oldDetails.remove();
-
-            // Add new details only if present
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `stowed-${i}-${stowedIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-
-            // Remove previous type classes
-            entry.classList.forEach(cls => {
-                if (cls.startsWith('gear') && cls !== 'gearEntry' && cls !== 'gearStowed') {
-                    entry.classList.remove(cls);
-                }
-            });
-            // Add new type class if item selected
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
+            createDetailsIcon(entry, item, idPrefix);
+            updateTypeClass(entry, item, ['gearEntry', 'gearStowed']);
 
             readyState[i-1].stowed[j].gear = selectedName;
             updateStowedLoad(i, stowedIndex);
@@ -293,6 +263,8 @@ function renderStowed(i) {
     });
 }
 
+// ———————————————————— Render Contents ————————————————————
+
 function renderContents(i) {
     let container = document.getElementById(`contents-container-${i}`);
     const gearEntry = document.querySelector(`.gearEntry:has(#gear${i}Select)`);
@@ -312,16 +284,14 @@ function renderContents(i) {
 
     readyState[i-1].contents.forEach((s, j) => {
         const contentsIndex = j + 1;
+        const idPrefix = `contents-${i}-${contentsIndex}`;
         const entry = document.createElement('div');
         entry.className = 'gearEntry gearContents';
 
-        let detailsHtml = '';
-
         entry.innerHTML = `
-            <select id="contents-${i}-${contentsIndex}-select" class="gearSelector"></select>
-            <input type="number" id="contents-${i}-${contentsIndex}-amt" min="1" value="${s.amt}"/>
-            <div id="contents-${i}-${contentsIndex}-load" class="gearLoad"></div>
-            ${detailsHtml}
+            <select id="${idPrefix}-select" class="gearSelector"></select>
+            <input type="number" id="${idPrefix}-amt" min="1" value="${s.amt}"/>
+            <div id="${idPrefix}-load" class="gearLoad"></div>
         `;
 
         container.appendChild(entry);
@@ -329,55 +299,21 @@ function renderContents(i) {
         const sel = entry.querySelector('select');
         populateGearSelector(sel, liquidsOptions, 'Select Liquid');
 
-        // Restore saved selection and add details if needed
         if (s.gear) {
             sel.value = s.gear;
-            const item = liquidsOptions.find(g => g.name === s.gear);
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `contents-${i}-${contentsIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-            // Add type class for contents item
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
+            const item = gearByName.get(s.gear);
+            createDetailsIcon(entry, item, idPrefix);
+            updateTypeClass(entry, item, ['gearEntry', 'gearContents']);
         }
 
-        // On change
         sel.addEventListener('change', () => {
             const selectedName = sel.value;
-            const item = liquidsOptions.find(g => g.name === selectedName);
+            const item = gearByName.get(selectedName);
 
-            // Remove old details
-            const oldDetails = document.getElementById(`contents-${i}-${contentsIndex}-details`);
+            const oldDetails = document.getElementById(`${idPrefix}-details`);
             if (oldDetails) oldDetails.remove();
-
-            // Add new details only if present
-            if (item?.details?.trim()) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.id = `contents-${i}-${contentsIndex}-details`;
-                detailsDiv.className = 'gearDetails';
-                detailsDiv.textContent = 'i';
-                detailsDiv.setAttribute("data-tip", `gear:${item.name}`);
-                entry.appendChild(detailsDiv);
-            }
-
-            // Remove previous type classes
-            entry.classList.forEach(cls => {
-                if (cls.startsWith('gear') && cls !== 'gearEntry' && cls !== 'gearContents') {
-                    entry.classList.remove(cls);
-                }
-            });
-            // Add new type class if item selected
-            if (item && item.category) {
-                const typeClass = 'gear' + item.category;
-                entry.classList.add(typeClass);
-            }
+            createDetailsIcon(entry, item, idPrefix);
+            updateTypeClass(entry, item, ['gearEntry', 'gearContents']);
 
             readyState[i-1].contents[j].gear = selectedName;
             updateContentsLoad(i, contentsIndex);
@@ -399,66 +335,47 @@ function renderContents(i) {
     });
 }
 
-// Update single stowed load
+// ———————————————————— Load Calculations ————————————————————
+
 function updateStowedLoad(readyI, stowedJ) {
     const sel = document.getElementById(`stowed-${readyI}-${stowedJ}-select`);
-    if (!sel) return;
-    const opt = sel.options[sel.selectedIndex];
-    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
-    const qty = readyState[readyI-1].stowed[stowedJ-1].amt;
-    const total = baseLoad * qty;
     const loadDiv = document.getElementById(`stowed-${readyI}-${stowedJ}-load`);
-    if (loadDiv) {
-        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
-    }
+    updateSlotLoad(sel, readyState[readyI-1].stowed[stowedJ-1].amt, loadDiv);
 }
-// Update single contents load
+
 function updateContentsLoad(readyI, contentsJ) {
     const sel = document.getElementById(`contents-${readyI}-${contentsJ}-select`);
-    if (!sel) return;
-    const opt = sel.options[sel.selectedIndex];
-    const baseLoad = parseFloat(opt.getAttribute('data-load')) || 0;
-    const qty = readyState[readyI-1].contents[contentsJ-1].amt;
-    const total = baseLoad * qty;
     const loadDiv = document.getElementById(`contents-${readyI}-${contentsJ}-load`);
-    if (loadDiv) {
-        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
-        loadDiv.style.color = (qty > 1 && baseLoad > 1) ? 'red' : '';
-    }
+    updateSlotLoad(sel, readyState[readyI-1].contents[contentsJ-1].amt, loadDiv);
 }
-// Update ready load (for pack: sum stowed + base; for container: sum contents + base; for non-pack: base * amt)
+
 function updateReadyLoad(i) {
     const state = readyState[i-1];
-    const item = allOptions.find(g => g.name === state.gear);
+    const item = gearByName.get(state.gear);
     let total = 0;
     if (item) {
         const baseLoad = parseFloat(item.load || 0);
         total += baseLoad * state.amt;
-        if (item?.category.toLowerCase() === 'pack') {
+        if (item.category?.toLowerCase() === 'pack') {
             state.stowed.forEach(s => {
-                const sItem = nonPackOptions.find(g => g.name === s.gear);
+                const sItem = gearByName.get(s.gear);
                 if (sItem) total += (parseFloat(sItem.load || 0)) * s.amt;
             });
-        } else if (item?.category.toLowerCase() === 'container') {
+        } else if (item.category?.toLowerCase() === 'container') {
             state.contents.forEach(s => {
-                const sItem = liquidsOptions.find(g => g.name === s.gear);
+                const sItem = gearByName.get(s.gear);
                 if (sItem) total += (parseFloat(sItem.load || 0)) * s.amt;
             });
         }
     }
     const loadDiv = document.getElementById(`gear${i}Load`);
     if (loadDiv) {
-        loadDiv.textContent = total > 0 ? total.toFixed(2).replace(/\.?0+$/, '') : '';
+        loadDiv.textContent = formatLoad(total);
         const loadLimit = parseFloat(item?.loadlimit);
-        if (!isNaN(loadLimit) && total > loadLimit) {
-            loadDiv.style.color = 'red';
-        } else {
-            loadDiv.style.color = '';
-        }
+        loadDiv.style.color = (!isNaN(loadLimit) && total > loadLimit) ? 'red' : '';
     }
 }
-// Updated calculateLoad (loop over state, no hard numbers beyond max)
+
 function calculateLoad() {
     let totalLoad = 0;
     readyState.forEach((state, idx) => {
@@ -466,11 +383,11 @@ function calculateLoad() {
         const loadText = document.getElementById(`gear${i}Load`)?.textContent || '0';
         totalLoad += parseFloat(loadText) || 0;
     });
-    const formattedTotal = totalLoad.toFixed(2).replace(/\.?0+$/, '');
-    document.getElementById('totalLoadValue').textContent = formattedTotal;
+    document.getElementById('totalLoadValue').textContent = formatLoad(totalLoad);
 }
 
-// Gear-specific event listener (extracted from main)
+// ———————————————————— Event Listeners ————————————————————
+
 document.addEventListener('change', e => {
     const t = e.target;
     if (t.matches('.gearAmtInputField, [id^="stowed-"][id$="-amt"], [id^="contents-"][id$="-amt"], [id^="gear"][id$="Select"], [id^="stowed-"][id$="-select"], [id^="contents-"][id$="-select"]')) {
@@ -492,7 +409,6 @@ document.addEventListener('change', e => {
     }
 });
 
-// Plus/Minus for gear slots
 document.addEventListener('click', e => {
     const t = e.target;
     if (t.matches('#gearPlus, #gearMinus')) {
@@ -505,7 +421,7 @@ document.addEventListener('click', e => {
     }
 });
 
-// Init gear after data is loaded (replaces window.load)
+// Init gear after data is loaded
 window.addEventListener('dataLoaded', () => {
     rebuildGearSelectors();
     calculateLoad();

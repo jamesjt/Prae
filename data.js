@@ -13,6 +13,11 @@ let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
 let hoverRulesData = [];
+// Lookup indexes (built after parse for O(1) access)
+let abilityByName = new Map();  // lowercase name -> ability
+let gearByName = new Map();     // name -> gear item
+let profByName = new Map();     // name -> prof
+let ruleByName = new Map();     // rule -> entry
 // Generic fetch + parse function
 async function fetchAndParseCsv(url, customParser = null) {
     try {
@@ -246,6 +251,27 @@ async function loadAllData() {
         profData.blast = proficiencies.filter(g => g.category?.toLowerCase() === 'blast');
         profData.invoke = proficiencies.filter(g => g.category?.toLowerCase() === 'invoke');
         hoverRulesData = hoverRules;
+        // Build lookup indexes
+        abilityByName = new Map();
+        for (const abilities of abilitiesData.values()) {
+            for (const a of abilities) {
+                abilityByName.set(a.name.toLowerCase(), a);
+            }
+        }
+        gearByName = new Map();
+        for (const g of gearData) {
+            gearByName.set(g.name, g);
+        }
+        profByName = new Map();
+        for (const type in profData) {
+            for (const p of profData[type]) {
+                profByName.set(p.name, p);
+            }
+        }
+        ruleByName = new Map();
+        for (const r of hoverRulesData) {
+            ruleByName.set(r.rule, r);
+        }
         // Dispatch event—everything is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));
     } catch (err) {

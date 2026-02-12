@@ -25,13 +25,28 @@
     <div class="container">
         <!-- Prae Rulebook -->
         <div id="prae-rulebook" class="content-section active">
-            <div class="sidebar"><div id="sidebar-content"></div></div>
+            <div class="sidebar">
+                <div id="sidebar-toggle" class="sidebar-toggle">Expand All</div>
+                <div id="sidebar-content"></div>
+            </div>
             <div class="rulebook-content">
                 <h1>Prae Rulebook</h1>
                 <div id="search-container">
                     <input type="text" id="search" placeholder="Filter sections...">
+                    <div id="search-counter"></div>
                 </div>
-                <div id="content-sections"></div>
+                <div id="content-sections">
+                    <div class="loading-message">
+                        <div class="loading-track">
+                            <div class="d10">
+                                <div class="d10-face d10-top"></div>
+                                <div class="d10-face d10-bottom"></div>
+                                <span class="d10-label">10</span>
+                            </div>
+                        </div>
+                        Loading...
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -939,6 +954,7 @@
       </article>
     </section>
     </div>
+    <button id="back-to-top" title="Back to top">&#9650;</button>
     <script src="data.js"></script>
     <script src="tooltip-matcher.js"></script>
     <script src="script.js"></script>
@@ -946,24 +962,5 @@
     <script src="gear-scripts.js"></script>
     <script src="tooltip-manager.js"></script>
     <script src="save-load.js"></script> <!-- New script include -->
-    <script>
-        // Tab navigation
-        document.querySelectorAll('.nav-list a').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const target = link.dataset.section;
-
-                document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
-                document.getElementById(target).classList.add('active');
-
-                document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
-                link.classList.add('active');
-
-                if (target === 'character-creator') {
-                    document.getElementById('creator-css').disabled = false;
-                }
-            });
-        });
-    </script>
 </body>
 </html>

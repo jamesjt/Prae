@@ -60,6 +60,10 @@ function renderSidebar(data) {
                 const yOffset = -navbarHeight - 20;
                 const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                 window.scrollTo({ top: y, behavior: 'smooth' });
+                element.classList.remove('highlight');
+                void element.offsetWidth; // Force reflow to restart animation
+                element.classList.add('highlight');
+                element.addEventListener('animationend', () => element.classList.remove('highlight'), { once: true });
             }
         }));
     } catch (error) {
@@ -95,8 +99,16 @@ function renderSections(data, term = '') {
                         const primary = way.props['primary attribute'] || '';
                         const attackMap = { 'Body': 'Strike', 'Mind': 'Blast', 'Spirit': 'Invoke' };
                         const attackSkill = attackMap[primary] || '';
+                        // Inject required skill
+                        if (way.reqSkill) {
+                            subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `<div><b>Required Skill:</b> ${way.reqSkill}</div>$1`);
+                        }
+                        // Inject primary attribute
+                        if (primary) {
+                            subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Primary Attribute:</b> ${primary}</div>`);
+                        }
                         if (attackSkill) {
-                            subProcessed = subProcessed.replace(/(<div><b>Suggested Skills:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
+                            subProcessed = subProcessed.replace(/(<div><b>Primary Attribute:<\/b>.*?<\/div>)/, `$1<div><b>Attack Skill:<\/b> ${attackSkill}</div>`);
                         }
                         const proficiency = way.props['proficiency'] || '';
                         if (proficiency) {
@@ -152,14 +164,18 @@ document.querySelectorAll('.nav-list a').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
         const target = link.getAttribute('data-section');
-        
+
         document.querySelectorAll('.content-section').forEach(sec => {
             sec.classList.remove('active');
         });
         document.getElementById(target)?.classList.add('active');
-        
+
         document.querySelectorAll('.nav-list a').forEach(a => a.classList.remove('active'));
         link.classList.add('active');
+
+        if (target === 'character-creator') {
+            document.getElementById('creator-css').disabled = false;
+        }
     });
 });
 
@@ -169,20 +185,21 @@ function setupSidebarScrollSync() {
     const sidebarItems = document.querySelectorAll('.sidebar-item[data-header]');
     const sidebar = document.querySelector('.sidebar');
 
-    // Create observer to detect visible sections
+    // Pre-build mapping from section ID to sidebar item
+    const sectionToSidebarItem = new Map();
+    sections.forEach(section => {
+        const id = section.id;
+        const item = document.querySelector(`.sidebar-item[data-header="${id}"], .sidebar-item[data-subitem="${id.split('-').pop()}"]`);
+        if (item) sectionToSidebarItem.set(id, item);
+    });
+
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Find matching sidebar item (header or subitem)
-                const id = entry.target.id;
-                const item = document.querySelector(`.sidebar-item[data-header="${id}"], .sidebar-item[data-subitem="${id.split('-').pop()}"]`);
-                
+                const item = sectionToSidebarItem.get(entry.target.id);
                 if (item) {
-                    // Optional: Highlight active item
                     sidebarItems.forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
-                    
-                    // Scroll sidebar to item if out of view
                     const rect = item.getBoundingClientRect();
                     const sidebarRect = sidebar.getBoundingClientRect();
                     if (rect.top < sidebarRect.top || rect.bottom > sidebarRect.bottom) {
@@ -191,7 +208,7 @@ function setupSidebarScrollSync() {
                 }
             }
         });
-    }, { rootMargin: '-20% 0px -60% 0px' });  // Adjust thresholds for "in view"
+    }, { rootMargin: '-20% 0px -60% 0px' });
 
     sections.forEach(section => observer.observe(section));
 }
@@ -226,9 +243,62 @@ window.addEventListener('dataLoaded', () => {
     addAbilityFieldClasses(); // Post-render class addition
 });
 
-document.getElementById('search').addEventListener('input', e => renderSections(allData, e.target.value.toLowerCase()));
+let searchTimeout;
+const searchInput = document.getElementById('search');
+const searchCounter = document.getElementById('search-counter');
+searchInput.addEventListener('input', e => {
+    const term = e.target.value.toLowerCase();
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        renderSections(allData, term);
+        updateSearchCounter(term);
+    }, 250);
+    searchInput.classList.toggle('search-active', term.length > 0);
+});
 
-// Rest unchanged
+function updateSearchCounter(term) {
+    if (!term) {
+        searchCounter.textContent = '';
+        return;
+    }
+    const total = Object.keys(allData).length;
+    const filtered = Object.keys(filterData(allData, term)).length;
+    searchCounter.textContent = `Showing ${filtered} of ${total} sections`;
+}
+
+// Back-to-top button
+const backToTop = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+    backToTop.style.display = window.scrollY > 400 ? 'block' : 'none';
+});
+backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Sidebar expand/collapse all
+document.getElementById('sidebar-toggle').addEventListener('click', function() {
+    const subitems = document.querySelectorAll('.subitems');
+    const headers = document.querySelectorAll('.section-header');
+    const expanding = this.textContent === 'Expand All';
+    subitems.forEach(s => s.classList.toggle('visible', expanding));
+    headers.forEach(h => h.classList.toggle('expanded', expanding));
+    this.textContent = expanding ? 'Collapse All' : 'Expand All';
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === '/' && !e.target.matches('input, textarea, select')) {
+        e.preventDefault();
+        searchInput.focus();
+    }
+    if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        searchInput.classList.remove('search-active');
+        searchCounter.textContent = '';
+        renderSections(allData);
+        searchInput.blur();
+    }
+});
 
 function getQueryParam(name) {
     const urlParams = new URLSearchParams(window.location.search);

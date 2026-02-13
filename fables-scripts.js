@@ -125,7 +125,14 @@ function showCreatureDetail(name) {
     // Tapered rule
     html += TAPERED_RULE;
 
-    // Stats row — HP thresholds + combat stats in one line
+    // Stats row — HP thresholds + combat stats with icons
+    const statIcons = {
+        'Guard': 'images/guard-white.png',
+        'Armor': 'images/armor2.png',
+        'Pace': 'images/pace6.png',
+        'Breath': 'images/breath2.png'
+    };
+
     const hpEntries = [
         ['Max HP', creature['Max HP'], 'sb-hp-healthy'],
         ['Marred', creature['Marred'], 'sb-hp-marred'],
@@ -143,12 +150,15 @@ function showCreatureDetail(name) {
 
     if (hpEntries.length || combatStats.length) {
         html += '<div class="sb-stats-line">';
-        hpEntries.forEach(([label, val, cls]) => {
-            html += `<div class="sb-stat-cell ${cls}"><div class="sb-stat-val">${val}</div><div class="sb-stat-lbl">${label}</div></div>`;
-        });
-        combatStats.forEach(([label, val]) => {
-            html += `<div class="sb-stat-cell"><div class="sb-stat-val">${val}</div><div class="sb-stat-lbl">${label}</div></div>`;
-        });
+        const renderStatCell = (label, val, cls) => {
+            const icon = statIcons[label];
+            const iconStyle = icon ? ` style="background-image:url('${icon}')"` : '';
+            html += `<div class="sb-stat-cell${cls ? ' ' + cls : ''}">`
+                 +  `<div class="sb-stat-icon"${iconStyle}><span class="sb-stat-val">${val}</span></div>`
+                 +  `<div class="sb-stat-lbl">${label}</div></div>`;
+        };
+        hpEntries.forEach(([label, val, cls]) => renderStatCell(label, val, cls));
+        combatStats.forEach(([label, val]) => renderStatCell(label, val, ''));
         html += '</div>';
         html += TAPERED_RULE;
     }
@@ -176,18 +186,21 @@ function showCreatureDetail(name) {
     // Combat Behavior section
     const behaviorFields = [
         { key: 'Strategy', label: 'Strategy' },
-        { key: 'Ignores', label: 'Ignores' },
         { key: 'Hates', label: 'Hates' },
-        { key: 'Dislikes', label: 'Dislikes' }
+        { key: 'Dislikes', label: 'Dislikes' },
+        { key: 'Ignores', label: 'Ignores' }
     ];
     const hasBehavior = behaviorFields.some(f => creature[f.key]);
     if (hasBehavior) {
         html += `<h3>Combat Behavior</h3>`;
+        html += `<div class="sb-behavior-grid">`;
         behaviorFields.forEach(f => {
             if (creature[f.key]) {
-                html += propLine(f.label + '.', processTextForTooltips(creature[f.key]));
+                html += `<div class="sb-behavior-lbl">${f.label}</div>`;
+                html += `<div class="sb-behavior-val">${processTextForTooltips(creature[f.key])}</div>`;
             }
         });
+        html += `</div>`;
     }
 
     // Attacks section (grid layout)

@@ -139,6 +139,10 @@ function buildTooltipEntries() {
     });
   });
 
+  bestiaryData.forEach(c => {
+    if (c.Name) addEntry(c.Name, { type: 'creature', key: `creature:${c.Name}`, length: c.Name.length });
+  });
+
   return entries;
 }
 

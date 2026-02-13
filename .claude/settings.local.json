@@ -3,7 +3,10 @@
     "allow": [
       "Bash(wc:*)",
       "Bash(git config:*)",
-      "WebFetch(domain:docs.google.com)"
+      "WebFetch(domain:docs.google.com)",
+      "Bash(node:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

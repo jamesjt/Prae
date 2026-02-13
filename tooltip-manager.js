@@ -101,6 +101,8 @@ class TooltipManager {
       return { ...baseOptions };
     } else if (key.startsWith("way:")) {
       return { ...baseOptions };
+    } else if (key.startsWith("creature:")) {
+      return { ...baseOptions, maxWidth: 400 };
     }
 
     return baseOptions; // Fallback for unknown
@@ -132,7 +134,7 @@ class TooltipManager {
 
   static expr(key) {
     const expr = key.replace("expr:", "");
-    return `|${expr}|`;
+    return expr;
   }
 
   // Helper capitalize (now static inside class)
@@ -179,6 +181,20 @@ class TooltipManager {
       </div>`;
   }
 
+  static creature(key) {
+    const name = key.replace("creature:", "");
+    const c = creatureByName.get(name);
+    if (!c) return `(Creature not found: ${name})`;
+    const imgHtml = c._imgPath ? `<img src="${c._imgPath}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;float:left;margin-right:10px;">` : '';
+    const stats = ['Guard', 'Max HP', 'Armor', 'Pace'].filter(f => c[f]).map(f => `${f}: ${c[f]}`).join(' · ');
+    return `<div class="tip-creature">
+        ${imgHtml}
+        <strong>${c.Name}</strong><br>
+        Lvl ${c.Lvl || '?'}${c.Size ? ' · ' + c.Size : ''}${c._biomes?.length ? ' · ' + c._biomes.join(', ') : ''}<br>
+        <span style="font-size:0.85em;color:#aaa;">${stats}</span>
+      </div>`;
+  }
+
   static way(key) {
     const name = key.replace("way:", "");
     const way = waysData.find(w => w.name === name);
@@ -205,6 +221,7 @@ class TooltipManager {
     if (key.startsWith("gear:")) return TooltipManager.gear(key);
     if (key.startsWith("prof:")) return TooltipManager.prof(key);
     if (key.startsWith("way:")) return TooltipManager.way(key);
+    if (key.startsWith("creature:")) return TooltipManager.creature(key);
     if (key.startsWith("expr:")) return TooltipManager.expr(key);
     if (key.startsWith("static:")) {
       const id = key.replace("static:", "");

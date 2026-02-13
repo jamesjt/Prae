@@ -10,6 +10,7 @@
 <script src="https://unpkg.com/tippy.js@6"></script>  <!-- Tippy.js v6+ (latest in 2025) -->
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />  <!-- Basic styles; customize as needed -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="fables-styles.css">
     <link rel="stylesheet" href="creator-styles.css" id="creator-css">
     <link rel="icon" href="images/favicon.ico">
 </head>
@@ -39,10 +40,29 @@
                     <div class="loading-message">
                         <div class="loading-track">
                             <div class="d10">
-                                <div class="d10-face d10-top"></div>
-                                <div class="d10-face d10-bottom"></div>
-                                <span class="d10-label">10</span>
+                                <svg class="d10-svg" viewBox="0 0 48 52" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="d10top" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#eabb50"/>
+                                            <stop offset="100%" stop-color="#d29a38"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- Left side face -->
+                                    <polygon points="24,1 11,23 1,27" fill="#a17828" stroke="#6b4e15" stroke-width="0.5"/>
+                                    <!-- Right side face -->
+                                    <polygon points="24,1 37,23 47,27" fill="#a17828" stroke="#6b4e15" stroke-width="0.5"/>
+                                    <!-- Left lower face -->
+                                    <polygon points="11,23 1,27 24,51 24,30" fill="#a17828" stroke="#6b4e15" stroke-width="0.5"/>
+                                    <!-- Right lower face -->
+                                    <polygon points="37,23 47,27 24,51 24,30" fill="#a17828" stroke="#6b4e15" stroke-width="0.5"/>
+                                    <!-- Front number face (large kite) -->
+                                    <polygon points="24,1 11,23 24,30 37,23" fill="url(#d10top)" stroke="#4a3610" stroke-width="0.5"/>
+                                    <!-- Number -->
+                                    <text x="24" y="20" text-anchor="middle" font-size="11" font-weight="bold"
+                                          font-family="Times New Roman, serif" fill="#1a1a1a">10</text>
+                                </svg>
                             </div>
+                            <div class="d10-table"></div>
                         </div>
                         Loading...
                     </div>
@@ -52,7 +72,30 @@
 
         <!-- Fables of Faen -->
         <div id="fables" class="content-section">
-            <div class=""><h1>Fables of Faen</h1><p>Coming soon...</p></div>
+            <div class="bestiary-list-panel">
+                <div class="bestiary-search-wrap">
+                    <input type="text" id="bestiary-search" placeholder="Search by name...">
+                    <button id="bestiary-reset" title="Reset filters">Reset</button>
+                </div>
+                <div class="bestiary-filter-row">
+                    <select id="bestiary-biome"><option value="">Biome</option></select>
+                    <select id="bestiary-size"><option value="">Size</option></select>
+                    <input type="number" id="bestiary-lvl-min" placeholder="Lvl min" min="0">
+                    <input type="number" id="bestiary-lvl-max" placeholder="Lvl max" min="0">
+                </div>
+                <div class="bestiary-col-headers">
+                    <span class="bestiary-col sortable active" data-sort="name">Name</span>
+                    <span class="bestiary-col bestiary-col-lvl sortable" data-sort="lvl">Lvl</span>
+                    <span class="bestiary-col bestiary-col-size sortable" data-sort="size">Size</span>
+                    <span class="bestiary-col bestiary-col-biome">Biome</span>
+                </div>
+                <div id="bestiary-list" class="bestiary-list-scroll"></div>
+            </div>
+            <div class="bestiary-stat-panel">
+                <div id="bestiary-detail" class="bestiary-detail-wrap">
+                    <div class="bestiary-placeholder">Select a creature from the list</div>
+                </div>
+            </div>
         </div>
 
         <!-- Character Creator — Pure Static Structure -->
@@ -109,16 +152,6 @@
                       <div id="proficiencyCheck" class="checkSection">
                         Proficiencies, 1 per Attack Skill Rank starting at Basic. 
                       </div>
-                      <!--
-                      <div id="gearCheck" class="checkSection">
-                        Purchase Starting Gear
-                        <div class="indent">
-                          - Select 1 Weapon for free<br/>
-                          - Learn 1 Ritual you can cast for free<br/>
-                          - Purchase additional gear with 150 starting g. 
-                        </div>
-                      </div>
-                      -->
                     </div>
                     <input id="charName" class="charText" type="text" placeholder="Character name">
                     <input id="charLvl" class="charText" type="number" min="1" max="11" step="1" value="1">
@@ -127,42 +160,6 @@
                     <select id="roleSelector">
                       <option value="">Way</option>
                     </select>
-                    
-<!--
-                    <img id="showCharDesc" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:charDesc">
-                    <div id="charDesc" class="charDetails">
-                      <div class="close-btn closeRitual">X</div>
-                      Height <input id="charHeight" type="text">
-                      Build <input id="charBuild" type="text">
-                      Skin <input id="charSkin" type="text">
-                      Hair <input id="charHair" type="text">
-                      Eyes <input id="charEyes" type="text">
-                      <br/>
-                      <textarea id="charDescription" placeholder="Describe yourself here..."></textarea>
-                    </div>
-                    <img id="showCharStory" class="detailsHoverPopoverDraggable" src="images/details.png" data-tip="static:charStory">
-                    <div id="charStory" class="charDetails">
-                      <div class="close-btn closeRitual">X</div>
-                      Birth Place <input id="birthPlace" type="text">
-                      <textarea id="childhoodStory" placeholder="Story of your childhood..."></textarea>
-                      <textarea id="trainingStory" placeholder="Story of your Training and how you came to your way..."></textarea>
-                      <textarea id="journalStory" placeholder="Journal..."></textarea>
-                    </div>
-                    <img id="showCharPersonality" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:charPersonality">
-                    <div id="charPersonality" class="charDetails">
-                      <div class="close-btn closeRitual">X</div>
-                      Current Goal in Life <input id="charPurpose" type="text">
-                      Values...will be flushed out with world.
-                    </div>
-                    <img id="showNotes" class="detailsHoverPopoverDraggable" src="images/details.png"data-tip="static:notes">
-                    <div id="notes" class="charDetails">
-                      <div class="close-btn closeRitual">X</div>
-                      <br/>
-                      <textarea id="notes1" class="pcNotes" placeholder="Notes 1..."></textarea>
-                      <textarea id="notes2" class="pcNotes" placeholder="Notes 2..."></textarea>
-                      <textarea id="notes3" class="pcNotes" placeholder="Notes 3..."></textarea>
-                    </div>
--->
                 </div>
 
                 <div class="secondaryAttributesWrapper">
@@ -915,19 +912,18 @@
                         <input type="text" inputmode="numeric" id="coinsGold" min="0" value="0"  class="gearCoins">g
                     </div>
                   </div>
-                <!--
-                End of column 3  --> 
-                </div> 
+                </div>
               </div> <!-- End Row Wrapper -->
                 <!-- ABILITIES SECTION — Updated with number inputs + live totals -->
                  
+                <div id="abilityBudget" class="ability-budget"></div>
                 <div class="abilityWrapper">
                     <div class="talentWrapper">
                         <!-- Talent Amount with Buttons and Live Total -->
                         <div class="amountRow">
                             <button id="talentMinus" class="amountButton">-</button>
                             <label class="amountLabel">Talents</label>
-                            <button id="talentPlus" class="amountButton">+</button>    
+                            <button id="talentPlus" class="amountButton">+</button>
                         </div>
                         <div id="wayTalent" class="talentAbility">
                             <div id="wayTalentName" class="wayTalent">Select Way</div>
@@ -945,11 +941,15 @@
                     </div>
                 </div><!-- End abilityWrapper -->
 <!-- New Save/Load UI -->
-<div id="saveLoadContainer" style="margin-top: 20px; text-align: center;">
-    <input type="text" id="saveCodeInput" placeholder="Enter save code here..." style="width: 300px; padding: 10px;">
-    <button id="loadButton">Load</button>
-    <button id="saveButton">Save</button>
-    <div id="savedCodesList" style="margin-top: 10px;"></div> <!-- New list for clickable codes -->
+<div id="saveLoadContainer">
+    <div id="saveLoadRow">
+        <input type="text" id="saveCodeInput" placeholder="Paste save code to load...">
+        <button id="loadButton">Load</button>
+        <input type="text" id="saveNameInput" placeholder="Save name (optional)">
+        <button id="saveButton">Save</button>
+    </div>
+    <div id="saveLoadFeedback"></div>
+    <div id="savedCodesList"></div>
 </div>
       </article>
     </section>
@@ -958,6 +958,7 @@
     <script src="data.js"></script>
     <script src="tooltip-matcher.js"></script>
     <script src="script.js"></script>
+    <script src="fables-scripts.js"></script>
     <script src="creator-scripts.js"></script>
     <script src="gear-scripts.js"></script>
     <script src="tooltip-manager.js"></script>

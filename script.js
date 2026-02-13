@@ -154,7 +154,8 @@ function processTextForTooltips(text) {
     gear: 'hoverGear',
     ability: 'hoverAbility',
     prof: 'hoverProf',
-    way: 'hoverWay'
+    way: 'hoverWay',
+    creature: 'hoverCreature'
   };
   return applyTooltipMatcher(text, { classMap });
 }

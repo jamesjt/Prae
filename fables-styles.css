@@ -1,0 +1,413 @@
+/* fables-styles.css — 5e.tools-style two-panel bestiary layout */
+
+/* ─── Two-panel layout ─── */
+#fables.active {
+    display: flex;
+    flex-direction: row;
+}
+
+/* ─── LEFT PANEL: List ─── */
+.bestiary-list-panel {
+    width: 400px;
+    min-width: 400px;
+    background-color: #222;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    height: calc(100vh - 50px);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    border-right: 1px solid #333;
+}
+
+/* Search bar */
+.bestiary-search-wrap {
+    display: flex;
+    gap: 6px;
+    padding: 10px 10px 6px;
+}
+#bestiary-search {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid #444;
+    border-radius: 3px;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+#bestiary-search::placeholder { color: #666; }
+#bestiary-search:focus { border-color: #d29a38; outline: none; }
+
+#bestiary-reset {
+    padding: 6px 12px;
+    border: 1px solid #444;
+    border-radius: 3px;
+    background: #2a2a2a;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 12px;
+}
+#bestiary-reset:hover { background: #3a3a3a; color: #d29a38; }
+
+/* Filter row */
+.bestiary-filter-row {
+    display: flex;
+    gap: 6px;
+    padding: 0 10px 8px;
+}
+.bestiary-filter-row select,
+.bestiary-filter-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 5px 6px;
+    border: 1px solid #444;
+    border-radius: 3px;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    font-size: 12px;
+}
+
+/* Column headers (sortable) */
+.bestiary-col-headers {
+    display: flex;
+    padding: 6px 10px;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    background: #1a1a1a;
+    font-size: 12px;
+    font-weight: bold;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    user-select: none;
+}
+.bestiary-col-headers .sortable {
+    cursor: pointer;
+}
+.bestiary-col-headers .sortable:hover { color: #d29a38; }
+.bestiary-col-headers .sortable.active { color: #d29a38; }
+.bestiary-col-headers .sortable.active::after { content: ' \25B2'; font-size: 9px; }
+.bestiary-col-headers .sortable.active.sort-desc::after { content: ' \25BC'; }
+
+/* Column widths (shared between headers and rows) */
+.bestiary-col { flex: 1; }
+.bestiary-col-lvl { flex: 0 0 45px; text-align: center; }
+.bestiary-col-size { flex: 0 0 65px; text-align: center; }
+.bestiary-col-biome { flex: 0 0 110px; }
+
+/* Scrollable list */
+.bestiary-list-scroll {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* List rows */
+.bestiary-row {
+    display: flex;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #ccc;
+    border-bottom: 1px solid #2a2a2a;
+    transition: background-color 0.1s;
+    align-items: center;
+}
+.bestiary-row:hover { background-color: #2a2a2a; }
+.bestiary-row.active {
+    background-color: #2d2418;
+    color: #d29a38;
+}
+
+.bestiary-no-results {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 30px 10px;
+}
+
+/* ─── RIGHT PANEL: Stat Block ─── */
+.bestiary-stat-panel {
+    flex: 1;
+    margin-left: 400px;
+    padding: 20px;
+    min-height: calc(100vh - 50px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.bestiary-detail-wrap {
+    width: 100%;
+    max-width: 600px;
+}
+
+.bestiary-placeholder {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 60px 20px;
+    font-size: 16px;
+}
+
+/* ─── STAT BLOCK (D&D style, dark theme) ─── */
+.stat-block {
+    font-family: 'Noto Sans', 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #e0e0e0;
+    position: relative;
+}
+
+/* Gold top/bottom bars */
+.sb-bar {
+    height: 4px;
+    background: #d29a38;
+    border: 1px solid #000;
+    position: relative;
+    z-index: 1;
+}
+
+/* Main content area */
+.sb-content {
+    background: #252525;
+    padding: 0.6em 0.8em 0.5em;
+    border-left: 1px solid #3a3a3a;
+    border-right: 1px solid #3a3a3a;
+    position: relative;
+    z-index: 0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Tapered rule divider (gold, matching D&D red tapered rule pattern) */
+.pointed-divider {
+    fill: #d29a38;
+    stroke: #d29a38;
+    margin: 0.6em 0 0.35em;
+    display: block;
+}
+
+/* Creature heading */
+.sb-heading h1 {
+    font-family: 'Libre Baskerville', 'Lora', Georgia, serif;
+    color: #d29a38;
+    font-weight: 700;
+    margin: 0;
+    font-size: 23px;
+    letter-spacing: 1px;
+    font-variant: small-caps;
+}
+
+.sb-heading h2 {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 12px;
+    margin: 0;
+    color: #aaa;
+}
+
+/* Section headers */
+.sb-content h3 {
+    border-bottom: 1px solid #d29a38;
+    color: #d29a38;
+    font-size: 18px;
+    font-variant: small-caps;
+    font-weight: normal;
+    letter-spacing: 1px;
+    margin: 0.6em 0 0.3em;
+}
+
+/* Property lines (bold name + inline text) */
+.sb-property-line {
+    line-height: 1.4;
+    text-indent: -1em;
+    padding-left: 1em;
+}
+
+.sb-prop-name {
+    font-weight: bold;
+    color: #d29a38;
+}
+
+/* Property blocks (traits, actions with descriptions) */
+.sb-property-block {
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+}
+
+/* Stat icons row (matching character sheet layout) */
+.sb-stats-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin: 0.5em 0;
+}
+
+.sb-stat-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+}
+
+.sb-stat-icon-img {
+    font-size: 20px;
+    height: 45px;
+    width: 80px;
+    text-align: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: whitesmoke;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8), -1px -1px 3px rgba(0,0,0,0.8);
+}
+
+.sb-stat-icon-plain {
+    font-size: 20px;
+    height: 45px;
+    width: 80px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #d29a38;
+    font-weight: bold;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #1a1a1a;
+}
+
+.sb-stat-icon-label {
+    font-size: 11px;
+    text-align: center;
+    color: #888;
+    margin-top: 2px;
+}
+
+/* Attack grid */
+.sb-atk-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.7fr 0.6fr 0.6fr 0.5fr 0.5fr 1.2fr 0.5fr;
+    gap: 0;
+    margin: 0.6em 0 0.4em;
+    font-size: 13px;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* H3 sits in the first header cell */
+.sb-atk-h3 {
+    border-bottom: 1px solid #d29a38 !important;
+    color: #d29a38;
+    font-size: 14px;
+    font-variant: small-caps;
+    font-weight: normal;
+    letter-spacing: 1px;
+    margin: 0 !important;
+    padding: 5px 8px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+}
+
+.sb-atk-header {
+    background: #1a1a1a;
+    color: #d29a38;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 5px 8px;
+    border-bottom: 1px solid #d29a38;
+    text-align: center;
+    cursor: help;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sb-atk-name {
+    color: #e0e0e0;
+    font-weight: bold;
+    padding: 5px 8px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.sb-atk-cell {
+    color: #ccc;
+    padding: 5px 8px;
+    border-bottom: 1px solid #2a2a2a;
+    text-align: center;
+}
+
+.sb-atk-ce {
+    text-align: left;
+}
+
+/* Alternate row shading (every other 8-cell row after header) */
+.sb-atk-grid > :nth-child(n+9):nth-child(-n+16) { background: #2a2a2a; }
+.sb-atk-grid > :nth-child(n+25):nth-child(-n+32) { background: #2a2a2a; }
+
+/* Remove bottom border on last row */
+.sb-atk-grid > :nth-last-child(-n+8) { border-bottom: none; }
+
+/* Creature image */
+.sb-image-wrap {
+    text-align: center;
+    margin: 0.8em 0;
+}
+.sb-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Fable (italic lore text) */
+.sb-fable {
+    color: #bbb;
+    line-height: 1.7;
+    margin: 0.5em 0;
+}
+
+/* General text block */
+.sb-text {
+    margin-bottom: 0.5em;
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+    #fables.active {
+        flex-direction: column;
+    }
+    .bestiary-list-panel {
+        width: 100%;
+        min-width: 100%;
+        position: static;
+        height: auto;
+        max-height: 45vh;
+        border-right: none;
+        border-bottom: 1px solid #333;
+    }
+    .bestiary-stat-panel {
+        margin-left: 0;
+        padding: 10px;
+    }
+    .bestiary-detail-wrap {
+        max-width: 100%;
+    }
+    .bestiary-col-biome { display: none; }
+    .bestiary-col-size { flex: 0 0 55px; }
+    .sb-stat-icon { width: 65px; }
+    .sb-stat-icon-img, .sb-stat-icon-plain { width: 65px; height: 38px; font-size: 16px; }
+    .sb-atk-grid { font-size: 11px; grid-template-columns: 1.2fr 0.7fr 0.6fr 0.6fr 0.5fr 0.5fr 0.5fr; }
+    .sb-atk-header, .sb-atk-name, .sb-atk-cell { padding: 4px 5px; }
+    .sb-atk-ce { display: none; }
+}

@@ -276,6 +276,9 @@ function buildWayGroups() {
             opt.value = way.name;
             opt.textContent = way.name;
             opt.disabled = true;
+            opt.title = way.reqSkill === 'Any'
+                ? 'Requires any skill at Basic rank'
+                : `Requires ${way.reqSkill} at Basic rank`;
             unavailGroup.appendChild(opt);
         });
         sel.appendChild(unavailGroup);
@@ -450,7 +453,14 @@ function calculateAbilities() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;
     const tExtra = talentAmount;
     const trExtra = tricksAmount;
-    const remaining = level + 1 - Math.max(0, tExtra + trExtra);
+    const budget = level + 1;
+    const used = Math.max(0, tExtra + trExtra);
+    const remaining = budget - used;
+    const el = document.getElementById('abilityBudget');
+    if (el) {
+        el.textContent = `Abilities: ${used} / ${budget}`;
+        el.classList.toggle('over-budget', remaining < 0);
+    }
 }
 function calculateAttributeValues() {
     const level = parseInt(document.getElementById('charLvl').value) || 1;

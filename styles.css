@@ -101,47 +101,58 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 
 .internal-link a { border-bottom: 1px dotted whitesmoke; color: whitesmoke; text-decoration: none; }
 .no-results { text-align: center; color: #888; font-style: italic; padding: 20px; }
-/* Loading animation — rolling d10 */
+/* Loading animation — bouncing d10 */
 .loading-message {
-    text-align: center; color: #d29a38; padding: 60px 20px; font-size: 1.2em;
+    text-align: center; color: #d29a38; padding: 40px 20px 20px; font-size: 1.2em;
     overflow: hidden;
 }
 .loading-track {
-    width: 100%; max-width: 500px; margin: 0 auto 20px; height: 70px;
+    width: 100%; max-width: 500px; margin: 0 auto 20px; height: 120px;
     position: relative;
 }
 .d10 {
-    position: absolute; width: 44px; height: 44px; top: 10px;
-    animation: d10-roll 5s ease-in-out infinite;
+    position: absolute; width: 44px; height: 48px;
+    animation: d10-x 4s ease-out infinite, d10-y 4s ease-out infinite, d10-wobble 4s ease-out infinite;
+    filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.5));
 }
-.d10-face {
-    position: absolute; left: 50%; width: 0; height: 0;
+.d10-svg { width: 100%; height: 100%; }
+.d10-table {
+    position: absolute; bottom: 4px; left: 0; width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(155,115,45,0.5), transparent);
 }
-.d10-top {
-    top: 0;
-    transform: translateX(-50%);
-    border-left: 22px solid transparent;
-    border-right: 22px solid transparent;
-    border-bottom: 30px solid #d29a38;
+/* Horizontal: roll left to right, decelerate */
+@keyframes d10-x {
+    0%   { left: -55px; }
+    40%  { left: 55%; }
+    60%  { left: 65%; }
+    80%  { left: 68%; }
+    100% { left: 68%; }
 }
-.d10-bottom {
-    bottom: 0;
-    transform: translateX(-50%);
-    border-left: 22px solid transparent;
-    border-right: 22px solid transparent;
-    border-top: 30px solid #b8842e;
+/* Vertical: arc down, bounce, settle */
+@keyframes d10-y {
+    0%   { top: -20px; }
+    12%  { top: 68px; }
+    20%  { top: 38px; }
+    32%  { top: 68px; }
+    40%  { top: 54px; }
+    50%  { top: 68px; }
+    56%  { top: 63px; }
+    62%  { top: 68px; }
+    75%  { top: 68px; }
+    100% { top: 68px; opacity: 0; }
 }
-.d10-label {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -40%);
-    font-size: 14px; font-weight: bold; color: #1a1a1a;
-    font-family: "Times New Roman", serif;
-    z-index: 1; pointer-events: none;
-}
-@keyframes d10-roll {
-    0%   { left: 0%;   transform: rotate(0deg); }
-    50%  { left: calc(100% - 44px); transform: rotate(360deg); }
-    100% { left: 0%;   transform: rotate(720deg); }
+/* Spin: fast clockwise rotation while rolling, decelerates to rest */
+@keyframes d10-wobble {
+    0%   { transform: rotate(0deg); }
+    12%  { transform: rotate(540deg); }
+    20%  { transform: rotate(720deg); }
+    32%  { transform: rotate(900deg); }
+    40%  { transform: rotate(1000deg); }
+    50%  { transform: rotate(1060deg); }
+    56%  { transform: rotate(1075deg); }
+    62%  { transform: rotate(1080deg); }
+    100% { transform: rotate(1080deg); }
 }
 
 /* Search counter */
@@ -174,9 +185,14 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 
 @media (max-width: 768px) {
     .sidebar { width: 100%; position: static; max-height: none; overflow-y: visible; top: 0; }
-    .main-content { margin-left: 0; padding: 10px; }
+    .rulebook-content { margin-left: 0; padding: 10px; }
     .section { margin-left: 0; max-width: 100%; }
     .container { margin-top: 120px; }
+    .ability-group-container { grid-template-columns: 1fr; }
+    .gear-list-container { grid-template-columns: 1fr 1fr; }
+    .level-list-container { grid-template-columns: repeat(4, 1fr); }
+    .armor-list-container { grid-template-columns: 1fr 1fr 1fr; }
+    .nav-list a { font-size: 1em; padding: 8px 10px; }
 }
 
 /* Navbar */
@@ -230,6 +246,13 @@ h1 { text-align: center; color: #ffffff; margin-bottom: 30px; }
 
 .gear-list div:first-child,.level-list div:first-child{background-color: rgba(74,53,34,1);padding:0px 7px;color:whitesmoke;}
 .way-text{margin-right:15px;}
+
+/* Tooltip hover classes */
+.hoverRule, .hoverGear, .hoverAbility, .hoverProf, .hoverWay, .hoverCreature {
+    border-bottom: 1px dotted currentColor;
+    cursor: help;
+}
+.hoverCreature { color: #d29a38; }
 
 .way-image {
     width: 100%;

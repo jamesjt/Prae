@@ -16,6 +16,17 @@ function triggerInput(el) {
     }
 }
 
+// Inline feedback (replaces alerts)
+function showFeedback(msg, isError) {
+    const el = document.getElementById('saveLoadFeedback');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = isError ? 'save-feedback-err' : 'save-feedback-ok';
+    if (!isError) {
+        setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+    }
+}
+
 // Collect full state in dependency order
 function collectState() {
     const state = {
@@ -80,6 +91,16 @@ function generateSaveCode() {
     const state = collectState();
     const json = JSON.stringify(state);
     return btoa(json); // Base64 encode
+}
+
+// Update has-value classes after loading char info
+function updateHasValueClasses(state) {
+    ['charName', 'childhood', 'training'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('has-value', el.value.trim() !== '');
+    });
+    const roleSel = document.getElementById('roleSelector');
+    if (roleSel) roleSel.classList.toggle('has-value', roleSel.value !== 'wayEmpty');
 }
 
 // Load from code: base64 -> JSON, set in order
@@ -178,8 +199,10 @@ function loadFromCode(code) {
         // Final updates
         calculateDerivedStats();
         calculateLoad();
+        updateHasValueClasses(state);
+        showFeedback('Character loaded', false);
     } catch (err) {
-        alert('Invalid save code');
+        showFeedback('Invalid save code', true);
     }
 }
 
@@ -195,7 +218,7 @@ function getCookie(name) {
     return match ? decodeURIComponent(match[2]) : null;
 }
 
-// Render saved codes as clickable links with delete X
+// Render saved codes list
 function renderSavedCodes() {
     const container = document.getElementById('savedCodesList');
     if (!container) return;
@@ -205,20 +228,26 @@ function renderSavedCodes() {
     const saves = savesJson ? JSON.parse(savesJson) : [];
 
     if (saves.length === 0) {
-        container.innerHTML = '<p class="no-saves">No saved codes yet.</p>';
+        container.innerHTML = '<p class="no-saves">No saved characters.</p>';
         return;
     }
 
     saves.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'save-entry';
-        const link = document.createElement('a');
-        link.className = 'save-link';
-        link.href = '#';
-        const truncatedCode = item.code.length > 20 ? item.code.substring(0, 20) + '...' : item.code;
-        link.textContent = `${item.name}: [${truncatedCode}]`;
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'save-name';
+        nameSpan.textContent = item.name || 'Unnamed';
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'save-date';
+        dateSpan.textContent = item.date || '';
+
+        const loadLink = document.createElement('span');
+        loadLink.className = 'save-link';
+        loadLink.textContent = 'Load';
+        loadLink.addEventListener('click', () => {
             loadFromCode(item.code);
         });
 
@@ -227,9 +256,10 @@ function renderSavedCodes() {
         copySpan.textContent = 'Copy';
         copySpan.addEventListener('click', () => {
             navigator.clipboard.writeText(item.code).then(() => {
-                alert('Full code copied to clipboard!');
+                copySpan.textContent = 'Copied!';
+                setTimeout(() => { copySpan.textContent = 'Copy'; }, 1500);
             }).catch(() => {
-                alert('Copy failed; please try manually.');
+                showFeedback('Copy failed', true);
             });
         });
 
@@ -242,7 +272,9 @@ function renderSavedCodes() {
             renderSavedCodes();
         });
 
-        div.appendChild(link);
+        div.appendChild(nameSpan);
+        div.appendChild(dateSpan);
+        div.appendChild(loadLink);
         div.appendChild(copySpan);
         div.appendChild(deleteSpan);
         container.appendChild(div);
@@ -253,18 +285,26 @@ function renderSavedCodes() {
 function saveAndStoreCode() {
     const state = collectState();
     const code = generateSaveCode();
-    const name = state.char.name || 'Unnamed';
+    const customName = document.getElementById('saveNameInput')?.value.trim();
+    const name = customName || state.char.name || 'Unnamed';
+    const date = new Date().toLocaleDateString();
 
     const savesJson = getCookie('savedCodes');
     let saves = savesJson ? JSON.parse(savesJson) : [];
 
-    saves.push({ name, code });
+    saves.push({ name, code, date });
     if (saves.length > 10) saves.shift(); // Limit to last 10
 
     setCookie('savedCodes', JSON.stringify(saves));
     document.getElementById('saveCodeInput').value = code;
     renderSavedCodes();
-    alert('Save code generated, stored in cookie, and added to list.');
+
+    // Auto-copy to clipboard
+    navigator.clipboard.writeText(code).then(() => {
+        showFeedback('Saved & copied to clipboard', false);
+    }).catch(() => {
+        showFeedback('Saved (clipboard copy failed)', false);
+    });
 }
 
 // Init: Wire buttons after dataLoaded (to ensure all elements exist)

@@ -727,27 +727,73 @@ a.internalLink{
     border: 2px solid #555;
     border-radius: 6px;
 }
+/* Save/Load section */
+#saveLoadContainer { margin-top: 20px; text-align: center; }
+#saveLoadRow { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+#saveCodeInput { width: 240px; padding: 6px 10px; background: #222; color: #e0e0e0; border: 1px solid #444; border-radius: 4px; }
+#saveNameInput { width: 140px; padding: 6px 10px; background: #222; color: #e0e0e0; border: 1px solid #444; border-radius: 4px; }
+#saveCodeInput::placeholder, #saveNameInput::placeholder { color: #888; }
+#saveLoadContainer button { padding: 6px 14px; background: #333; color: #d29a38; border: 1px solid #555; border-radius: 4px; cursor: pointer; }
+#saveLoadContainer button:hover { background: #d29a38; color: #222; }
+#saveLoadFeedback { margin-top: 6px; min-height: 1.2em; font-size: 0.9em; }
+.save-feedback-ok { color: #d29a38; }
+.save-feedback-err { color: #e05555; }
+
 .save-entry {
-    margin: 5px 0;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 4px 0; padding: 4px 8px; border-radius: 4px;
 }
+.save-entry:hover { background: #1a1a1a; }
+.save-name { color: #d29a38; font-weight: bold; }
+.save-date { color: #888; font-size: 0.8em; }
+.save-link { cursor: pointer; color: #aaa; font-size: 0.85em; text-decoration: underline; }
+.save-link:hover { color: #fff; }
+.save-copy { cursor: pointer; color: #aaa; font-size: 0.85em; }
+.save-copy:hover { color: #d29a38; }
+.save-delete { cursor: pointer; color: #666; font-size: 0.85em; }
+.save-delete:hover { color: #e05555; }
+.no-saves { color: #888; font-style: italic; }
 
-.save-link {
-    margin-right: 10px;
-    color: #ddd;
-}
+/* Ability budget indicator */
+.ability-budget { color: #d29a38; font-size: 0.9em; text-align: center; padding: 4px 0; }
+.ability-budget.over-budget { color: #e05555; }
 
-.save-copy {
-    cursor: pointer;
-    color: #ddd;
-    margin-right: 10px;
-}
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    #character-creator { padding-left: 5px; padding-right: 5px; }
+    #charInfo { display: flex; flex-wrap: wrap; gap: 4px; }
+    .charText { width: auto; flex: 1; min-width: 80px; }
+    #charName { width: auto; flex: 2; min-width: 120px; }
+    #charLvl { width: 50px; flex: 0; }
+    #roleSelector { width: auto; flex: 1; min-width: 100px; }
 
-.save-delete {
-    cursor: pointer;
-    color: red;
-    margin-left: 5px;
-}
+    .columnWrapper { flex-direction: column; }
+    #column1, #column2, #column3 { margin: 0; width: 100%; }
 
-.no-saves {
-    color: #ddd;
+    #skillHeader, #attackSkillHeader { width: 100%; margin-left: 0; }
+    .skillListing { width: 100%; }
+    #strikeWrapper, #blastWrapper, #invokeWrapper { width: 100%; }
+    .profSelector { width: 100%; }
+    .profDesc { left: auto; width: 100%; position: static; }
+
+    .gearListContainer, .gearEntryHeader { width: 100%; }
+    .gearEntry { flex-wrap: wrap; }
+
+    .abilityWrapper { flex-direction: column; }
+    .talentWrapper, .trickWrapper { width: 100%; }
+
+    .ritualDetails, .ritualBody, .ritualTable { width: 100%; }
+    .charDetails { width: calc(100vw - 40px); left: 10px; }
+
+    .section:nth-of-type(odd) header,
+    .section:nth-of-type(odd) footer,
+    .section:nth-of-type(odd) article,
+    .section:nth-of-type(even) header,
+    .section:nth-of-type(even) footer,
+    .section:nth-of-type(even) article { width: 100%; }
+
+    #saveLoadContainer { padding: 0 10px; }
+    #saveLoadRow { flex-direction: column; align-items: center; }
+    #saveCodeInput, #saveNameInput { width: 100%; }
+    .save-entry { flex-wrap: wrap; justify-content: center; }
 }

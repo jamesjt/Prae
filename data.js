@@ -4,7 +4,8 @@ const CSV_URLS = {
     rulebook: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_NiAKsJIQu_X4cf5_knfMSMPMEMqlxkRgoTOlM23AGjycSOeeKX90HzOwFKMHp67gy_GBXeZynyWG/pub?gid=1022265880&single=true&output=csv',
     abilities: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=1439570479&single=true&output=csv',
     ways: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=53126780&single=true&output=csv',
-    rules: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv'
+    rules: 'https://docs.google.com/spreadsheets/d/1OIAs6EFgLFKG3QN_b4Vtm48BwSFb7VwDxOXWhkotXz8/pub?gid=715914535&single=true&output=csv',
+    bestiary: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmztpGbI426Uh7kgEATDWwcerzNet6tXwbLOGkRMs9DnHt5XqHF-Xp6ykrvZA2co7K-qPna36aIVIv/pub?output=csv'
 };
 // Globals (keep as-is for now; populated here)
 let allData = {}; // Main sections data
@@ -13,6 +14,8 @@ let waysData = [];
 let profData = { strike: [], blast: [], invoke: [] };
 let gearData = [];
 let hoverRulesData = [];
+let bestiaryData = [];
+let creatureByName = new Map();
 // Lookup indexes (built after parse for O(1) access)
 let abilityByName = new Map();  // lowercase name -> ability
 let gearByName = new Map();     // name -> gear item
@@ -231,14 +234,91 @@ function parseRules(rows) {
     // Return all parsed parts
     return { dataByCategory, hoverRules };
 }
+// Parser for bestiary CSV (Faen creatures)
+function parseBestiary(rows) {
+    const headers = rows[0].map(h => h.trim());
+    const creatures = [];
+
+    // Build header index map (first occurrence only for unique headers)
+    const hIdx = {};
+    headers.forEach((h, i) => {
+        if (!(h in hIdx)) hIdx[h] = i;
+    });
+
+    // Attack columns: headers are [Atk 1, atk1Name, Rng, Dice, Mod, Dmg, APR, Note] x3
+    // "Atk N" is a type marker, "atkNName" is the actual attack name
+    const atkGroups = [];
+    const atkFields = ['Rng', 'Dice', 'Mod', 'Dmg', 'APR', 'Note'];
+    for (let i = 0; i < headers.length; i++) {
+        if (/^atk\dName$/.test(headers[i])) {
+            // atkNName is the name column; "Atk N" type column is one before it
+            const group = { typeIdx: i - 1, nameIdx: i };
+            atkFields.forEach((f, fi) => {
+                group[f.toLowerCase()] = i + 1 + fi;
+            });
+            atkGroups.push(group);
+        }
+    }
+
+    // Hidden columns to skip
+    const hiddenHeaders = new Set(['Based on', 'Research Links', 'Notes', 'TB', 'MB', 'Rank', 'Atk 1', 'Atk 2', 'Atk 3']);
+
+    // Build set of all column indices belonging to attack groups
+    const atkColumnIndices = new Set();
+    atkGroups.forEach(g => {
+        atkColumnIndices.add(g.typeIdx); // "Atk N" type column
+        for (let j = g.nameIdx; j <= g.nameIdx + atkFields.length; j++) atkColumnIndices.add(j);
+    });
+
+    for (let r = 1; r < rows.length; r++) {
+        const row = rows[r];
+        const name = row[hIdx['Name']]?.trim();
+        if (!name) continue;
+
+        const creature = {};
+        // Map all simple columns (skip hidden + attack columns)
+        headers.forEach((h, i) => {
+            if (hiddenHeaders.has(h) || atkColumnIndices.has(i)) return;
+            if (row[i]?.trim()) creature[h] = row[i].trim();
+        });
+
+        // Parse attacks
+        creature._attacks = [];
+        atkGroups.forEach(g => {
+            const atkName = row[g.nameIdx]?.trim();
+            if (!atkName || /^Atk \d$/.test(atkName)) return;
+            creature._attacks.push({
+                type: row[g.typeIdx]?.trim() || '',
+                name: atkName,
+                rng: row[g.rng]?.trim() || '',
+                dice: row[g.dice]?.trim() || '',
+                mod: row[g.mod]?.trim() || '',
+                dmg: row[g.dmg]?.trim() || '',
+                apr: row[g.apr]?.trim() || '',
+                note: row[g.note]?.trim() || ''
+            });
+        });
+
+        // Parse biome as array
+        creature._biomes = creature.Biome ? creature.Biome.split(',').map(b => b.trim()).filter(Boolean) : [];
+
+        // Resolve image path
+        creature._imgPath = creature.Img ? `images/faenArt/${creature.Img}` : '';
+
+        creatures.push(creature);
+    }
+    return creatures;
+}
+
 // Main load function (loads all in parallel)
 async function loadAllData() {
     try {
-        const [rulebookRows, abilitiesRows, waysRows, rulesRows] = await Promise.all([
+        const [rulebookRows, abilitiesRows, waysRows, rulesRows, bestiaryRows] = await Promise.all([
             fetchAndParseCsv(CSV_URLS.rulebook),
             fetchAndParseCsv(CSV_URLS.abilities),
             fetchAndParseCsv(CSV_URLS.ways),
-            fetchAndParseCsv(CSV_URLS.rules)
+            fetchAndParseCsv(CSV_URLS.rules),
+            fetchAndParseCsv(CSV_URLS.bestiary).catch(() => null)
         ]);
         // Parse each
         allData = parseRulebook(rulebookRows);
@@ -271,6 +351,14 @@ async function loadAllData() {
         ruleByName = new Map();
         for (const r of hoverRulesData) {
             ruleByName.set(r.rule, r);
+        }
+        // Bestiary
+        if (bestiaryRows) {
+            bestiaryData = parseBestiary(bestiaryRows);
+            creatureByName = new Map();
+            for (const c of bestiaryData) {
+                creatureByName.set(c.Name, c);
+            }
         }
         // Dispatch event—everything is ready
         window.dispatchEvent(new CustomEvent('dataLoaded'));

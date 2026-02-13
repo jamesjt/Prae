@@ -125,57 +125,29 @@ function showCreatureDetail(name) {
     // Tapered rule
     html += TAPERED_RULE;
 
-    // Stat icons row (matching character sheet layout)
-    // Map stat names to icon files
-    const statIconMap = {
-        'Max HP': 'vit.png',
-        'Marred': 'marred.png',
-        'Desperate': 'desperate.png',
-        'Guard': 'guard-white.png',
-        'Armor': 'armor2.png',
-        'Pace': 'pace6.png',
-        'Initiative': 'initiative.png',
-        'Breath': 'breath2.png',
-        'Mana': 'mana.png',
-        'Inspirit': 'inspirit2.png'
-    };
+    // Stats row — HP thresholds + combat stats in one line
+    const hpEntries = [
+        ['Max HP', creature['Max HP'], 'sb-hp-healthy'],
+        ['Marred', creature['Marred'], 'sb-hp-marred'],
+        ['Desperate', creature['Desperate'], 'sb-hp-desperate']
+    ].filter(([, v]) => v);
 
-    // All stats to show in the icon row (in display order)
-    const iconStats = ['Max HP', 'Marred', 'Desperate', 'Guard', 'Armor', 'Pace', 'Initiative', 'Breath', 'Mana', 'Inspirit'];
-    // Stats without icons, shown as plain text
-    const plainStats = ['Brace', 'Punish'];
+    const combatStats = [
+        ['Guard', creature.Guard],
+        ['Armor', creature.Armor],
+        ['Pace', creature.Pace],
+        ['Brace', creature.Brace],
+        ['Breath', creature.Breath],
+        ['Punish', creature.Punish]
+    ].filter(([, v]) => v);
 
-    const hasIconStats = iconStats.some(f => creature[f]);
-    const hasPlainStats = plainStats.some(f => creature[f]);
-
-    if (hasIconStats) {
-        html += '<div class="sb-stats-row">';
-        iconStats.forEach(f => {
-            if (!creature[f]) return;
-            const icon = statIconMap[f];
-            html += `<div class="sb-stat-icon">` +
-                `<div class="sb-stat-icon-img" style="background-image:url('images/${icon}');">${creature[f]}</div>` +
-                `<div class="sb-stat-icon-label">${f}</div>` +
-                `</div>`;
+    if (hpEntries.length || combatStats.length) {
+        html += '<div class="sb-stats-line">';
+        hpEntries.forEach(([label, val, cls]) => {
+            html += `<div class="sb-stat-cell ${cls}"><div class="sb-stat-val">${val}</div><div class="sb-stat-lbl">${label}</div></div>`;
         });
-        // Append plain stats (no icons) in same row
-        plainStats.forEach(f => {
-            if (!creature[f]) return;
-            html += `<div class="sb-stat-icon">` +
-                `<div class="sb-stat-icon-plain">${creature[f]}</div>` +
-                `<div class="sb-stat-icon-label">${f}</div>` +
-                `</div>`;
-        });
-        html += '</div>';
-        html += TAPERED_RULE;
-    } else if (hasPlainStats) {
-        html += '<div class="sb-stats-row">';
-        plainStats.forEach(f => {
-            if (!creature[f]) return;
-            html += `<div class="sb-stat-icon">` +
-                `<div class="sb-stat-icon-plain">${creature[f]}</div>` +
-                `<div class="sb-stat-icon-label">${f}</div>` +
-                `</div>`;
+        combatStats.forEach(([label, val]) => {
+            html += `<div class="sb-stat-cell"><div class="sb-stat-val">${val}</div><div class="sb-stat-lbl">${label}</div></div>`;
         });
         html += '</div>';
         html += TAPERED_RULE;

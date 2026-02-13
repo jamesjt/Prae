@@ -303,7 +303,9 @@ function parseBestiary(rows) {
         creature._biomes = creature.Biome ? creature.Biome.split(',').map(b => b.trim()).filter(Boolean) : [];
 
         // Resolve image path
-        creature._imgPath = creature.Img ? `images/faenArt/${creature.Img}` : '';
+        // Resolve image path; append .png if no extension present
+        const img = creature.Img;
+        creature._imgPath = img ? `images/faenArt/${img.includes('.') ? img : img + '.png'}` : '';
 
         creatures.push(creature);
     }
